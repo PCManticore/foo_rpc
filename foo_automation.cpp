@@ -48,10 +48,7 @@ public:
 
 
 		OverlappedObject* overlapped = connect_pipe(handle);
-		HANDLE events[1];
-		events[0] = overlapped->event;
-
-		int res = WaitForMultipleObjects(1, events, FALSE, INFINITE);
+		int res = wait_overlapped_event(overlapped);
 		// TODO handle exceptional case
 
 		DWORD transferred = 0;
@@ -103,11 +100,25 @@ private:
 public:	
 
 	DWORD create_named_pipe() {
-		char buffer[1024];
+		TCHAR buffer[BUFSIZE];
+		DWORD res;
+		wstring stringbuffer;
 		// TODO: get this from a config file
 		PipeListener listener("\\\\.\\pipe\\foobar2000");
 		while (true) {
+			logToFoobarConsole("acception new client %d", 2222);
 			OverlappedObject * overlapped = listener.accept();
+			logToFoobarConsole("client accepted");
+
+			logToFoobarConsole("try to recv bytes from him");
+			res = recv_bytes(overlapped->handle, buffer);
+			logToFoobarConsole("finished recving bytes from him");
+			logToFoobarConsole(to_string(res));
+			
+			//wstring bob(buffer);
+			//string bill(bob.begin(), bob.end());
+			//logToFoobarConsole(bill);
+
 		}
 
 		/*

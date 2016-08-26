@@ -21,5 +21,8 @@ typedef struct {
 
 
 DWORD create_pipe(std::string pipeAddress, bool first, HANDLE* pipeOut);
-OverlappedObject *new_overlapped(HANDLE handle);
+OverlappedObject* new_overlapped(HANDLE handle);
 OverlappedObject* connect_pipe(HANDLE handle);
+DWORD wait_overlapped_event(OverlappedObject* overlapped);
+DWORD recv_bytes(HANDLE handle, TCHAR * readBuffer);
+
