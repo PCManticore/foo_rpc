@@ -1,28 +1,31 @@
 #pragma once
+#include <tuple>
 #include <string>
-#include <Windows.h>
+#include <windows.h>
+
+using namespace std;
 
 #define CONNECTING_STATE 0 
 #define READING_STATE 1 
 #define WRITING_STATE 2
 #define BUFSIZE 4096
-#define CREATE_NAMED_PIPE_SUCCESS 1
+#define SUCCESS 1
+#define FAILED 0
 
 typedef struct {
 
 	HANDLE handle;
-	DWORD pending;
-	DWORD completed;
 	HANDLE event;
 	OVERLAPPED overlapped;
-	TCHAR readBuffer[BUFSIZE];
-	TCHAR writeBuffer[BUFSIZE];
+	DWORD pending;
+	DWORD completed;
 } OverlappedObject, *LPOverlappedObject;
 
 
-DWORD create_pipe(std::string pipeAddress, bool first, HANDLE* pipeOut);
 OverlappedObject* new_overlapped(HANDLE handle);
 OverlappedObject* connect_pipe(HANDLE handle);
 DWORD wait_overlapped_event(OverlappedObject* overlapped);
-DWORD recv_bytes(HANDLE handle, TCHAR * readBuffer);
+DWORD recv_bytes(HANDLE handle, char * readBuffer);
+DWORD create_pipe(std::string pipeAddress, HANDLE* pipeOut, bool isFirst);
+tuple<DWORD, DWORD, DWORD> get_overlapped_event(OverlappedObject * overlapped);
 

@@ -40,6 +40,7 @@ public:
 
 		HANDLE handle;
 		DWORD connectResult;
+		DWORD lastError;
 		BOOL success;
 
 		createNamedPipe(false);
@@ -51,25 +52,10 @@ public:
 		int res = wait_overlapped_event(overlapped);
 		// TODO handle exceptional case
 
-		DWORD transferred = 0;
-		int res2 = GetOverlappedResult(overlapped->handle, &overlapped->overlapped,
-			&transferred, true);
-		int err = res2 ? ERROR_SUCCESS : GetLastError();
-		switch (err) {
-		case ERROR_SUCCESS:
-		case ERROR_MORE_DATA:
-		case ERROR_OPERATION_ABORTED:
-			logToFoobarConsole("success");
-			overlapped->completed = 1;
-			overlapped->pending = 0;
-			break;
-		case ERROR_IO_INCOMPLETE:
-			logToFoobarConsole("incomplete");
-			break;
-		default:
-			overlapped->pending = 0;
-			logToFoobarConsole("WTF?");
-			return 0;
+		tie(success, ignore, lastError) = get_overlapped_event(overlapped);
+		if (!success) {
+			logToFoobarConsole("Getting overlapped event failed with %d.", lastError);
+			return NULL;
 		}
 		return overlapped;
 	}
@@ -82,10 +68,10 @@ private:
 
 	Returns 0 when the pipe couldn't be created, 1 otherwise.
 	*/
-	DWORD createNamedPipe(bool first) {
+	DWORD createNamedPipe(bool isFirst) {
 		HANDLE pipe;
-		DWORD result = create_pipe(pipeAddress, first, &pipe);
-		if (result == CREATE_NAMED_PIPE_SUCCESS) {
+		DWORD result = create_pipe(pipeAddress, &pipe, isFirst);
+		if (result == SUCCESS) {
 			handles.push_back(pipe);
 		}
 		return result;
@@ -100,9 +86,9 @@ private:
 public:	
 
 	DWORD create_named_pipe() {
-		TCHAR buffer[BUFSIZE];
+		char buffer[1000] = "";
 		DWORD res;
-		wstring stringbuffer;
+		char stringbuffer;
 		// TODO: get this from a config file
 		PipeListener listener("\\\\.\\pipe\\foobar2000");
 		while (true) {
@@ -113,7 +99,7 @@ public:
 			logToFoobarConsole("try to recv bytes from him");
 			res = recv_bytes(overlapped->handle, buffer);
 			logToFoobarConsole("finished recving bytes from him");
-			logToFoobarConsole(to_string(res));
+			logToFoobarConsole(string(buffer));
 			
 			//wstring bob(buffer);
 			//string bill(bob.begin(), bob.end());

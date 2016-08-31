@@ -1,28 +1,31 @@
 #pragma once
 #include <assert.h>
 #include <string>
+#include <tuple>
+
 #include "_winapi.h"
 #include "logging.h"
+
+using namespace std;
 
 OverlappedObject *new_overlapped(HANDLE handle)
 {
 	OverlappedObject *self = new OverlappedObject();
 	self->handle = handle;
-	self->pending;
-	self->completed;
-	memset(&self->overlapped, 0, sizeof(OVERLAPPED));
-	memset(&self->writeBuffer, 0, BUFSIZE);
+	self->pending = 0;
+	self->completed = 0;
+	memset(&self->overlapped, 0, sizeof(OVERLAPPED));	
 	/* Manual reset, initially non-signalled */
 	self->overlapped.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 	return self;
 }
 
 DWORD create_pipe(std::string pipeAddress,
-	              bool first,
-	              HANDLE* pipeOut) {
+	              HANDLE* pipeOut,
+	              bool isFirst) {
 
 	DWORD flags = PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED;
-	if (first) {
+	if (isFirst) {
 		flags |= FILE_FLAG_FIRST_PIPE_INSTANCE;
 	}
 
@@ -35,12 +38,15 @@ DWORD create_pipe(std::string pipeAddress,
 		1024 * 16,
 		NMPWAIT_WAIT_FOREVER,
 		NULL);
+
 	if (pipeOut == INVALID_HANDLE_VALUE) {
-		// TODO: pass GetLastError
-		logToFoobarConsole("Failed creating named pipe.");
-		return GetLastError();
+		logToFoobarConsole(
+			"Failed creating named pipe. "
+			"The operation failed with error %d.",
+			GetLastError());
+		return FAILED;
 	}
-	return CREATE_NAMED_PIPE_SUCCESS;
+	return SUCCESS;
 }
 
 OverlappedObject* connect_pipe(HANDLE handle) {
@@ -52,108 +58,133 @@ OverlappedObject* connect_pipe(HANDLE handle) {
 		overlapped ? &overlapped->overlapped : NULL);
 
 	if (!overlapped) {
-		logToFoobarConsole("Cannot create an overlapped object.");
-		return 0;
+		logToFoobarConsole(
+			"Cannot create an overlapped object. "
+		    "The operation failed with error %d.",
+			GetLastError());
+		return FAILED;
 	}
 
 	int err = GetLastError();
 	/* Overlapped ConnectNamedPipe never returns a success code */
 	assert(success == 0);
 	if (err == ERROR_IO_PENDING) {
-		logToFoobarConsole("Operation pending.");
+		// TODO HOW TO HANDLE THIS?
 		overlapped->pending = 1;
 	}
 	else if (err == ERROR_PIPE_CONNECTED) {
-		logToFoobarConsole("Pipe connected.");
 		SetEvent(overlapped->overlapped.hEvent);
 	}
 	else {
-		logToFoobarConsole("Could not connect to the named pipe.");
+		logToFoobarConsole("Could not connect to the named pipe. "
+		                   "The operation failed with error %d.", err);
 		// TODO: log this with stderr
-		return 0;
+		return FAILED;
 	}
 	return overlapped;
 }
 
 DWORD wait_overlapped_event(OverlappedObject* overlapped) {
-	HANDLE events[1];
-	events[0] = overlapped->event;
+	HANDLE events[1] = { overlapped->event };
 	return WaitForMultipleObjects(1, events, FALSE, INFINITE);
 }
 
+tuple<DWORD, DWORD, DWORD> get_overlapped_event(OverlappedObject * overlapped) {
+	DWORD result;
+	DWORD error;
+	DWORD transferred = 0;
+	
+	result = GetOverlappedResult(
+		overlapped->handle,
+		&overlapped->overlapped,
+		&transferred,
+		true);
+
+	error = result ? ERROR_SUCCESS : GetLastError();	
+
+	switch (error) {
+	    case ERROR_SUCCESS:
+	    case ERROR_MORE_DATA:
+	    case ERROR_OPERATION_ABORTED:
+		    overlapped->completed = 1;
+		    overlapped->pending = 0;
+		    break;
+	    case ERROR_IO_INCOMPLETE:
+		    break;
+	    default:
+		    overlapped->pending = 0;
+		    return make_tuple(FAILED, result, error);
+	}
+	return make_tuple(SUCCESS, result, error);
+}
 
 
 DWORD read_from_pipe(HANDLE handle, int size,
-	                 TCHAR * readBuffer,
-	                 OverlappedObject * overlapped) {
+	                 OverlappedObject * overlapped,
+	                 char * readBuffer) {
 
 	DWORD nread;
 	DWORD err;
+	BOOL ret;
 
-	BOOL ret;	
-	
+	// TODO: don't return the same value (0 or ret, it might be confusing)
 	overlapped = new_overlapped(handle);
 	if (!overlapped) {
 		logToFoobarConsole("Cannot read from pipe.");
-		return 0;
+		return FAILED;
 	}
-
+	
 	ret = ReadFile(
 		handle, readBuffer, size, &nread,
 		overlapped ? &overlapped->overlapped : NULL);
 
 	err = ret ? 0 : GetLastError();
-
-	if (overlapped) {
-		if (!ret) {
-			if (err == ERROR_IO_PENDING)
-				overlapped->pending = 1;
-			else if (err != ERROR_MORE_DATA) {
-				// TODO log err
-				logToFoobarConsole(std::to_string(err));
-				logToFoobarConsole("Cannot read, unknown error.");
-				return 0;
-			}
+	if (!ret) {
+		if (err == ERROR_IO_PENDING)
+			// TODO: what to do with this pending field?
+			overlapped->pending = 1;
+		else if (err != ERROR_MORE_DATA) {
+			logToFoobarConsole("Cannot read from pipe. "
+				                "The operation failed with error %d.", err);
+			return FAILED;
 		}
 	}
-	return err;
+	return SUCCESS;
 }
 
 
-DWORD recv_bytes(HANDLE handle, TCHAR * readBuffer) {
+DWORD recv_bytes(HANDLE handle, char * readBuffer) {
 	DWORD res;
 	DWORD waitres;
-	DWORD overlappedres;
+	DWORD overlappedResult;
 	DWORD transferred;
+	BOOL success;
+	DWORD lastError;
+
 	int size = 256;	
 	OverlappedObject * overlapped = new_overlapped(handle);
 
-	logToFoobarConsole("READIN from pipe");
-	res = read_from_pipe(handle, size, readBuffer, overlapped);
-	logToFoobarConsole("FINISHED reading");
+	res = read_from_pipe(handle, size, overlapped, readBuffer);
 
 	if (res == ERROR_IO_PENDING) {
 		waitres = wait_overlapped_event(overlapped);
 		assert(waitres == WAIT_OBJECT_0);
 	}
 
-	logToFoobarConsole("getting overlapped");
-	overlappedres = GetOverlappedResult(
-		overlapped->handle,
-		&overlapped->overlapped,
-		&transferred,
-		true);
-	switch (overlappedres) {
+	tie(success, overlappedResult, lastError) = get_overlapped_event(overlapped);
+	// todo handle success as well
+	switch (lastError) {
 	    case 0:
-			logToFoobarConsole("AICISA");
+			// todo WHAT IS THIS
 			logToFoobarConsole(std::to_string(GetLastError()));
 		    return 0;
 		case ERROR_MORE_DATA:
-			logToFoobarConsole("more data to implement");
+			// TODO: implement this
 			break;
 		default:
-			logToFoobarConsole(std::to_string(transferred));
-			return overlappedres;
+			// TODO what is this?
+			logToFoobarConsole("getting last error %d", GetLastError());
+			return overlappedResult;
 	}
 	return res;
 
