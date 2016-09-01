@@ -5,6 +5,7 @@
 
 #include "_winapi.h"
 #include "logging.h"
+#include "either.h"
 
 using namespace std;
 
@@ -44,9 +45,9 @@ DWORD create_pipe(std::string pipeAddress,
 			"Failed creating named pipe. "
 			"The operation failed with error %d.",
 			GetLastError());
-		return FAILED;
+		return OPERATION_FAILED;
 	}
-	return SUCCESS;
+	return OPERATION_SUCCESS;
 }
 
 OverlappedObject* connect_pipe(HANDLE handle) {
@@ -62,7 +63,7 @@ OverlappedObject* connect_pipe(HANDLE handle) {
 			"Cannot create an overlapped object. "
 		    "The operation failed with error %d.",
 			GetLastError());
-		return FAILED;
+		return OPERATION_FAILED;
 	}
 
 	int err = GetLastError();
@@ -79,7 +80,7 @@ OverlappedObject* connect_pipe(HANDLE handle) {
 		logToFoobarConsole("Could not connect to the named pipe. "
 		                   "The operation failed with error %d.", err);
 		// TODO: log this with stderr
-		return FAILED;
+		return OPERATION_FAILED;
 	}
 	return overlapped;
 }
@@ -89,7 +90,8 @@ DWORD wait_overlapped_event(OverlappedObject* overlapped) {
 	return WaitForMultipleObjects(1, events, FALSE, INFINITE);
 }
 
-tuple<DWORD, DWORD, DWORD> get_overlapped_event(OverlappedObject * overlapped) {
+//tuple<DWORD, DWORD, DWORD> get_overlapped_event(OverlappedObject * overlapped) {
+Maybe<tuple<DWORD, DWORD>> get_overlapped_event(OverlappedObject * overlapped) {
 	DWORD result;
 	DWORD error;
 	DWORD transferred = 0;
@@ -113,9 +115,12 @@ tuple<DWORD, DWORD, DWORD> get_overlapped_event(OverlappedObject * overlapped) {
 		    break;
 	    default:
 		    overlapped->pending = 0;
-		    return make_tuple(FAILED, result, error);
+		    //return make_tuple(OPERATION_FAILED, result, error);
+			return Maybe<tuple<DWORD, DWORD>>::withError(error);
 	}
-	return make_tuple(SUCCESS, result, error);
+	// TODO error can be ommitted
+	return Maybe<tuple<DWORD, DWORD>>(make_tuple(result, error));
+	//return make_tuple(OPERATION_SUCCESS, result, error);
 }
 
 
@@ -131,7 +136,7 @@ DWORD read_from_pipe(HANDLE handle, int size,
 	overlapped = new_overlapped(handle);
 	if (!overlapped) {
 		logToFoobarConsole("Cannot read from pipe.");
-		return FAILED;
+		return OPERATION_FAILED;
 	}
 	
 	ret = ReadFile(
@@ -146,22 +151,53 @@ DWORD read_from_pipe(HANDLE handle, int size,
 		else if (err != ERROR_MORE_DATA) {
 			logToFoobarConsole("Cannot read from pipe. "
 				                "The operation failed with error %d.", err);
-			return FAILED;
+			return OPERATION_FAILED;
 		}
 	}
-	return SUCCESS;
+	return OPERATION_SUCCESS;
+}
+
+Maybe<tuple<DWORD, DWORD>> peek_named_pipe(HANDLE handle, char * buf, int size) {
+	DWORD nread, navail, nleft;
+	BOOL ret;
+
+	if (size) {
+		ret = PeekNamedPipe(handle, buf, size, &nread, &navail, &nleft);
+	}
+	else {
+		ret = PeekNamedPipe(handle, NULL, 0, NULL, &navail, &nleft);
+	}
+
+	if (!ret) {
+		//return make_tuple(OPERATION_FAILED, navail, nleft);
+		return Maybe<tuple<DWORD, DWORD>>::withError(OPERATION_FAILED);
+	}
+	return Maybe<tuple<DWORD, DWORD>>(make_tuple(navail, nleft));
+	//return make_tuple(OPERATION_SUCCESS, navail, nleft);
+
 }
 
 
-DWORD recv_bytes(HANDLE handle, char * readBuffer) {
+DWORD get_more_data(HANDLE handle, char * buffer, int maxsize) {
+	DWORD navail, nleft;
+	Maybe<tuple<DWORD, DWORD>> result = peek_named_pipe(handle, buffer, maxsize);
+	if (result.isFailed()) {
+		return result.error();
+	}
+	tie(navail, nleft) = result.result();
+	
+	assert(nleft > 0);
+	return recv_bytes(handle, buffer, navail);
+}
+
+
+DWORD recv_bytes(HANDLE handle, char * readBuffer, int size) {
 	DWORD res;
 	DWORD waitres;
 	DWORD overlappedResult;
-	DWORD transferred;
 	BOOL success;
 	DWORD lastError;
 
-	int size = 256;	
 	OverlappedObject * overlapped = new_overlapped(handle);
 
 	res = read_from_pipe(handle, size, overlapped, readBuffer);
@@ -171,21 +207,35 @@ DWORD recv_bytes(HANDLE handle, char * readBuffer) {
 		assert(waitres == WAIT_OBJECT_0);
 	}
 
-	tie(success, overlappedResult, lastError) = get_overlapped_event(overlapped);
-	// todo handle success as well
+	//tie(success, overlappedResult, lastError) = get_overlapped_event(overlapped);	
+	Maybe<tuple<DWORD, DWORD>> result = get_overlapped_event(overlapped);
+	if (result.isFailed()) {
+		logToFoobarConsole("Getting overlapped event failed with %d.", result.error());
+		return OPERATION_FAILED;
+	}
+	tie(overlappedResult, lastError) = result.result();
+
 	switch (lastError) {
-	    case 0:
-			// todo WHAT IS THIS
-			logToFoobarConsole(std::to_string(GetLastError()));
-		    return 0;
 		case ERROR_MORE_DATA:
 			// TODO: implement this
 			break;
+		case ERROR_SUCCESS:
+			// Operation succeeded.
+			return OPERATION_SUCCESS;
 		default:
-			// TODO what is this?
-			logToFoobarConsole("getting last error %d", GetLastError());
-			return overlappedResult;
+			return OPERATION_FAILED;
 	}
-	return res;
-
+	// TODO: remove after implementing data?
+	return OPERATION_FAILED;
 }
+
+
+/*
+
+TODO:
+
+1. pasez bufferii dintr-o parte in alta sau ii pun in Overlapped
+2. folosesc char * sau altceva
+3. cum intorc erorile, nu pare consistent modul in care o fac (tuple vs error codes cu output params)
+4. cum implementez more data
+*/

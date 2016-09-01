@@ -39,7 +39,6 @@ public:
 	OverlappedObject * accept() {
 
 		HANDLE handle;
-		DWORD connectResult;
 		DWORD lastError;
 		BOOL success;
 
@@ -52,11 +51,17 @@ public:
 		int res = wait_overlapped_event(overlapped);
 		// TODO handle exceptional case
 
-		tie(success, ignore, lastError) = get_overlapped_event(overlapped);
-		if (!success) {
-			logToFoobarConsole("Getting overlapped event failed with %d.", lastError);
+		Maybe<tuple<DWORD, DWORD>> result = get_overlapped_event(overlapped);
+		if (result.isFailed()) {
+			logToFoobarConsole("Getting overlapped event failed with %d.", result.error());
 			return NULL;
 		}
+		
+		//tie(success, ignore, lastError) = get_overlapped_event(overlapped);
+		//if (!success) {
+		//	logToFoobarConsole("Getting overlapped event failed with %d.", lastError);
+		//	return NULL;
+		//}
 		return overlapped;
 	}
 
@@ -71,7 +76,7 @@ private:
 	DWORD createNamedPipe(bool isFirst) {
 		HANDLE pipe;
 		DWORD result = create_pipe(pipeAddress, &pipe, isFirst);
-		if (result == SUCCESS) {
+		if (result == OPERATION_SUCCESS) {
 			handles.push_back(pipe);
 		}
 		return result;
@@ -86,9 +91,8 @@ private:
 public:	
 
 	DWORD create_named_pipe() {
-		char buffer[1000] = "";
+
 		DWORD res;
-		char stringbuffer;
 		// TODO: get this from a config file
 		PipeListener listener("\\\\.\\pipe\\foobar2000");
 		while (true) {
@@ -96,8 +100,9 @@ public:
 			OverlappedObject * overlapped = listener.accept();
 			logToFoobarConsole("client accepted");
 
+			char buffer[1000] = "";
 			logToFoobarConsole("try to recv bytes from him");
-			res = recv_bytes(overlapped->handle, buffer);
+			res = recv_bytes(overlapped->handle, buffer, 256);
 			logToFoobarConsole("finished recving bytes from him");
 			logToFoobarConsole(string(buffer));
 			
