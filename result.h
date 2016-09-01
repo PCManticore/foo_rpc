@@ -3,20 +3,22 @@
 #define SENTINEL_ERROR -9999
 
 template<class T>
-class Maybe {
+class Result {
 private:
 	T obj;
 	DWORD errorCode = SENTINEL_ERROR;
 
-	Maybe(DWORD t) : errorCode(t) {}
+	Result() {}
 
 public:
 
-	static Maybe<T> withError(DWORD code) {
-		return Maybe<T>(code);
+	static Result<T> withError(DWORD code) {
+		Result<T> instance = Result();
+		instance.errorCode = code;
+		return instance;
 	};
 
-	Maybe(T t) : obj(t) {}
+	Result(T t) : obj(t) {}
 
 	DWORD isFailed() {
 		return this->errorCode != SENTINEL_ERROR;		

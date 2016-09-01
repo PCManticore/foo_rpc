@@ -47,21 +47,22 @@ public:
 		handles.pop_front();
 
 
-		OverlappedObject* overlapped = connect_pipe(handle);
-		int res = wait_overlapped_event(overlapped);
-		// TODO handle exceptional case
-
-		Maybe<tuple<DWORD, DWORD>> result = get_overlapped_event(overlapped);
+		Result<OverlappedObject*> result = connect_pipe(handle);
 		if (result.isFailed()) {
-			logToFoobarConsole("Getting overlapped event failed with %d.", result.error());
+			logToFoobarConsole("Could not connect to pipe %d", result.error());
 			return NULL;
 		}
+		OverlappedObject* overlapped = result.result();
+
+		// TODO handle exceptional case
+		int res = wait_overlapped_event(overlapped);
 		
-		//tie(success, ignore, lastError) = get_overlapped_event(overlapped);
-		//if (!success) {
-		//	logToFoobarConsole("Getting overlapped event failed with %d.", lastError);
-		//	return NULL;
-		//}
+		Result<DWORD> overlappedResult = get_overlapped_event(overlapped);
+		if (overlappedResult.isFailed()) {
+			logToFoobarConsole("Getting overlapped event failed with %d.", overlappedResult.error());
+			return NULL;
+		}
+
 		return overlapped;
 	}
 
