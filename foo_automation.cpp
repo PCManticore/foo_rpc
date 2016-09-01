@@ -1,6 +1,9 @@
 #include <string>
 #include <deque>
+#include <future>
 
+#include "asyncobj.h"
+#include "event.h"
 #include "logging.h"
 #include "_winapi.h"
 #include "stdafx.h"
@@ -87,8 +90,7 @@ private:
 
 class test : public initquit {
 private:
-	DWORD ThreadID;
-	HANDLE Event = CreateEvent(NULL, FALSE, FALSE, NULL);
+	DWORD ThreadID;	
 public:	
 
 	DWORD create_named_pipe() {
@@ -103,27 +105,45 @@ public:
 
 			char buffer[1000] = "";
 			logToFoobarConsole("try to recv bytes from him");
-			res = recv_bytes(overlapped->handle, buffer, 256);
+			Result<DWORD> result = recv_bytes(overlapped->handle, buffer, 256);
+			if (result.isFailed()) {
+				logToFoobarConsole("Failed receiving data from pipe %d", result.error());
+				return result.error();
+			}
+
 			logToFoobarConsole("finished recving bytes from him");
 			logToFoobarConsole(string(buffer));
-			
-			//wstring bob(buffer);
-			//string bill(bob.begin(), bob.end());
-			//logToFoobarConsole(bill);
 
+			// TO REMOVE
+			/*static_api_ptr_t<playlist_manager> pm;
+			static_api_ptr_t<playback_control> pc;			
+			metadb_handle_ptr ptr;
+			DWORD length = 0;
+			if (pc->get_now_playing(ptr))
+			{
+				length = ptr->get_length();
+			}
+			string songLength = to_string(length);
+			
+			future fut;
+			static_api_ptr_t<main_thread_callback_manager>()->add_callback(
+				new service_impl_t<console_debug_callback>(fut)
+			);
+			
+			*/
+			Event event;
+			static_api_ptr_t<main_thread_callback_manager>()->add_callback(
+				new service_impl_t<current_playlist_callback>(event)
+			);
+			event.wait();
+
+			logToFoobarConsole("is ready %s", event.isReady());
+			send_bytes(overlapped->handle, "claudiu", 7);
+			
 		}
 
 		/*
-			logToFoobarConsole("Start reading from the pipe.");
-			while (ReadFile(pipe, buffer, sizeof(buffer) - 1, &dwRead, NULL) != FALSE)
-			{
-				
-				buffer[dwRead] = '\0';
-
-				
-				logToFoobarConsole(string(buffer));
-			}
-		
+		TODO
 		DisconnectNamedPipe(pipe);
 		*/
 		return 0;

@@ -118,20 +118,67 @@ Result<DWORD> get_overlapped_event(OverlappedObject * overlapped) {
 	return Result<DWORD>(error);
 }
 
+Result<tuple<DWORD, DWORD>> peek_named_pipe(HANDLE handle, char * buf, int size) {
+	DWORD nread, navail, nleft;
+	BOOL ret;
 
-Result<DWORD> read_from_pipe(HANDLE handle, int size,
-	                         OverlappedObject * overlapped,
-	                         char * readBuffer) {
+	if (size) {
+		ret = PeekNamedPipe(handle, buf, size, &nread, &navail, &nleft);
+	}
+	else {
+		ret = PeekNamedPipe(handle, NULL, 0, NULL, &navail, &nleft);
+	}
+
+	if (!ret) {
+		return Result<tuple<DWORD, DWORD>>::withError(GetLastError());
+	}
+	return Result<tuple<DWORD, DWORD>>(make_tuple(navail, nleft));
+
+}
+
+Result<DWORD> get_more_data(HANDLE handle, char * buffer, int maxsize) {
+	DWORD navail, nleft;
+	Result<tuple<DWORD, DWORD>> result = peek_named_pipe(handle, buffer, maxsize);
+	if (result.isFailed()) {
+		return Result<DWORD>::withError(result.error());
+	}
+	tie(navail, nleft) = result.result();
+
+	assert(nleft > 0);
+	// TODO recv bytes? will be circular dep since it will be called from recv_bytes?
+	return recv_bytes(handle, buffer, navail);
+}
+
+Result<tuple<DWORD, DWORD>> write_to_pipe(HANDLE handle,
+	                                      OverlappedObject * overlapped,
+	                                      const char * writeBuffer,
+	                                      int len) {	
+	DWORD written;
+	BOOL ret;
+	DWORD err;
+
+	ret = WriteFile(handle, writeBuffer, len, &written,
+		            overlapped ? &overlapped->overlapped : NULL);
+	err = ret ? 0 : GetLastError();
+
+	if (!ret) {
+		if (err == ERROR_IO_PENDING)
+			overlapped->pending = 1;
+		else {
+			return Result<tuple<DWORD, DWORD>>::withError(err);
+		}
+	}
+	return Result<tuple<DWORD, DWORD>>(make_tuple(err, written));
+}
+
+
+Result<tuple<DWORD, DWORD>> read_from_pipe(HANDLE handle, int size,
+	                                       OverlappedObject * overlapped,
+	                                       char * readBuffer) {
 
 	DWORD nread;
 	DWORD err;
 	BOOL ret;
-	
-	overlapped = new_overlapped(handle);
-	if (!overlapped) {
-		logToFoobarConsole("Cannot read from pipe.");
-		return Result<DWORD>::withError(GetLastError());		
-	}
 	
 	ret = ReadFile(
 		handle, readBuffer, size, &nread,
@@ -145,61 +192,72 @@ Result<DWORD> read_from_pipe(HANDLE handle, int size,
 		else if (err != ERROR_MORE_DATA) {
 			logToFoobarConsole("Cannot read from pipe. "
 				                "The operation failed with error %d.", err);
-			return Result<DWORD>::withError(err);
+			return Result<tuple<DWORD, DWORD>>::withError(err);
 		}
 	}
-	return Result<DWORD>(err);
+	return Result<tuple<DWORD, DWORD>>(make_tuple(err, nread));
 }
 
-Result<tuple<DWORD, DWORD>> peek_named_pipe(HANDLE handle, char * buf, int size) {
-	DWORD nread, navail, nleft;
-	BOOL ret;
-
-	if (size) {
-		ret = PeekNamedPipe(handle, buf, size, &nread, &navail, &nleft);
-	}
-	else {
-		ret = PeekNamedPipe(handle, NULL, 0, NULL, &navail, &nleft);
-	}
-
-	if (!ret) {
-		// TODO what error!
-		return Result<tuple<DWORD, DWORD>>::withError(OPERATION_FAILED);
-	}
-	return Result<tuple<DWORD, DWORD>>(make_tuple(navail, nleft));
-
-}
-
-
-DWORD get_more_data(HANDLE handle, char * buffer, int maxsize) {
-	DWORD navail, nleft;
-	Result<tuple<DWORD, DWORD>> result = peek_named_pipe(handle, buffer, maxsize);
-	if (result.isFailed()) {
-		return result.error();
-	}
-	tie(navail, nleft) = result.result();
-	
-	assert(nleft > 0);
-	return recv_bytes(handle, buffer, navail);
-}
-
-
-DWORD recv_bytes(HANDLE handle, char * readBuffer, int size) {
-	DWORD res;
+Result<DWORD> send_bytes(HANDLE handle, const char * writeBuffer, int len) {
+	DWORD error;
+	DWORD written;
 	DWORD waitres;
-	DWORD overlappedResult;
-	BOOL success;
 	DWORD lastError;
 
 	OverlappedObject * overlapped = new_overlapped(handle);
-	Result<DWORD> result = read_from_pipe(handle, size, overlapped, readBuffer);
-	if (result.isFailed()) {
-		logToFoobarConsole("Failed receiving from pipe %d", result.error());
-		return result.error();
+	if (!overlapped) {
+		logToFoobarConsole("Cannot get an overlapped object: %d.",
+			GetLastError());
+		return Result<DWORD>::withError(GetLastError());
 	}
 
-	res = result.result();
-	if (res == ERROR_IO_PENDING) {
+    Result<tuple<DWORD, DWORD>> result = write_to_pipe(handle, overlapped, writeBuffer, len);
+	if (result.isFailed()) {
+		logToFoobarConsole("Failed writing to pipe %d", result.error());
+		return Result<DWORD>::withError(result.error());
+	}
+
+	tie(error, written) = result.result();
+	if (error == ERROR_IO_PENDING) {
+		waitres = wait_overlapped_event(overlapped);
+		assert(waitres == WAIT_OBJECT_0);
+	}
+
+	Result<DWORD> resultOverlapped = get_overlapped_event(overlapped);
+	if (resultOverlapped.isFailed()) {
+		logToFoobarConsole("Getting overlapped event failed with %d.",
+			resultOverlapped.error());
+		return resultOverlapped;
+	}
+	lastError = resultOverlapped.result();
+	assert(lastError == 0);
+	// TODO: assert nwritten == len(buf)	
+	return Result<DWORD>(lastError);
+	
+}
+
+Result<DWORD> recv_bytes(HANDLE handle, char * readBuffer, int size) {	
+	DWORD waitres;
+	DWORD error;	
+	DWORD lastError;
+	DWORD nread;
+
+	OverlappedObject * overlapped = new_overlapped(handle);
+	if (!overlapped) {
+		logToFoobarConsole("Cannot get an overlapped object: %d.",
+			                GetLastError());
+		return Result<DWORD>::withError(GetLastError());
+	}
+	Result<tuple<DWORD, DWORD>> result = read_from_pipe(handle, size,
+		                                                overlapped,
+		                                                readBuffer);
+	if (result.isFailed()) {
+		logToFoobarConsole("Failed receiving from pipe %d", result.error());
+		return Result<DWORD>::withError(result.error());
+	}
+
+	tie(error, nread) = result.result();
+	if (error == ERROR_IO_PENDING) {
 		waitres = wait_overlapped_event(overlapped);
 		assert(waitres == WAIT_OBJECT_0);
 	}
@@ -208,8 +266,7 @@ DWORD recv_bytes(HANDLE handle, char * readBuffer, int size) {
 	if (resultOverlapped.isFailed()) {
 		logToFoobarConsole("Getting overlapped event failed with %d.",
 			               resultOverlapped.error());
-		// TODO: propagate errors (return resultOverlapped, instead of the error, maybe add context?)
-		return resultOverlapped.error();
+		return resultOverlapped;
 	}
 	lastError = resultOverlapped.result();
 
@@ -219,12 +276,11 @@ DWORD recv_bytes(HANDLE handle, char * readBuffer, int size) {
 			break;
 		case ERROR_SUCCESS:
 			// Operation succeeded.
-			return OPERATION_SUCCESS;
+			return Result<DWORD>(nread);
 		default:
-			return OPERATION_FAILED;
-	}
-	// TODO: remove after implementing data?
-	return OPERATION_FAILED;
+			return Result<DWORD>::withError(lastError);
+	}	
+	return Result<DWORD>::withError(lastError);
 }
 
 
@@ -234,6 +290,15 @@ TODO:
 
 1. pasez bufferii dintr-o parte in alta sau ii pun in Overlapped
 2. folosesc char * sau altceva
-3. cum intorc erorile, nu pare consistent modul in care o fac (tuple vs error codes cu output params)
+3. acolo unde intorc DWORD (recv_bytes) ar trebui sa intorc Result<DWORD>,
+   chiar daca intorc deja vreun result.error() prin cod (ce e resultul lui recv_bytes, eroare
+   sau numar de bytes cititi?)
 4. cum implementez more data
+5. use waitforsingleobject or waitformultipleobjects?
+6. move pipelistener into its own file
+7. make an event object similar to asyncobj
+8. think about a protocolbetween foo_automation and foobar_callback, including proxying
+    of methods from former to the latter
+9. receive / write json at th epipe layer
+10. API for passing callbacks between threads
 */
