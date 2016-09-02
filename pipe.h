@@ -5,6 +5,8 @@
 #include "logging.h"
 #include "_winapi.h"
 
+#define INITIAL_READ_SIZE 128
+
 using namespace std;
 
 // TODO: move in a .cpp file?
@@ -19,9 +21,31 @@ public:
     return send_bytes(handle, bytes, strlen(bytes));
   }
 
-  DWORD recv() {
-    // TODO
-    return 0;
+  Result<tuple<DWORD, vector<char>>> recv() {
+    DWORD lastError, nread = 0;
+    vector<char> moreData;
+    vector<char> buffer(INITIAL_READ_SIZE);
+
+    Result<tuple<DWORD, DWORD>> result = recv_bytes(handle, &buffer[0], INITIAL_READ_SIZE);
+    if (result.isFailed()) {
+      logToFoobarConsole("Failed receiving bytes %d", result.error());
+      return Result<tuple<DWORD, vector<char>>>::withError(result.error());
+    }
+
+    tie(lastError, nread) = result.result();
+    if (lastError == ERROR_MORE_DATA) {
+      Result<tuple<DWORD, vector<char>>> moreDataResult = get_more_data(handle);
+      if (moreDataResult.isFailed()) {
+        logToFoobarConsole("Failed retrieving more data %d", moreDataResult.error());
+        return Result<tuple<DWORD, vector<char>>>::withError(moreDataResult.error());
+      }
+      
+      tie(ignore, moreData) = moreDataResult.result();
+      
+      buffer.insert(end(buffer), begin(moreData), end(moreData));
+
+    }
+    return Result<tuple<DWORD, vector<char>>>(make_tuple(nread + buffer.size(), buffer));
   }
 
   void close() {

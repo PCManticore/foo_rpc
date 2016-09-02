@@ -29,22 +29,27 @@ public:
   DWORD listen_commands() {
 
     DWORD res;
+    vector<char> received;
 
     while (true) {
+
       logToFoobarConsole("acception new client %d", 2222);
       PipeConnection connection = listener.accept();
       logToFoobarConsole("client accepted");
 
       char buffer[1000] = "";
       logToFoobarConsole("try to recv bytes from him");
-      Result<DWORD> result = recv_bytes(connection.handle, buffer, 256);
+      Result<tuple<DWORD, vector<char>>> result = connection.recv();
+
+      //Result<DWORD> result = recv_bytes(connection.handle, buffer, 256);
       if (result.isFailed()) {
         logToFoobarConsole("Failed receiving data from pipe %d", result.error());
         return result.error();
       }
 
+      tie(ignore, received) = result.result();
       logToFoobarConsole("finished recving bytes from him");
-      logToFoobarConsole(string(buffer));
+      logToFoobarConsole(string(received.begin(), received.end()));
 
       // TO REMOVE
       /*static_api_ptr_t<playlist_manager> pm;
