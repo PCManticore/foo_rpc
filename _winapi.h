@@ -12,11 +12,11 @@ using namespace std;
 
 typedef struct {
 
-	HANDLE handle;
-	HANDLE event;
-	OVERLAPPED overlapped;
-	DWORD pending;
-	DWORD completed;
+  HANDLE handle;
+  HANDLE event;
+  OVERLAPPED overlapped;
+  DWORD pending;
+  DWORD completed;
 } OverlappedObject, *LPOverlappedObject;
 
 
