@@ -7,12 +7,22 @@
 
 using namespace std;
 
+// TODO: move in a .cpp file?
 class PipeConnection {
 public:
-  // TODO: should be public
+  // TODO: should be public?
   HANDLE handle;
 
   PipeConnection(HANDLE pipeHandle) : handle(pipeHandle) {}
+
+  Result<DWORD> send(const char * bytes) {
+    return send_bytes(handle, bytes, strlen(bytes));
+  }
+
+  DWORD recv() {
+    // TODO
+    return 0;
+  }
 
   void close() {
     CloseHandle(handle);
@@ -54,6 +64,12 @@ public:
     }
 
     return PipeConnection(handle);
+  }
+
+  void close() {
+    for (auto handle : handles) {
+      CloseHandle(handle);
+    }
   }
 
 private:

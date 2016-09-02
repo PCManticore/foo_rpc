@@ -21,13 +21,15 @@ DECLARE_COMPONENT_VERSION(
 class foobar2000api : public initquit {
 private:
   DWORD ThreadID;
+  // TODO: get this from a config file
+  PipeListener listener = PipeListener("\\\\.\\pipe\\foobar2000");
+
 public:
 
-  DWORD create_named_pipe() {
+  DWORD listen_commands() {
 
     DWORD res;
-    // TODO: get this from a config file
-    PipeListener listener("\\\\.\\pipe\\foobar2000");
+
     while (true) {
       logToFoobarConsole("acception new client %d", 2222);
       PipeConnection connection = listener.accept();
@@ -68,14 +70,11 @@ public:
       event.wait();
 
       logToFoobarConsole("is ready %s", event.isReady());
-      send_bytes(connection.handle, "claudiu", 7);
+      connection.send("claudiu");
+      connection.close();      
 
     }
 
-    /*
-    TODO
-    DisconnectNamedPipe(pipe);
-    */
     return 0;
 
   }
@@ -83,7 +82,7 @@ public:
   static DWORD WINAPI named_pipe_thread(void* Param)
   {
     foobar2000api* This = (foobar2000api*)Param;
-    return This->create_named_pipe();
+    return This->listen_commands();
   }
 
   virtual void on_init()
@@ -94,7 +93,10 @@ public:
 
   virtual void on_quit()
   {
-
+    /*
+    TODO DisconnectNamedPipe(pipe)?;
+    */
+    listener.close();
   }
 };
 
