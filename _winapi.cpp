@@ -23,8 +23,8 @@ OverlappedObject *new_overlapped(HANDLE handle)
 }
 
 DWORD create_pipe(std::string pipeAddress,
-  HANDLE* pipeOut,
-  bool isFirst) {
+                  HANDLE* pipeOut,
+                  bool isFirst) {
 
   DWORD flags = PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED;
   if (isFirst) {
@@ -54,7 +54,7 @@ DWORD create_pipe(std::string pipeAddress,
 Result<OverlappedObject*> connect_pipe(HANDLE handle) {
   DWORD success;
 
-  OverlappedObject *overlapped = new_overlapped(handle);
+  OverlappedObject * overlapped = new_overlapped(handle);
   success = ConnectNamedPipe(
     handle,
     overlapped ? &overlapped->overlapped : NULL);
@@ -86,10 +86,10 @@ Result<OverlappedObject*> connect_pipe(HANDLE handle) {
 }
 
 DWORD wait_overlapped_event(OverlappedObject* overlapped) {
-  return WaitForSingleObject(overlapped->event, INFINITE);
+  return WaitForSingleObject(overlapped->overlapped.hEvent, INFINITE);
 }
 
-Result<DWORD> get_overlapped_event(OverlappedObject * overlapped) {
+Result<DWORD> get_overlapped_result(OverlappedObject * overlapped) {
   DWORD result;
   DWORD error;
   DWORD transferred = 0;
@@ -234,7 +234,7 @@ Result<DWORD> send_bytes(HANDLE handle, const char * writeBuffer, int len) {
     assert(waitres == WAIT_OBJECT_0);
   }
 
-  Result<DWORD> resultOverlapped = get_overlapped_event(overlapped);
+  Result<DWORD> resultOverlapped = get_overlapped_result(overlapped);
   if (resultOverlapped.isFailed()) {
     logToFoobarConsole("Getting overlapped event failed with %d.",
       resultOverlapped.error());
@@ -271,7 +271,7 @@ Result<tuple<DWORD, DWORD>> recv_bytes(HANDLE handle, char * readBuffer, int siz
     assert(waitres == WAIT_OBJECT_0);
   }
 
-  Result<DWORD> resultOverlapped = get_overlapped_event(overlapped);
+  Result<DWORD> resultOverlapped = get_overlapped_result(overlapped);
   if (resultOverlapped.isFailed()) {
     logToFoobarConsole("Getting overlapped event failed with %d.",
       resultOverlapped.error());
@@ -297,15 +297,10 @@ TODO:
 
 1. pasez bufferii dintr-o parte in alta sau ii pun in Overlapped
 2. folosesc char * sau altceva
-3. acolo unde intorc DWORD (recv_bytes) ar trebui sa intorc Result<DWORD>,
-   chiar daca intorc deja vreun result.error() prin cod (ce e resultul lui recv_bytes, eroare
-   sau numar de bytes cititi?)
-4. cum implementez more data
-6. move pipelistener into its own file
-7. make an event object similar to asyncobj
-8. think about a protocolbetween foo_automation and foobar_callback, including proxying
+3. think about a protocolbetween foo_automation and foobar_callback, including proxying
     of methods from former to the latter
-9. receive / write json at th epipe layer
-10. API for passing callbacks between threads
-11. configuration object for various settings
+4. receive / write json at th epipe layer
+5. API for passing callbacks between threads
+6. configuration object for various settings
+7. close overlapped using cancelio
 */

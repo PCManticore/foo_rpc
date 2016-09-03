@@ -13,12 +13,12 @@ using namespace std;
 class PipeConnection {
 public:
   // TODO: should be public?
-  HANDLE handle;
+  OverlappedObject * overlapped;
 
-  PipeConnection(HANDLE pipeHandle) : handle(pipeHandle) {}
+  PipeConnection(OverlappedObject * overlappedObj) : overlapped(overlappedObj) {}
 
   Result<DWORD> send(const char * bytes) {
-    return send_bytes(handle, bytes, strlen(bytes));
+    return send_bytes(overlapped->handle, bytes, strlen(bytes));
   }
 
   Result<tuple<DWORD, vector<char>>> recv() {
@@ -26,7 +26,7 @@ public:
     vector<char> moreData;
     vector<char> buffer(INITIAL_READ_SIZE);
 
-    Result<tuple<DWORD, DWORD>> result = recv_bytes(handle, &buffer[0], INITIAL_READ_SIZE);
+    Result<tuple<DWORD, DWORD>> result = recv_bytes(overlapped->handle, &buffer[0], INITIAL_READ_SIZE);
     if (result.isFailed()) {
       logToFoobarConsole("Failed receiving bytes %d", result.error());
       return Result<tuple<DWORD, vector<char>>>::withError(result.error());
@@ -34,7 +34,7 @@ public:
 
     tie(lastError, nread) = result.result();
     if (lastError == ERROR_MORE_DATA) {
-      Result<tuple<DWORD, vector<char>>> moreDataResult = get_more_data(handle);
+      Result<tuple<DWORD, vector<char>>> moreDataResult = get_more_data(overlapped->handle);
       if (moreDataResult.isFailed()) {
         logToFoobarConsole("Failed retrieving more data %d", moreDataResult.error());
         return Result<tuple<DWORD, vector<char>>>::withError(moreDataResult.error());
@@ -49,7 +49,33 @@ public:
   }
 
   void close() {
-    CloseHandle(handle);
+    DWORD bytes;
+
+    int err = GetLastError();
+
+    if (overlapped->pending) {
+      if (CancelIoEx(overlapped->handle, &overlapped->overlapped) &&
+        GetOverlappedResult(overlapped->handle, &overlapped->overlapped, &bytes, TRUE))
+      {
+        /* The operation is no longer pending -- nothing to do. */
+      }
+      else
+      {
+        /* The operation is still pending, but the process is
+        probably about to exit, so we need not worry too much
+        about memory leaks.
+        */
+        CloseHandle(overlapped->overlapped.hEvent);
+        SetLastError(err);
+        return;
+      }
+    }
+
+    SetLastError(err);
+    // TODO: is this correct?
+    DisconnectNamedPipe(overlapped->handle);
+    CloseHandle(overlapped->handle);
+    CloseHandle(overlapped->overlapped.hEvent);
   }
 
 };
@@ -80,18 +106,20 @@ public:
     // TODO handle exceptional case
     int res = wait_overlapped_event(overlapped);
 
-    Result<DWORD> overlappedResult = get_overlapped_event(overlapped);
+    Result<DWORD> overlappedResult = get_overlapped_result(overlapped);
     if (overlappedResult.isFailed()) {
       logToFoobarConsole("Getting overlapped event failed with %d.",
         overlappedResult.error());
       return NULL;
     }
 
-    return PipeConnection(handle);
+    return PipeConnection(overlapped);
   }
 
   void close() {
-    for (auto handle : handles) {
+    while (handles.size() > 0) {
+      HANDLE handle = handles.front();
+      handles.pop_front();
       CloseHandle(handle);
     }
   }

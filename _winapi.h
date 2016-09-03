@@ -12,8 +12,7 @@ using namespace std;
 
 typedef struct {
 
-  HANDLE handle;
-  HANDLE event;
+  HANDLE handle;  
   OVERLAPPED overlapped;
   DWORD pending;
   DWORD completed;
@@ -26,6 +25,6 @@ DWORD create_pipe(std::string pipeAddress, HANDLE * pipeOut, bool isFirst);
 Result<DWORD> send_bytes(HANDLE handle, const char * writeBuffer, int len);
 Result<tuple<DWORD, DWORD>> recv_bytes(HANDLE handle, char * readBuffer, int size);
 Result<OverlappedObject*> connect_pipe(HANDLE handle);
-Result<DWORD> get_overlapped_event(OverlappedObject * overlapped);
+Result<DWORD> get_overlapped_result(OverlappedObject * overlapped);
 Result<tuple<DWORD, vector<char>>> get_more_data(HANDLE handle);
 
