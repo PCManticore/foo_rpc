@@ -8,6 +8,7 @@
 #include "pipe.h"
 #include "_winapi.h"
 #include "stdafx.h"
+#include "foobar_callback.h"
 
 using namespace std;
 
@@ -28,7 +29,6 @@ public:
 
   DWORD listen_commands() {
 
-    DWORD res;
     vector<char> received;
 
     while (true) {
@@ -37,11 +37,9 @@ public:
       PipeConnection connection = listener.accept();
       logToFoobarConsole("client accepted");
 
-      char buffer[1000] = "";
       logToFoobarConsole("try to recv bytes from him");
       Result<tuple<DWORD, vector<char>>> result = connection.recv();
 
-      //Result<DWORD> result = recv_bytes(connection.handle, buffer, 256);
       if (result.isFailed()) {
         logToFoobarConsole("Failed receiving data from pipe %d", result.error());
         return result.error();
@@ -68,14 +66,40 @@ public:
       );
 
       */
-      Event event;
-      static_api_ptr_t<main_thread_callback_manager>()->add_callback(
-        new service_impl_t<current_playlist_callback>(event)
-      );
-      event.wait();
+     FoobarImpl::PlaybackControl pc;
 
-      logToFoobarConsole("is ready %s", event.isReady());
-      connection.send("claudiu");
+      Response<double> length;
+      fb2k::inMainThread([&] {pc.playback_get_length(&length); });
+      length.wait();
+      logToFoobarConsole("length of song %s", length.result());
+
+
+      //Event pause;
+      //fb2k::inMainThread([&] {pc.toggle_pause(pause); });
+      //pause.wait();
+
+      Event isPaused;
+      Param<tuple<play_control::t_track_command, BOOL>> param(
+        make_tuple(play_control::t_track_command::track_command_play, false));
+
+      fb2k::inMainThread([&] {
+        pc.start(param, isPaused);
+      });
+      isPaused.wait();
+        
+
+      Response<tuple<string, BOOL>> formatTitle;
+      
+      fb2k::inMainThread([&] {pc.playback_format_title_complete(&formatTitle); });
+      formatTitle.wait();
+
+      BOOL playing;
+      string title;
+      tie(title, playing) = formatTitle.result();
+
+      logToFoobarConsole("title %s is now playing %s", title, playing);
+
+      connection.send(title.c_str());
       connection.close();      
 
     }

@@ -169,7 +169,7 @@ Result<tuple<DWORD, DWORD>> read_from_pipe(HANDLE handle,
 }
 
 Result<tuple<DWORD, DWORD>> peek_named_pipe(HANDLE handle) {
-  DWORD nread, navail, nleft;
+  DWORD navail, nleft;
   BOOL ret;
 
   ret = PeekNamedPipe(handle, NULL, 0, NULL, &navail, &nleft);

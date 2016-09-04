@@ -1,20 +1,35 @@
 #pragma once
 
-#include <Windows.h>
+#include <windows.h>
 
 #include "event.h"
 
-
 template<class T>
-class AsyncObj {
+class Param {
 private:
   T obj;
-  Event event;
 
 public:
 
-  void setValue(T value) {
-    obj = value;
+  Param(T value) : obj(value) {}
+
+  T value() {
+    return obj;
+  }
+};
+
+// TODO: don't like the name Response, but cant use Result
+template<class T>
+class Response {
+private:
+  Event event;  
+  T response;
+
+public:
+
+
+  void setResponse(T value) {
+    this->response = value;
     event.set();
   }
 
@@ -26,8 +41,8 @@ public:
     return event.wait();
   }
 
-  T value() {
-    return obj;
+  T result() {
+    return this->response;
   }
 
 };

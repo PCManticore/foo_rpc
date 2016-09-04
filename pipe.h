@@ -89,8 +89,6 @@ public:
   PipeConnection accept() {
 
     HANDLE handle;
-    DWORD lastError;
-    BOOL success;
 
     createNamedPipe(false);
     handle = handles.front();
