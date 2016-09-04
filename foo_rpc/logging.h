@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-#include "api/foobar_callback.h"
+#include "api/debug.h"
 
 #include "tinyformat.h"
 
@@ -17,6 +17,6 @@ void logToFoobarConsole(std::string message, const Args&... args) {
   formattedMessage = oss.str();
   
   static_api_ptr_t<main_thread_callback_manager>()->add_callback(
-    new service_impl_t<console_debug_callback>(formattedMessage)
+    new service_impl_t<foobar::console_debug_callback>(formattedMessage)
   );
 }

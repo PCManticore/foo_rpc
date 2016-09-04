@@ -8,7 +8,7 @@
 #include "pipe.h"
 #include "_winapi.h"
 #include "stdafx.h"
-#include "api/foobar_callback.h"
+#include "api/playback_control.h"
 
 using namespace std;
 
