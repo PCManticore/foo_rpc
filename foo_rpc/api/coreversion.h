@@ -36,5 +36,6 @@ namespace foobar {
       bool versionCheck = core_version_2->test_version(major, minor1, minor2, minor3);
       result.setResult(versionCheck);
 
+    };
   };
-};
+}

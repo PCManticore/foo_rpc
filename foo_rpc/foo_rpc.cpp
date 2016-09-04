@@ -9,6 +9,7 @@
 #include "_winapi.h"
 #include "stdafx.h"
 #include "api/playback_control.h"
+#include "api/coreversion.h"
 
 using namespace std;
 
