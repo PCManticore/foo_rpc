@@ -14,7 +14,7 @@ using namespace std;
 
 
 DECLARE_COMPONENT_VERSION(
-"foo_automation",
+"foo_rpc",
 "0.0.1",
 "Access foobar2000's internal API programmatically..\n"
 );
@@ -134,5 +134,5 @@ initquit_factory_t<foobar2000api> g_foo;
 
 // The module attribute is specified in order to implement DllMain,
 // DllRegisterServer and DllUnregisterServer
-[module(dll, name = "foo_automation", helpstring = "Foobar automation component")];
+[module(dll, name = "foo_rpc", helpstring = "Foobar automation component")];
 [emitidl];
