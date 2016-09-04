@@ -2,9 +2,9 @@
 #include <deque>
 #include <future>
 
-#include "asyncobj.h"
 #include "event.h"
 #include "logging.h"
+#include "percolate.h"
 #include "pipe.h"
 #include "_winapi.h"
 #include "stdafx.h"
@@ -68,7 +68,7 @@ public:
       */
      FoobarImpl::PlaybackControl pc;
 
-      Response<double> length;
+      ApiResult<double> length;
       fb2k::inMainThread([&] {pc.playback_get_length(&length); });
       length.wait();
       logToFoobarConsole("length of song %s", length.result());
@@ -79,7 +79,7 @@ public:
       //pause.wait();
 
       Event isPaused;
-      Param<tuple<play_control::t_track_command, BOOL>> param(
+      ApiParam<tuple<play_control::t_track_command, BOOL>> param(
         make_tuple(play_control::t_track_command::track_command_play, false));
 
       fb2k::inMainThread([&] {
@@ -88,7 +88,7 @@ public:
       isPaused.wait();
         
 
-      Response<tuple<string, BOOL>> formatTitle;
+      ApiResult<tuple<string, BOOL>> formatTitle;
       
       fb2k::inMainThread([&] {pc.playback_format_title_complete(&formatTitle); });
       formatTitle.wait();

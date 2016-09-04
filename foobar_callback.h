@@ -2,8 +2,8 @@
 #include <string>
 
 #include "stdafx.h"
-#include "asyncobj.h"
 #include "event.h"
+#include "percolate.h"
 
 
 using namespace std;
@@ -27,7 +27,7 @@ namespace FoobarImpl {
       pc->get_now_playing(temp);      
     }
 
-    void start(Param<tuple<play_control::t_track_command, BOOL>> param, Event event) {
+    void start(ApiParam<tuple<play_control::t_track_command, BOOL>> param, Event event) {
       play_control::t_track_command command;
       BOOL is_paused;
       tie(command, is_paused) = param.value();
@@ -41,39 +41,39 @@ namespace FoobarImpl {
       event.set();
     }
 
-    void is_playing(Response<bool> * response) {
+    void is_playing(ApiResult<bool> * response) {
       bool isPlaying = pc->is_playing();
-      response->setResponse(isPlaying);
+      response->setResult(isPlaying);
     }
 
-    void is_paused(Response<bool> * response) {
+    void is_paused(ApiResult<bool> * response) {
       bool isPaused = pc->is_paused();
-      response->setResponse(isPaused);
+      response->setResult(isPaused);
     }
 
-    void pause(Param<bool> param, Event event) {
+    void pause(ApiParam<bool> param, Event event) {
       pc->pause(param.value());
       event.set();
     }
 
-    void get_stop_after_current(Response<bool> * response) {
+    void get_stop_after_current(ApiResult<bool> * response) {
       bool stopAfterCurrent = pc->get_stop_after_current();
-      response->setResponse(stopAfterCurrent);
+      response->setResult(stopAfterCurrent);
     }
 
-    void set_stop_after_current(Param<bool> param, Event event) {
+    void set_stop_after_current(ApiParam<bool> param, Event event) {
       pc->set_stop_after_current(param.value());
       event.set();
     }
 
-    void set_volume(Param<float> volume, Event event) {
+    void set_volume(ApiParam<float> volume, Event event) {
       pc->set_volume(volume.value());
       event.set();
     }
 
-    void get_volume(Response<float> * response) {
+    void get_volume(ApiResult<float> * response) {
       float volume = pc->get_volume();
-      response->setResponse(volume);
+      response->setResult(volume);
     }
 
     void volume_up(Event event) {
@@ -91,27 +91,27 @@ namespace FoobarImpl {
       event.set();
     }
 
-    void playback_seek(Param<double> param, Event event) {
+    void playback_seek(ApiParam<double> param, Event event) {
       pc->playback_seek(param.value());
       event.set();
     }
 
-    void playback_seek_delta(Param<double> param, Event event) {
+    void playback_seek_delta(ApiParam<double> param, Event event) {
       pc->playback_seek_delta(param.value());
       event.set();
     }
 
-    void playback_can_seek(Response<bool> * response) {
+    void playback_can_seek(ApiResult<bool> * response) {
       bool canSeek = pc->playback_can_seek();
-      response->setResponse(canSeek);
+      response->setResult(canSeek);
     }
 
-    void playback_get_position(Response<double> * response) {
+    void playback_get_position(ApiResult<double> * response) {
       double position = pc->playback_get_position();
-      response->setResponse(position);
+      response->setResult(position);
     }
 
-    void playback_format_title(Param<string> param, Response<tuple<string, BOOL>> * response) {
+    void playback_format_title(ApiParam<string> param, ApiResult<tuple<string, BOOL>> * response) {
 
       pfc::string8 temp;      
       titleformat_object::ptr script;
@@ -121,29 +121,29 @@ namespace FoobarImpl {
         NULL, temp, script, NULL,
         playback_control::t_display_level::display_level_all);
       if (success) {
-        response->setResponse(make_tuple(temp.c_str(), success));
+        response->setResult(make_tuple(temp.c_str(), success));
       }
       else {
-        response->setResponse(make_tuple("", success));
+        response->setResult(make_tuple("", success));
       }
     }
 
-    void playback_format_title_complete(Response<tuple<string, BOOL>> * response) {
-      Param<string> param(
+    void playback_format_title_complete(ApiResult<tuple<string, BOOL>> * response) {
+      ApiParam<string> param(
         "[%album artist% -]['['%album%[CD%discnumber%]"
         "[#%tracknumber%]']'] % title%['//' %track artist%]");
 
       playback_format_title(param, response);
     }
 
-    void playback_get_length(Response<double> * response) {
+    void playback_get_length(ApiResult<double> * response) {
       double length = pc->playback_get_length();
-      response->setResponse(length);
+      response->setResult(length);
     }
 
-    void playback_get_length_ex(Response<double> * response) {
+    void playback_get_length_ex(ApiResult<double> * response) {
       double length = pc->playback_get_length_ex();
-      response->setResponse(length);
+      response->setResult(length);
     }
 
     void toggle_stop_after_current(Event event) {
@@ -176,14 +176,14 @@ namespace FoobarImpl {
       event.set();
     }
 
-    void is_muted(Response<bool> * response) {
+    void is_muted(ApiResult<bool> * response) {
       bool isMuted = pc->is_muted();
-      response->setResponse(isMuted);
+      response->setResult(isMuted);
     }
 
-    void get_volume_step(Response<float> * response) {
+    void get_volume_step(ApiResult<float> * response) {
       float volume_step = pc2->get_volume_step();
-      response->setResponse(volume_step);
+      response->setResult(volume_step);
     }
 
   };
