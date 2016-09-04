@@ -1,7 +1,8 @@
 #pragma once
 #include <string>
 
-#include "foobar_callback.h"
+#include "api/foobar_callback.h"
+
 #include "tinyformat.h"
 
 

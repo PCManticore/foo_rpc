@@ -8,7 +8,7 @@
 #include "pipe.h"
 #include "_winapi.h"
 #include "stdafx.h"
-#include "foobar_callback.h"
+#include "api/foobar_callback.h"
 
 using namespace std;
 
@@ -65,8 +65,9 @@ public:
         new service_impl_t<console_debug_callback>(fut)
       );
 
-      */
-     FoobarImpl::PlaybackControl pc;
+      */  
+      
+      foobar::PlaybackControl pc;
 
       ApiResult<double> length;
       fb2k::inMainThread([&] {pc.playback_get_length(&length); });

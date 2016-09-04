@@ -9,7 +9,7 @@
 using namespace std;
 
 // TODO: merging this with the other one does not work (linker error)
-namespace FoobarImpl {
+namespace foobar {
 
   class PlaybackControl {
   private:
