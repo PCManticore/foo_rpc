@@ -10,6 +10,7 @@
 #include "stdafx.h"
 #include "api/playback_control.h"
 #include "api/coreversion.h"
+#include "api/playlist.h"
 
 using namespace std;
 
@@ -69,9 +70,10 @@ public:
       */  
       
       foobar::PlaybackControl pc;
+      foobar::Playlist pl;
 
       ApiResult<double> length;
-      fb2k::inMainThread([&] {pc.playback_get_length(&length); });
+      fb2k::inMainThread([&] {pc.playback_get_length(length); });
       length.wait();
       logToFoobarConsole("length of song %s", length.result());
 
@@ -92,12 +94,21 @@ public:
 
       ApiResult<tuple<string, BOOL>> formatTitle;
       
-      fb2k::inMainThread([&] {pc.playback_format_title_complete(&formatTitle); });
+      fb2k::inMainThread([&] {pc.playback_format_title_complete(formatTitle); });
       formatTitle.wait();
 
       BOOL playing;
       string title;
       tie(title, playing) = formatTitle.result();
+
+      ApiResult<t_size> activePlaylist;
+      fb2k::inMainThread([&] {
+        pl.get_active_playlist(activePlaylist);
+      });
+      activePlaylist.wait();
+
+      logToFoobarConsole("active playlist %s", activePlaylist.result());
+        
 
       logToFoobarConsole("title %s is now playing %s", title, playing);
 

@@ -40,14 +40,14 @@ namespace foobar {
       event.set();
     }
 
-    void is_playing(ApiResult<bool> * response) {
+    void is_playing(ApiResult<bool> & response) {
       bool isPlaying = pc->is_playing();
-      response->setResult(isPlaying);
+      response.setResult(isPlaying);
     }
 
-    void is_paused(ApiResult<bool> * response) {
+    void is_paused(ApiResult<bool> & response) {
       bool isPaused = pc->is_paused();
-      response->setResult(isPaused);
+      response.setResult(isPaused);
     }
 
     void pause(ApiParam<bool> param, Event event) {
@@ -55,9 +55,9 @@ namespace foobar {
       event.set();
     }
 
-    void get_stop_after_current(ApiResult<bool> * response) {
+    void get_stop_after_current(ApiResult<bool> & response) {
       bool stopAfterCurrent = pc->get_stop_after_current();
-      response->setResult(stopAfterCurrent);
+      response.setResult(stopAfterCurrent);
     }
 
     void set_stop_after_current(ApiParam<bool> param, Event event) {
@@ -70,9 +70,9 @@ namespace foobar {
       event.set();
     }
 
-    void get_volume(ApiResult<float> * response) {
+    void get_volume(ApiResult<float> & response) {
       float volume = pc->get_volume();
-      response->setResult(volume);
+      response.setResult(volume);
     }
 
     void volume_up(Event event) {
@@ -100,17 +100,17 @@ namespace foobar {
       event.set();
     }
 
-    void playback_can_seek(ApiResult<bool> * response) {
+    void playback_can_seek(ApiResult<bool> & response) {
       bool canSeek = pc->playback_can_seek();
-      response->setResult(canSeek);
+      response.setResult(canSeek);
     }
 
-    void playback_get_position(ApiResult<double> * response) {
+    void playback_get_position(ApiResult<double> & response) {
       double position = pc->playback_get_position();
-      response->setResult(position);
+      response.setResult(position);
     }
 
-    void playback_format_title(ApiParam<string> param, ApiResult<tuple<string, BOOL>> * response) {
+    void playback_format_title(ApiParam<string> param, ApiResult<tuple<string, BOOL>> & response) {
 
       pfc::string8 temp;      
       titleformat_object::ptr script;
@@ -120,14 +120,14 @@ namespace foobar {
         NULL, temp, script, NULL,
         playback_control::t_display_level::display_level_all);
       if (success) {
-        response->setResult(make_tuple(temp.c_str(), success));
+        response.setResult(make_tuple(temp.c_str(), success));
       }
       else {
-        response->setResult(make_tuple("", success));
+        response.setResult(make_tuple("", success));
       }
     }
 
-    void playback_format_title_complete(ApiResult<tuple<string, BOOL>> * response) {
+    void playback_format_title_complete(ApiResult<tuple<string, BOOL>> & response) {
       ApiParam<string> param(
         "[%album artist% -]['['%album%[CD%discnumber%]"
         "[#%tracknumber%]']'] % title%['//' %track artist%]");
@@ -135,14 +135,14 @@ namespace foobar {
       playback_format_title(param, response);
     }
 
-    void playback_get_length(ApiResult<double> * response) {
+    void playback_get_length(ApiResult<double> & response) {
       double length = pc->playback_get_length();
-      response->setResult(length);
+      response.setResult(length);
     }
 
-    void playback_get_length_ex(ApiResult<double> * response) {
+    void playback_get_length_ex(ApiResult<double> & response) {
       double length = pc->playback_get_length_ex();
-      response->setResult(length);
+      response.setResult(length);
     }
 
     void toggle_stop_after_current(Event event) {
@@ -175,14 +175,14 @@ namespace foobar {
       event.set();
     }
 
-    void is_muted(ApiResult<bool> * response) {
+    void is_muted(ApiResult<bool> & response) {
       bool isMuted = pc->is_muted();
-      response->setResult(isMuted);
+      response.setResult(isMuted);
     }
 
-    void get_volume_step(ApiResult<float> * response) {
+    void get_volume_step(ApiResult<float> & response) {
       float volume_step = pc2->get_volume_step();
-      response->setResult(volume_step);
+      response.setResult(volume_step);
     }
 
   };
