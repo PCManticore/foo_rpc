@@ -2,6 +2,7 @@
 #include <deque>
 #include <future>
 
+#include "local_exceptions.h"
 #include "event.h"
 #include "logging.h"
 #include "percolate.h"
@@ -11,6 +12,9 @@
 #include "api/playback_control.h"
 #include "api/coreversion.h"
 #include "api/playlist.h"
+#include "rpcapi/rpc_playback_control.h"
+
+#include "msgpack.hpp"
 
 using namespace std;
 
@@ -24,6 +28,7 @@ DECLARE_COMPONENT_VERSION(
 class foobar2000api : public initquit {
 private:
   DWORD ThreadID;
+  
   // TODO: get this from a config file
   PipeListener listener = PipeListener("\\\\.\\pipe\\foobar2000");
 
@@ -32,14 +37,11 @@ public:
   DWORD listen_commands() {
 
     vector<char> received;
+    foobar::RpcPlaylist rpc_playlist;
 
     while (true) {
-
-      logToFoobarConsole("acception new client %d", 2222);
-      PipeConnection connection = listener.accept();
-      logToFoobarConsole("client accepted");
-
-      logToFoobarConsole("try to recv bytes from him");
+      
+      PipeConnection connection = listener.accept();      
       Result<tuple<DWORD, vector<char>>> result = connection.recv();
 
       if (result.isFailed()) {
@@ -48,72 +50,20 @@ public:
       }
 
       tie(ignore, received) = result.result();
-      logToFoobarConsole("finished recving bytes from him");
-      logToFoobarConsole(string(received.begin(), received.end()));
-
-      // TO REMOVE
-      /*static_api_ptr_t<playlist_manager> pm;
-      static_api_ptr_t<playback_control> pc;
-      metadb_handle_ptr ptr;
-      DWORD length = 0;
-      if (pc->get_now_playing(ptr))
-      {
-        length = ptr->get_length();
+      string content = string(received.begin(), received.end());      
+     
+      const char * rec = content.c_str();
+      
+      try {
+        string rpc_result = rpc_playlist.playback_format_title_complete(rec);
+        connection.send(rpc_result.c_str());
       }
-      string songLength = to_string(length);
+      catch (RPCException & e) {
+        connection.send(e.what());        
+      }
 
-      future fut;
-      static_api_ptr_t<main_thread_callback_manager>()->add_callback(
-        new service_impl_t<console_debug_callback>(fut)
-      );
+      connection.close();
 
-      */  
-      
-      foobar::PlaybackControl pc;
-      foobar::Playlist pl;
-
-      ApiResult<double> length;
-      fb2k::inMainThread([&] {pc.playback_get_length(length); });
-      length.wait();
-      logToFoobarConsole("length of song %s", length.result());
-
-
-      //Event pause;
-      //fb2k::inMainThread([&] {pc.toggle_pause(pause); });
-      //pause.wait();
-
-      Event isPaused;
-      ApiParam<tuple<play_control::t_track_command, BOOL>> param(
-        make_tuple(play_control::t_track_command::track_command_play, false));
-
-      fb2k::inMainThread([&] {
-        pc.start(param, isPaused);
-      });
-      isPaused.wait();
-        
-
-      ApiResult<tuple<string, BOOL>> formatTitle;
-      
-      fb2k::inMainThread([&] {pc.playback_format_title_complete(formatTitle); });
-      formatTitle.wait();
-
-      BOOL playing;
-      string title;
-      tie(title, playing) = formatTitle.result();
-
-      ApiResult<t_size> activePlaylist;
-      fb2k::inMainThread([&] {
-        pl.get_active_playlist(activePlaylist);
-      });
-      activePlaylist.wait();
-
-      logToFoobarConsole("active playlist %s", activePlaylist.result());
-        
-
-      logToFoobarConsole("title %s is now playing %s", title, playing);
-
-      connection.send(title.c_str());
-      connection.close();      
 
     }
 

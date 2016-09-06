@@ -303,4 +303,5 @@ TODO:
 5. API for passing callbacks between threads
 6. configuration object for various settings
 7. close overlapped using cancelio
+8. recv urmat de send si close poate duce la o eroare in client (there is no other process at the end of pipe)
 */
