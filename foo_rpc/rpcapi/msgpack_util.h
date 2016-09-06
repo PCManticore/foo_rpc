@@ -4,10 +4,11 @@
 #include "../local_exceptions.h"
 
 template<typename T>
-T unpack_from_buf(const char* buf) {
+T unpack_from_buf(vector<char> buf) {
   try {
+    const char* bufdata = buf.data();
     msgpack::unpacked result;
-    msgpack::unpack(result, buf, strlen(buf));
+    msgpack::unpack(result, bufdata, buf.size());
     msgpack::object obj = result.get();
     return obj.as<T>();
   }

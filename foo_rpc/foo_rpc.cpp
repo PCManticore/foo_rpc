@@ -36,8 +36,8 @@ public:
 
   DWORD listen_commands() {
 
-    vector<char> received;
-    foobar::RpcPlaylist rpc_playlist;
+    vector<char> received;    
+    foobar::MethodDispatcher dispatcher;
 
     while (true) {
       
@@ -50,20 +50,17 @@ public:
       }
 
       tie(ignore, received) = result.result();
-      string content = string(received.begin(), received.end());      
-     
-      const char * rec = content.c_str();
-      
+
       try {
-        string rpc_result = rpc_playlist.playback_format_title_complete(rec);
+        string rpc_result = dispatcher.dispatch(received);
         connection.send(rpc_result.c_str());
       }
       catch (RPCException & e) {
-        connection.send(e.what());        
+        logToFoobarConsole("Error while dispatching: %s", e.what());
+        connection.send(e.what());
       }
 
       connection.close();
-
 
     }
 

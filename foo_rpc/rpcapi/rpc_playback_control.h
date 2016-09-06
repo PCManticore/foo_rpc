@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <map>
 #include <tuple>
 
 #include "stdafx.h"
@@ -15,6 +16,7 @@ using namespace std;
 
 namespace foobar {
 
+
   class RpcPlaylist {
   private:
     Playlist pl;
@@ -22,7 +24,7 @@ namespace foobar {
   public:
     RpcPlaylist() {}
 
-    string playback_format_title_complete(const char* & buf) {
+    string playback_format_title_complete(vector<char> buf) {
 
       auto dst = unpack_from_buf<tuple<string, t_size, t_size>>(buf);
       ApiParam<tuple<const char*, t_size, t_size>> param(make_tuple(
@@ -45,4 +47,39 @@ namespace foobar {
       return str.substr(0, resSize);
     }
   };
+}
+
+namespace foobar {
+  typedef map<string, std::function<string(vector<char> &)>> dispatch_map;
+
+  class MethodDispatcher {
+  private:
+    RpcPlaylist rpc_playlist;
+    dispatch_map registry;
+
+  public:
+
+    MethodDispatcher() {
+      registry["Playlist.playback_format_title_complete"] = [&](vector<char> & param) {
+        return rpc_playlist.playback_format_title_complete(param);
+      };
+    }
+
+    string dispatch(vector<char> received) {
+      string method_name;
+      vector<char> buf;      
+
+      auto dst = unpack_from_buf<tuple<string, vector<char>>>(received);
+      tie(method_name, buf) = dst;
+
+      dispatch_map::const_iterator iter = registry.find(method_name);
+      if (iter == registry.end())
+      {
+        throw RPCException("Cannot find the given method.");
+      }      
+      return iter->second(buf);
+    }
+
+  };  
+
 }
