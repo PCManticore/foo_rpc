@@ -1,9 +1,9 @@
 #pragma once
 #include <string>
 
-#include "stdafx.h"
-#include "event.h"
-#include "percolate.h"
+#include "../stdafx.h"
+#include "../event.h"
+#include "../percolate.h"
 
 
 using namespace std;

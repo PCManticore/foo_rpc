@@ -9,12 +9,8 @@
 #include "pipe.h"
 #include "_winapi.h"
 #include "stdafx.h"
-#include "api/playback_control.h"
-#include "api/coreversion.h"
-#include "api/playlist.h"
-#include "rpcapi/rpc_playback_control.h"
 
-#include "msgpack.hpp"
+#include "rpcapi/dispatch.h"
 
 using namespace std;
 
@@ -59,11 +55,8 @@ public:
         logToFoobarConsole("Error while dispatching: %s", e.what());
         connection.send(e.what());
       }
-
       connection.close();
-
     }
-
     return 0;
 
   }

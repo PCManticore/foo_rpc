@@ -1,7 +1,6 @@
 #include <string>
 
-#include "stdafx.h"
-
+#include "../stdafx.h"
 
 namespace foobar {
 

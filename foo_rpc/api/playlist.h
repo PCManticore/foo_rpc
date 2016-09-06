@@ -1,9 +1,9 @@
 #pragma once
 #include <map>
+#include <vector>
 
-#include "stdafx.h"
-#include "percolate.h"
-
+#include "../stdafx.h"
+#include "../percolate.h"
 
 using namespace std;
 
@@ -60,7 +60,6 @@ namespace foobar {
 
       t_size created_index = playlist_manager->create_playlist(p_name, p_name_length, p_index);
       result.setResult(created_index);
-
     }
     
     void reorder(ApiParam<tuple<const t_size *, t_size>> param,

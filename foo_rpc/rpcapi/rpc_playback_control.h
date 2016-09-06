@@ -17,30 +17,26 @@ using namespace std;
 namespace foobar {
 
 
-  class RpcPlaylist {
+  class RpcPlaybackControl {
   private:
-    Playlist pl;
+    foobar::PlaybackControl pc;
 
   public:
-    RpcPlaylist() {}
+    RpcPlaybackControl() {}
 
-    string playback_format_title_complete(vector<char> buf) {
+    string playback_format_title_complete(vector<char> & _unused) {
 
-      auto dst = unpack_from_buf<tuple<string, t_size, t_size>>(buf);
-      ApiParam<tuple<const char*, t_size, t_size>> param(make_tuple(
-        std::get<0>(dst).c_str(),
-        std::get<1>(dst),
-        std::get<2>(dst)
-      ));
-      ApiResult<t_size> resultAPI;
+      ApiResult<tuple<string, BOOL>> result;
 
       fb2k::inMainThread([&] {
-        pl.create_playlist(param, resultAPI);
+        pc.playback_format_title_complete(result);
       });
-      resultAPI.wait();
+      result.wait();
 
       msgpack::sbuffer sbuf;
-      msgpack::pack(sbuf, resultAPI.result());
+      tuple<string, bool> converted = result.result();
+      // TODO: maybe we should drop BOOL altogether?
+      msgpack::pack(sbuf, converted);
 
       int resSize = sbuf.size();
       string str(sbuf.data());
@@ -49,37 +45,3 @@ namespace foobar {
   };
 }
 
-namespace foobar {
-  typedef map<string, std::function<string(vector<char> &)>> dispatch_map;
-
-  class MethodDispatcher {
-  private:
-    RpcPlaylist rpc_playlist;
-    dispatch_map registry;
-
-  public:
-
-    MethodDispatcher() {
-      registry["Playlist.playback_format_title_complete"] = [&](vector<char> & param) {
-        return rpc_playlist.playback_format_title_complete(param);
-      };
-    }
-
-    string dispatch(vector<char> received) {
-      string method_name;
-      vector<char> buf;      
-
-      auto dst = unpack_from_buf<tuple<string, vector<char>>>(received);
-      tie(method_name, buf) = dst;
-
-      dispatch_map::const_iterator iter = registry.find(method_name);
-      if (iter == registry.end())
-      {
-        throw RPCException("Cannot find the given method.");
-      }      
-      return iter->second(buf);
-    }
-
-  };  
-
-}

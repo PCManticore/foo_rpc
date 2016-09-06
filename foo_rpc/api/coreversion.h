@@ -1,6 +1,10 @@
 #pragma once
-#include "stdafx.h"
-#include "percolate.h"
+#include <tuple>
+
+#include "../stdafx.h"
+#include "../percolate.h"
+
+using namespace std;
 
 namespace foobar {
   class CoreVersion {
