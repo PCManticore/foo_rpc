@@ -7,12 +7,11 @@
 #include "event.h"
 #include "percolate.h"
 #include "api/playback_control.h"
-
-#include "msgpack_util.h"
-#include "msgpack.hpp"
-
+#include "serialization/msgpack.h"
 
 using namespace std;
+using namespace serialization;
+
 
 namespace foobar {
 
@@ -24,23 +23,14 @@ namespace foobar {
   public:
     RpcPlaybackControl() {}
 
-    string playback_format_title_complete(vector<char> & _unused) {
-
-      ApiResult<tuple<string, BOOL>> result;
-
+    Payload playback_format_title_complete(vector<char> & _unused) {      
+      ApiResult<string> result;
       fb2k::inMainThread([&] {
         pc.playback_format_title_complete(result);
       });
       result.wait();
-
-      msgpack::sbuffer sbuf;
-      tuple<string, bool> converted = result.result();
-      // TODO: maybe we should drop BOOL altogether?
-      msgpack::pack(sbuf, converted);
-
-      int resSize = sbuf.size();
-      string str(sbuf.data());
-      return str.substr(0, resSize);
+      
+      return serialization::Msgpack::packed_result(result);
     }
   };
 }

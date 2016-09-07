@@ -22,7 +22,7 @@ typedef struct {
 OverlappedObject* new_overlapped(HANDLE handle);
 DWORD wait_overlapped_event(OverlappedObject* overlapped);
 DWORD create_pipe(std::string pipeAddress, HANDLE * pipeOut, bool isFirst);
-Result<DWORD> send_bytes(HANDLE handle, const char * writeBuffer, int len);
+Result<DWORD> send_bytes(HANDLE handle, string writeBuffer, int len);
 Result<tuple<DWORD, DWORD>> recv_bytes(HANDLE handle, char * readBuffer, int size);
 Result<OverlappedObject*> connect_pipe(HANDLE handle);
 Result<DWORD> get_overlapped_result(OverlappedObject * overlapped);

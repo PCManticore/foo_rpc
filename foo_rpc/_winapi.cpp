@@ -120,13 +120,13 @@ Result<DWORD> get_overlapped_result(OverlappedObject * overlapped) {
 
 Result<tuple<DWORD, DWORD>> write_to_pipe(HANDLE handle,
                                           OverlappedObject * overlapped,
-                                          const char * writeBuffer,
+                                          string writeBuffer,
                                           int len) {
   DWORD written;
   BOOL ret;
   DWORD err;
 
-  ret = WriteFile(handle, writeBuffer, len, &written,
+  ret = WriteFile(handle, writeBuffer.c_str(), len, &written,
                   overlapped ? &overlapped->overlapped : NULL);
   err = ret ? 0 : GetLastError();
 
@@ -209,7 +209,7 @@ Result<tuple<DWORD, vector<char>>> get_more_data(HANDLE handle) {
   return Result<tuple<DWORD, vector<char>>>(make_tuple(nread, buffer));
 }
 
-Result<DWORD> send_bytes(HANDLE handle, const char * writeBuffer, int len) {
+Result<DWORD> send_bytes(HANDLE handle, string writeBuffer, int len) {
   DWORD error;
   DWORD written;
   DWORD waitres;

@@ -3,12 +3,13 @@
 #include <string>
 
 #include "rpc_playback_control.h"
+#include "serialization/msgpack.h"
 
 using namespace std;
-
+using namespace serialization;
 
 namespace foobar {
-  typedef map<string, std::function<string(vector<char> &)>> dispatch_map;
+  typedef map<string, std::function<Payload(vector<char> &)>> dispatch_map;
 
   class MethodDispatcher {
   private:
@@ -23,11 +24,11 @@ namespace foobar {
       };
     }
 
-    string dispatch(vector<char> received) {
+    Payload dispatch(vector<char> received) {
       string method_name;
       vector<char> buf;
 
-      auto dst = unpack_from_buf<tuple<string, vector<char>>>(received);
+      auto dst = serialization::Msgpack::unpack<tuple<string, vector<char>>>(received);
       tie(method_name, buf) = dst;
 
       dispatch_map::const_iterator iter = registry.find(method_name);

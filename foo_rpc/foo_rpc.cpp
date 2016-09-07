@@ -11,6 +11,7 @@
 #include "stdafx.h"
 
 #include "rpcapi/dispatch.h"
+#include "rpcapi/serialization/base.h"
 
 using namespace std;
 
@@ -48,8 +49,8 @@ public:
       tie(ignore, received) = result.result();
 
       try {
-        string rpc_result = dispatcher.dispatch(received);
-        connection.send(rpc_result.c_str());
+        serialization::Payload rpc_result = dispatcher.dispatch(received);
+        connection.send(rpc_result.data, rpc_result.size);
       }
       catch (RPCException & e) {
         logToFoobarConsole("Error while dispatching: %s", e.what());

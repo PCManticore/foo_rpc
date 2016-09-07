@@ -17,8 +17,12 @@ public:
 
   PipeConnection(OverlappedObject * overlappedObj) : overlapped(overlappedObj) {}
 
-  Result<DWORD> send(const char * bytes) {
-    return send_bytes(overlapped->handle, bytes, strlen(bytes));
+  Result<DWORD> send(string bytes, int length) {
+    return send_bytes(overlapped->handle, bytes, length);
+  }
+
+  Result<DWORD> send(string bytes) {
+    return send(bytes, bytes.length());
   }
 
   Result<tuple<DWORD, vector<char>>> recv() {

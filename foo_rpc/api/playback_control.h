@@ -26,9 +26,9 @@ namespace foobar {
       pc->get_now_playing(temp);      
     }
 
-    void start(ApiParam<tuple<play_control::t_track_command, BOOL>> param, Event event) {
+    void start(ApiParam<tuple<play_control::t_track_command, bool>> param, Event event) {
       play_control::t_track_command command;
-      BOOL is_paused;
+      bool is_paused;
       tie(command, is_paused) = param.value();
 
       pc->start(command, is_paused);
@@ -110,7 +110,7 @@ namespace foobar {
       response.setResult(position);
     }
 
-    void playback_format_title(ApiParam<string> param, ApiResult<tuple<string, BOOL>> & response) {
+    void playback_format_title(ApiParam<string> param, ApiResult<string> & response) {
 
       pfc::string8 temp;      
       titleformat_object::ptr script;
@@ -120,14 +120,14 @@ namespace foobar {
         NULL, temp, script, NULL,
         playback_control::t_display_level::display_level_all);
       if (success) {
-        response.setResult(make_tuple(temp.c_str(), success));
+        response.setResult(temp.c_str());
       }
       else {
-        response.setResult(make_tuple("", success));
+        response.setResult("");
       }
     }
 
-    void playback_format_title_complete(ApiResult<tuple<string, BOOL>> & response) {
+    void playback_format_title_complete(ApiResult<string> & response) {
       ApiParam<string> param(
         "[%album artist% -]['['%album%[CD%discnumber%]"
         "[#%tracknumber%]']'] % title%['//' %track artist%]");
