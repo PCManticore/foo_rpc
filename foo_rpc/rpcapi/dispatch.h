@@ -20,24 +20,6 @@ namespace foobar {
     
   public:
 
-    MethodDispatcher() {            
-      registry["PlaybackControl.playback_format_title_complete"] = [&](vector<char> & param) {
-        return rpc_playback_control.playback_format_title_complete(param);
-      };
-      registry["PlaybackControl.play_or_pause"] = [&](vector<char> & param) {
-        return rpc_playback_control.play_or_pause(param);
-      };
-      registry["PlaybackControl.set_volume"] = [&](vector<char> & param) {
-        return rpc_playback_control.set_volume(param);
-      };
-      registry["PlaybackControl.start"] = [&](vector<char> & param) {
-        return rpc_playback_control.start(param);
-      };
-      registry["CoreVersion.get_name"] = [&](vector<char> & param) {
-        return rpc_core_version.get_name(param);
-      };
-    }
-
     Payload dispatch(vector<char> received) {
       string method_name;
       vector<char> buf;
@@ -51,6 +33,143 @@ namespace foobar {
         throw RPCException("Cannot find the given method.");
       }
       return iter->second(buf);
+    }
+
+    MethodDispatcher() {
+
+      registry["CoreVersion.get_version_string"] = [&](vector<char> & param) {
+        return rpc_core_version.get_version_string(param);
+      };
+
+      registry["CoreVersion.get_name"] = [&](vector<char> & param) {
+        return rpc_core_version.get_name(param);
+      };
+
+      registry["CoreVersion.get_version"] = [&](vector<char> & param) {
+        return rpc_core_version.get_version(param);
+      };
+
+      registry["CoreVersion.get_version_as_text"] = [&](vector<char> & param) {
+        return rpc_core_version.get_version_as_text(param);
+      };
+
+      registry["CoreVersion.test_version"] = [&](vector<char> & param) {
+        return rpc_core_version.test_version(param);
+      };
+
+
+      registry["PlaybackControl.start"] = [&](vector<char> & param) {
+        return rpc_playback_control.start(param);
+      };
+
+      registry["PlaybackControl.stop"] = [&](vector<char> & param) {
+        return rpc_playback_control.stop(param);
+      };
+
+      registry["PlaybackControl.is_playing"] = [&](vector<char> & param) {
+        return rpc_playback_control.is_playing(param);
+      };
+
+      registry["PlaybackControl.is_paused"] = [&](vector<char> & param) {
+        return rpc_playback_control.is_paused(param);
+      };
+
+      registry["PlaybackControl.pause"] = [&](vector<char> & param) {
+        return rpc_playback_control.pause(param);
+      };
+
+      registry["PlaybackControl.get_stop_after_current"] = [&](vector<char> & param) {
+        return rpc_playback_control.get_stop_after_current(param);
+      };
+
+      registry["PlaybackControl.set_stop_after_current"] = [&](vector<char> & param) {
+        return rpc_playback_control.set_stop_after_current(param);
+      };
+
+      registry["PlaybackControl.set_volume"] = [&](vector<char> & param) {
+        return rpc_playback_control.set_volume(param);
+      };
+
+      registry["PlaybackControl.get_volume"] = [&](vector<char> & param) {
+        return rpc_playback_control.get_volume(param);
+      };
+
+      registry["PlaybackControl.volume_up"] = [&](vector<char> & param) {
+        return rpc_playback_control.volume_up(param);
+      };
+
+      registry["PlaybackControl.volume_down"] = [&](vector<char> & param) {
+        return rpc_playback_control.volume_down(param);
+      };
+
+      registry["PlaybackControl.volume_mute_toggle"] = [&](vector<char> & param) {
+        return rpc_playback_control.volume_mute_toggle(param);
+      };
+
+      registry["PlaybackControl.playback_seek"] = [&](vector<char> & param) {
+        return rpc_playback_control.playback_seek(param);
+      };
+
+      registry["PlaybackControl.playback_seek_delta"] = [&](vector<char> & param) {
+        return rpc_playback_control.playback_seek_delta(param);
+      };
+
+      registry["PlaybackControl.playback_can_seek"] = [&](vector<char> & param) {
+        return rpc_playback_control.playback_can_seek(param);
+      };
+
+      registry["PlaybackControl.playback_get_position"] = [&](vector<char> & param) {
+        return rpc_playback_control.playback_get_position(param);
+      };
+
+      registry["PlaybackControl.playback_format_title"] = [&](vector<char> & param) {
+        return rpc_playback_control.playback_format_title(param);
+      };
+
+      registry["PlaybackControl.playback_format_title_complete"] = [&](vector<char> & param) {
+        return rpc_playback_control.playback_format_title_complete(param);
+      };
+
+      registry["PlaybackControl.playback_get_length"] = [&](vector<char> & param) {
+        return rpc_playback_control.playback_get_length(param);
+      };
+
+      registry["PlaybackControl.playback_get_length_ex"] = [&](vector<char> & param) {
+        return rpc_playback_control.playback_get_length_ex(param);
+      };
+
+      registry["PlaybackControl.toggle_stop_after_current"] = [&](vector<char> & param) {
+        return rpc_playback_control.toggle_stop_after_current(param);
+      };
+
+      registry["PlaybackControl.toggle_pause"] = [&](vector<char> & param) {
+        return rpc_playback_control.toggle_pause(param);
+      };
+
+      registry["PlaybackControl.play_or_pause"] = [&](vector<char> & param) {
+        return rpc_playback_control.play_or_pause(param);
+      };
+
+      registry["PlaybackControl.play_or_unpause"] = [&](vector<char> & param) {
+        return rpc_playback_control.play_or_unpause(param);
+      };
+
+      registry["PlaybackControl.previous"] = [&](vector<char> & param) {
+        return rpc_playback_control.previous(param);
+      };
+
+      registry["PlaybackControl.next"] = [&](vector<char> & param) {
+        return rpc_playback_control.next(param);
+      };
+
+      registry["PlaybackControl.is_muted"] = [&](vector<char> & param) {
+        return rpc_playback_control.is_muted(param);
+      };
+
+      registry["PlaybackControl.get_volume_step"] = [&](vector<char> & param) {
+        return rpc_playback_control.get_volume_step(param);
+      };
+
     }
 
   };
