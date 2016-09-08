@@ -76,6 +76,12 @@ RESULT_AND_PARAM = """
       return serialization::serializer.packed_result(result);
     }}"""
 
+DISPATCH_ENTRY = '''
+      registry["{cls_name}.{method}"] = [&](vector<char> & param) {{
+        return {rpc_member}.{method}(param);
+      }};
+'''
+
 
 def _generate_method_from_parameters(name, parameters):
     if len(parameters) == 1:
@@ -148,17 +154,43 @@ def generate_header(args):
             stream.write(header_header)
 
 
+def _to_snake_case(name):
+    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+
+
+def generate_dispatch(args):
+    header = parse_header(args.header)
+    for cls, cls_body in header.classes.items():
+        cls_snake_case = _to_snake_case(cls)
+        rpc_member = "rpc_" + cls_snake_case
+
+        for method in cls_body['methods']['public']:
+            name = method['name']
+            if name == cls:
+                # Constructor.
+                continue
+            print(DISPATCH_ENTRY.format(rpc_member=rpc_member, method=name, cls_name=cls), end="")
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="cmd")
     generate_header_parser = subparsers.add_parser(
         "generate_header",
-        description="Generate a RPC header file from an API header file.")
+        description="Generates a RPC header file from an API header file.")
+    generate_dispatch_parser = subparsers.add_parser(
+        "generate_dispatch",
+        description="Generates a partial dispatch table with the methods "
+                    "from the given header.")
 
     generate_header_parser.add_argument("--header", type=str)
     generate_header_parser.add_argument("--output",
                                         required=True,
                                         type=argparse.FileType('w+'))
+
+    generate_dispatch_parser.add_argument("--header", type=str)
+
     args = parser.parse_args()
 
     if args.cmd is None:
