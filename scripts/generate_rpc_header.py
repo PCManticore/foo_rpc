@@ -1,5 +1,6 @@
 """Parses a given header in order to generate the RPC interface of it."""
 
+import argparse
 import datetime
 import os
 import re
@@ -133,13 +134,35 @@ class RpcClass(object):
 def parse_header(header_file):
     return header_parser.CppHeader(header_file)
 
-
-if __name__ == '__main__':
-    header = parse_header(sys.argv[1])
+def generate_header(args):
+    header = parse_header(args.header)
     for cls, cls_body in header.classes.items():
         class_header = RpcClass(cls, cls_body).generate()
+
         header_header = HEADER_HEADER.format(
             header=os.path.basename(sys.argv[1]),
             cls=class_header,
             date=datetime.datetime.now().strftime("%Y-%M-%d %H:%m:%S"))
-        print(header_header)
+
+        with args.output as stream:
+            stream.write(header_header)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers(dest="cmd")
+    generate_header_parser = subparsers.add_parser(
+        "generate_header",
+        description="Generate a RPC header file from an API header file.")
+
+    generate_header_parser.add_argument("--header", type=str)
+    generate_header_parser.add_argument("--output",
+                                        required=True,
+                                        type=argparse.FileType('w+'))
+    args = parser.parse_args()
+
+    if args.cmd is None:
+        parser.print_help()
+        exit()
+
+    globals()[args.cmd](args)
