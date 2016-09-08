@@ -11,13 +11,17 @@ namespace serialization {
       size = value_size;
     }
   };
-
+  
   class Serializer {
-  public:
-    template<typename T>
-    static T unpack(vector<char> buf) {};
+  public:    
 
     template<typename T>
-    static Payload packed_result(ApiResult<T> result) {};
+    T unpack(vector<char> buf) {};
+
+    template<typename T>
+    Payload packed_bool(bool value) {};
+
+    template<typename T>
+    Payload packed_result(ApiResult<T> result) {};
   };
 }

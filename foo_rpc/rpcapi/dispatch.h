@@ -3,7 +3,7 @@
 #include <string>
 
 #include "rpc_playback_control.h"
-#include "serialization/msgpack.h"
+#include "factory.h"
 
 using namespace std;
 using namespace serialization;
@@ -12,15 +12,21 @@ namespace foobar {
   typedef map<string, std::function<Payload(vector<char> &)>> dispatch_map;
 
   class MethodDispatcher {
-  private:
-    RpcPlaybackControl rpc_playback_control;
+  private:    
+    RpcPlaybackControl rpc_playback_control;    
     dispatch_map registry;
-
+    
   public:
 
-    MethodDispatcher() {
+    MethodDispatcher() {            
       registry["PlaybackControl.playback_format_title_complete"] = [&](vector<char> & param) {
         return rpc_playback_control.playback_format_title_complete(param);
+      };
+      registry["PlaybackControl.play_or_pause"] = [&](vector<char> & param) {
+        return rpc_playback_control.play_or_pause(param);
+      };
+      registry["PlaybackControl.set_volume"] = [&](vector<char> & param) {
+        return rpc_playback_control.set_volume(param);
       };
     }
 
@@ -28,7 +34,7 @@ namespace foobar {
       string method_name;
       vector<char> buf;
 
-      auto dst = serialization::Msgpack::unpack<tuple<string, vector<char>>>(received);
+      auto dst = serializer.unpack<tuple<string, vector<char>>>(received);
       tie(method_name, buf) = dst;
 
       dispatch_map::const_iterator iter = registry.find(method_name);

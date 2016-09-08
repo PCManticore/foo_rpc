@@ -34,7 +34,7 @@ public:
   DWORD listen_commands() {
 
     vector<char> received;    
-    foobar::MethodDispatcher dispatcher;
+    auto dispatcher = foobar::MethodDispatcher();
 
     while (true) {
       
