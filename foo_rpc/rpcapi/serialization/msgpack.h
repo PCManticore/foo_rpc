@@ -6,8 +6,10 @@
 
 #include "msgpack.hpp"
 
-namespace serialization {  
+MSGPACK_ADD_ENUM(play_control::t_track_command);
 
+namespace serialization {  
+ 
   class Msgpack : public Serializer {
   private:
     template<typename T>

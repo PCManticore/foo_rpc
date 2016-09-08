@@ -3,6 +3,7 @@
 #include <string>
 
 #include "rpc_playback_control.h"
+#include "rpc_coreversion.h"
 #include "factory.h"
 
 using namespace std;
@@ -13,7 +14,8 @@ namespace foobar {
 
   class MethodDispatcher {
   private:    
-    RpcPlaybackControl rpc_playback_control;    
+    RpcPlaybackControl rpc_playback_control;
+    RpcCoreVersion rpc_core_version;
     dispatch_map registry;
     
   public:
@@ -27,6 +29,12 @@ namespace foobar {
       };
       registry["PlaybackControl.set_volume"] = [&](vector<char> & param) {
         return rpc_playback_control.set_volume(param);
+      };
+      registry["PlaybackControl.start"] = [&](vector<char> & param) {
+        return rpc_playback_control.start(param);
+      };
+      registry["CoreVersion.get_name"] = [&](vector<char> & param) {
+        return rpc_core_version.get_name(param);
       };
     }
 

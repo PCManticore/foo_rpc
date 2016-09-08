@@ -21,11 +21,6 @@ namespace foobar {
     
     // TODO: get_now_playing
 
-    void get_now_playing() {
-      metadb_handle_ptr temp;
-      pc->get_now_playing(temp);      
-    }
-
     void start(ApiParam<tuple<play_control::t_track_command, bool>> param, Event event) {
       play_control::t_track_command command;
       bool is_paused;
