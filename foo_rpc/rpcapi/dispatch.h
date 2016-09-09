@@ -2,8 +2,8 @@
 #include <map>
 #include <string>
 
-#include "rpc_playback_control.h"
-#include "rpc_coreversion.h"
+#include "rpc/playback_control.h"
+#include "rpc/coreversion.h"
 #include "factory.h"
 
 using namespace std;
