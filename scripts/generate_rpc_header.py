@@ -146,7 +146,7 @@ def generate_header(args):
         class_header = RpcClass(cls, cls_body).generate()
 
         header_header = HEADER_HEADER.format(
-            header=os.path.basename(sys.argv[1]),
+            header=os.path.basename(args.header),
             cls=class_header,
             date=datetime.datetime.now().strftime("%Y-%M-%d %H:%m:%S"))
 
