@@ -52,24 +52,27 @@ namespace foobar {
       event.set();
     }
 
-    void create_playlist(ApiParam < tuple<const char *, t_size, t_size>> param,
+    void create_playlist(ApiParam <tuple<vector<char>, t_size, t_size>> param,
                          ApiResult<t_size> & result) {
-      const char * p_name;
+      vector<char> p_name;
       t_size p_name_length, p_index;
       tie(p_name, p_name_length, p_index) = param.value();
 
-      t_size created_index = playlist_manager->create_playlist(p_name, p_name_length, p_index);
+      t_size created_index = playlist_manager->create_playlist(p_name.data(), p_name_length, p_index);
       result.setResult(created_index);
     }
     
-    void reorder(ApiParam<tuple<const t_size *, t_size>> param,
+   void reorder(ApiParam<vector<int>> param,
                  ApiResult<bool> & result) {
-      const t_size * p_order;
-      t_size p_count;
-      tie(p_order, p_count) = param.value();
+      pfc::array_t<t_size> order;
+      vector<int> permutations = param.value();
+      order.set_size(permutations.size());
 
-      bool succesful = playlist_manager->reorder(p_order, p_count);
+      for (t_size index = 0; index < permutations.size(); index++) {
+        order[index] = permutations[index];
+      }
 
+      bool succesful = playlist_manager->reorder(order.get_ptr(), order.get_count());
       result.setResult(succesful);
 
     }
@@ -87,11 +90,12 @@ namespace foobar {
       result.setResult(focus);
     }
 
-    void playlist_get_name(ApiParam<t_size> param, ApiResult<tuple<pfc::string8, bool>> & result) {
+    void playlist_get_name(ApiParam<t_size> param, ApiResult<pfc::string8> & result) {
       t_size p_playlist = param.value();
       pfc::string8 temp;
       bool success = playlist_manager->playlist_get_name(p_playlist, temp);
-      result.setResult(make_tuple(temp, success));
+          
+      result.setResult(temp);
     }
 
     void playlist_reorder_items(ApiParam<tuple<t_size, vector<int>>> param,
@@ -101,7 +105,7 @@ namespace foobar {
       vector<int> permutations;
       tie(p_playlist, permutations) = param.value();
       order.set_size(permutations.size());
-      for (int index = 0; index < permutations.size(); index++) {
+      for (size_t index = 0; index < permutations.size(); index++) {
         order[index] = permutations[index];
       }
 
@@ -109,10 +113,10 @@ namespace foobar {
       result.setResult(success);
     }
 
-    void playlist_set_selection(ApiParam<tuple<t_size, vector<t_size>, vector<t_size>>> param, Event event) {
+    void playlist_set_selection(ApiParam<tuple<t_size, vector<t_size>, vector<bool>>> param, Event event) {
       t_size p_playlist;
       vector<t_size> p_affected;
-      vector<t_size> p_status;
+      vector<bool> p_status;
       tie(p_playlist, p_affected, p_status) = param.value();
 
       if (p_status.size() != p_affected.size()) {
@@ -124,7 +128,7 @@ namespace foobar {
       pfc::bit_array_var_impl p_affected_array;
       bit_array_bittable p_status_array(p_affected.size());      
       
-      for (int index = 0; index < p_affected.size(); index++) {
+      for (size_t index = 0; index < p_affected.size(); index++) {
         auto elem = p_affected[index];
         auto status = p_status[index];
 

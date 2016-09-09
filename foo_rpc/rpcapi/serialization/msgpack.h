@@ -8,6 +8,23 @@
 
 MSGPACK_ADD_ENUM(play_control::t_track_command);
 
+namespace msgpack {
+  MSGPACK_API_VERSION_NAMESPACE(MSGPACK_DEFAULT_API_NS) {
+    namespace adaptor {
+
+
+      template<>
+      struct pack<pfc::string8> {
+        template <typename Stream>
+        packer<Stream>& operator()(msgpack::packer<Stream>& o, pfc::string8 const& v) const {
+          o.pack(v.c_str());
+          return o;
+        }
+      };
+    }
+  }
+}
+
 namespace serialization {  
  
   class Msgpack : public Serializer {

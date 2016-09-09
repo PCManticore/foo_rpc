@@ -4,6 +4,7 @@
 
 #include "rpc/playback_control.h"
 #include "rpc/coreversion.h"
+#include "rpc/playlist.h"
 #include "factory.h"
 
 using namespace std;
@@ -16,6 +17,7 @@ namespace foobar {
   private:    
     RpcPlaybackControl rpc_playback_control;
     RpcCoreVersion rpc_core_version;
+    RpcPlaylist rpc_playlist;
     dispatch_map registry;
     
   public:
@@ -168,6 +170,62 @@ namespace foobar {
 
       registry["PlaybackControl.get_volume_step"] = [&](vector<char> & param) {
         return rpc_playback_control.get_volume_step(param);
+      };
+      
+      registry["Playlist.get_playlist_count"] = [&](vector<char> & param) {
+        return rpc_playlist.get_playlist_count(param);
+      };
+
+      registry["Playlist.get_active_playlist"] = [&](vector<char> & param) {
+        return rpc_playlist.get_active_playlist(param);
+      };
+
+      registry["Playlist.set_active_playlist"] = [&](vector<char> & param) {
+        return rpc_playlist.set_active_playlist(param);
+      };
+
+      registry["Playlist.get_playing_playlist"] = [&](vector<char> & param) {
+        return rpc_playlist.get_playing_playlist(param);
+      };
+
+      registry["Playlist.set_playing_playlist"] = [&](vector<char> & param) {
+        return rpc_playlist.set_playing_playlist(param);
+      };
+
+      registry["Playlist.remove_playlists"] = [&](vector<char> & param) {
+        return rpc_playlist.remove_playlists(param);
+      };
+
+      registry["Playlist.create_playlist"] = [&](vector<char> & param) {
+        return rpc_playlist.create_playlist(param);
+      };
+      
+     registry["Playlist.reorder"] = [&](vector<char> & param) {
+        return rpc_playlist.reorder(param);
+      };
+
+      registry["Playlist.playlist_get_item_count"] = [&](vector<char> & param) {
+        return rpc_playlist.playlist_get_item_count(param);
+      };
+
+      registry["Playlist.playlist_get_focus_item"] = [&](vector<char> & param) {
+        return rpc_playlist.playlist_get_focus_item(param);
+      };
+      
+     registry["Playlist.playlist_get_name"] = [&](vector<char> & param) {
+        return rpc_playlist.playlist_get_name(param);
+      };
+
+      registry["Playlist.playlist_reorder_items"] = [&](vector<char> & param) {
+        return rpc_playlist.playlist_reorder_items(param);
+      };
+
+      registry["Playlist.playlist_set_selection"] = [&](vector<char> & param) {
+        return rpc_playlist.playlist_set_selection(param);
+      };
+
+      registry["Playlist.playlist_remove_items"] = [&](vector<char> & param) {
+        return rpc_playlist.playlist_remove_items(param);
       };
 
     }
