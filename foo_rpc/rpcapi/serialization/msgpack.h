@@ -35,7 +35,7 @@ namespace serialization {
       msgpack::pack(sbuf, data);
       // This is quite trashy, but we will lose the buffer
       // once it goes out of scope.
-      Payload payload(string(sbuf.data()), sbuf.size());
+      Payload payload(string(sbuf.data(), sbuf.size()), sbuf.size());
       return payload;
     }    
 
