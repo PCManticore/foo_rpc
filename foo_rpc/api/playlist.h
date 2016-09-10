@@ -12,6 +12,7 @@ namespace foobar {
   class Playlist {
   private:
     static_api_ptr_t<playlist_manager> playlist_manager;
+    static_api_ptr_t<metadb> metadb_manager;
     
   public:
     void get_playlist_count(ApiResult<t_size> & result) {
@@ -154,13 +155,183 @@ namespace foobar {
       result.setResult(successful);
     }
 
-    // TODO: virtual bool playlist_replace_item(t_size p_playlist,t_size p_item,const metadb_handle_ptr & p_new_item) = 0;
+    void playlist_replace_item(ApiParam<tuple<t_size, t_size, string>> param, ApiResult<bool> & result) {
+      t_size p_playlist;
+      t_size p_item;
+      string path;
+      tie(p_playlist, p_item, path) = param.value();
 
-    //void playlist_set_focus_item(ApiParam<tuple<t_size, t_size>> param, Event event) {
-     // t_size 
-    //}
-    //! Sets index of focus item on specified playlist; use infinite to set no focus item.
-    //virtual void playlist_set_focus_item(t_size p_playlist, t_size p_item) = 0;
+      metadb_handle_ptr handle;
+      metadb_manager->handle_create(handle, make_playable_location(path.c_str(), 0));
+
+      bool success = playlist_manager->playlist_replace_item(p_playlist, p_item, handle);
+
+      result.setResult(success);
+    }
+
+    void playlist_set_focus_item(ApiParam<tuple<t_size, t_size>> param, Event event) {
+      t_size p_playlist, p_item;
+      tie(p_playlist, p_item) = param.value();
+
+      playlist_manager->playlist_set_focus_item(p_playlist, p_item);
+
+      event.set();
+    }
+
+    void playlist_insert_items(ApiParam<tuple<t_size, t_size, vector<string>>> param,
+                               ApiResult<t_size> & result) {
+      t_size p_playlist, p_base;
+      vector<string> files;
+      
+      tie(p_playlist, p_base, files) = param.value();
+
+      // Build the required handles.
+      pfc::list_t<metadb_handle_ptr> handles;
+      for (auto file : files) {
+        metadb_handle_ptr handle;
+        metadb_manager->handle_create(handle, make_playable_location(file.c_str(), 0));        
+        handles.add_item(handle);
+      }
+      
+      t_size res = playlist_manager->playlist_insert_items(
+        p_playlist, p_base, handles, bit_array_true());
+
+      result.setResult(res);
+    }
+
+
+    void playlist_ensure_visible(ApiParam<tuple<t_size, t_size>> param, Event event) {
+      t_size p_playlist, p_item;
+      tie(p_playlist, p_item) = param.value();
+
+      playlist_manager->playlist_ensure_visible(p_playlist, p_item);
+
+      event.set();
+    }
+
+    void playlist_rename(ApiParam<tuple<t_size, string>> param,
+                         ApiResult<bool> &  result) {
+      string name;
+      t_size p_playlist;
+      tie(p_playlist, name) = param.value();
+
+      bool success = playlist_manager->playlist_rename(
+        p_playlist, name.c_str(), name.length());
+
+      result.setResult(success);
+
+    }
+
+    void playlist_undo_backup(ApiParam<t_size> param, Event event) {
+      t_size p_playlist = param.value();
+      playlist_manager->playlist_undo_backup(p_playlist);
+      event.set();
+    }
+
+    void playlist_undo_restore(ApiParam<t_size> param, ApiResult<bool> & result) {
+      t_size p_playlist = param.value();
+
+      bool success = playlist_manager->playlist_undo_restore(p_playlist);
+
+      result.setResult(success);
+    }
+
+    void playlist_redo_restore(ApiParam<t_size> param, ApiResult<bool> & result) {
+      t_size p_playlist = param.value();
+
+      bool success = playlist_manager->playlist_redo_restore(p_playlist);
+
+      result.setResult(success);
+    }
+
+    void playlist_is_undo_available(ApiParam<t_size> param, ApiResult<bool> & result) {
+      t_size p_playlist = param.value();
+
+      bool success = playlist_manager->playlist_is_undo_available(p_playlist);
+
+      result.setResult(success);
+    }
+
+    void playlist_is_redo_available(ApiParam<t_size> param, ApiResult<bool> & result) {
+      t_size p_playlist = param.value();
+
+      bool success = playlist_manager->playlist_is_redo_available(p_playlist);
+
+      result.setResult(success);
+    }
+
+    void playlist_item_format_title(ApiParam<tuple<t_size, t_size, string>> param, ApiResult<pfc::string8>& result) {
+      string format;
+      pfc::string8 temp;
+      t_size p_playlist, p_item;
+
+      tie(p_playlist, p_item, format) = param.value();
+
+      titleformat_object::ptr script;
+      static_api_ptr_t<titleformat_compiler>()->compile_force(script, format.c_str());
+
+      playlist_manager->playlist_item_format_title(
+        p_playlist,
+        p_item,
+        NULL,
+        temp,
+        script.get_ptr(),
+        NULL,
+        playback_control::t_display_level::display_level_all
+      );      
+      result.setResult(temp);
+    }
+
+    void get_playing_item_location(ApiResult<tuple<bool, t_size, t_size>> & result) {
+      t_size p_playlist = INFINITY;
+      t_size p_index = INFINITY;
+
+      bool success = playlist_manager->get_playing_item_location(&p_playlist, &p_index);
+
+      result.setResult(make_tuple(success, p_playlist, p_index));
+    }
+
+    void playlist_sort_by_format(ApiParam<tuple<t_size, string, bool>> param, ApiResult<bool> & result) {
+      t_size p_playlist;
+      string format;
+      bool p_sel_only;
+
+      tie(p_playlist, format, p_sel_only) = param.value();
+      
+      bool success = playlist_manager->playlist_sort_by_format(
+        p_playlist, format.c_str(), p_sel_only);
+
+      result.setResult(success);
+
+    }
+
+    void playback_order_get_count(ApiResult<t_size> & result) {
+      t_size order = playlist_manager->playback_order_get_count();
+
+      result.setResult(order);
+    }
+
+    void playback_order_get_name(ApiParam<t_size> param, ApiResult<string> & result) {
+      t_size p_index = param.value();
+
+      const char* name = playlist_manager->playback_order_get_name(p_index);
+
+      string temp(name);
+      result.setResult(temp);
+    }
+
+    void playback_order_get_active(ApiResult<t_size> & result) {
+      t_size index = playlist_manager->playback_order_get_active();
+      result.setResult(index);
+    }
+
+    void playback_order_set_active(ApiParam<t_size> param, Event event) {
+      t_size p_index = param.value();
+
+      playlist_manager->playback_order_set_active(p_index);
+
+      event.set();
+    }
 
   };
 }
