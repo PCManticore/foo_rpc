@@ -20,7 +20,7 @@ class RpcCoreVersion {
   public:
 
     Payload get_version_string(vector<char> & buffer) {
-      ApiResult<const char *> result;
+      ApiResult<string> result;
       fb2k::inMainThread([&] {
         api.get_version_string(result);
       });
@@ -29,7 +29,7 @@ class RpcCoreVersion {
     }
 
     Payload get_name(vector<char> & buffer) {
-      ApiResult<const char *> result;
+      ApiResult<string> result;
       fb2k::inMainThread([&] {
         api.get_name(result);
       });
@@ -47,7 +47,7 @@ class RpcCoreVersion {
     }
 
     Payload get_version_as_text(vector<char> & buffer) {
-      ApiResult<const char *> result;
+      ApiResult<string> result;
       fb2k::inMainThread([&] {
         api.get_version_as_text(result);
       });
