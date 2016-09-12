@@ -21,6 +21,18 @@ namespace msgpack {
           return o;
         }
       };
+
+      template<>
+      struct pack<t_playback_queue_item> {
+        template <typename Stream>
+        packer<Stream>& operator()(msgpack::packer<Stream>& o, t_playback_queue_item const& v) const {
+          map<string, t_size> playback_item;
+          playback_item["item"] = v.m_item;
+          playback_item["playlist"] = v.m_playlist;
+          o.pack(playback_item);
+          return o;
+        }
+      };
     }
   }
 }

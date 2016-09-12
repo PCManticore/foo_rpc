@@ -333,5 +333,111 @@ namespace foobar {
       event.set();
     }
 
+    void queue_add_item_playlist(ApiParam<tuple<t_size, t_size>> param, Event event) {
+      t_size p_playlist, p_item;
+      tie(p_playlist, p_item) = param.value();
+
+      playlist_manager->queue_add_item_playlist(p_playlist, p_item);
+
+      event.set();
+
+    }
+
+    void queue_add_item(ApiParam<string> param, Event event) {
+      metadb_handle_ptr handle;
+      string file;
+
+      file = param.value();
+      
+      metadb_manager->handle_create(handle, make_playable_location(file.c_str(), 0));
+      
+      playlist_manager->queue_add_item(handle);
+
+      event.set();
+    }
+
+    void queue_get_count(ApiResult<t_size> & result) {
+      t_size count = playlist_manager->queue_get_count();
+
+      result.setResult(count);
+    }
+
+    void queue_get_contents(ApiResult<vector<t_playback_queue_item>>  & result) {
+      vector<t_playback_queue_item> contents;
+
+      pfc::list_t<t_playback_queue_item> handles;
+
+      playlist_manager->queue_get_contents(handles);
+
+      handles.for_each([&](auto handle) {
+        contents.push_back(handle);
+      });
+      
+      result.setResult(contents);
+      
+    }
+
+    void queue_remove_mask(ApiParam<vector<t_size>> param, Event event) {
+      vector<t_size> elems = param.value();
+      bit_array_bittable mask(elems.size());
+
+      for (auto elem : elems) {
+        mask.set(elem, true);
+      }
+
+      playlist_manager->queue_remove_mask(mask);
+
+      event.set();
+    }
+
+    void queue_flush(Event event) {
+      playlist_manager->queue_flush();
+
+      event.set();
+    }
+
+    void queue_is_active(ApiResult<bool> & result) {
+      bool is_active = playlist_manager->queue_is_active();
+
+      result.setResult(is_active);
+    }
+
+    void highlight_playing_item(ApiResult<bool> & result) {
+      bool success = playlist_manager->highlight_playing_item();
+
+      result.setResult(success);
+    }
+
+    void remove_playlist(ApiParam<t_size> param, ApiResult<bool> & result) {
+      t_size p_playlist = param.value();
+
+      bool success = playlist_manager->remove_playlist(p_playlist);
+
+      result.setResult(success);
+    }
+
+    void remove_playlist_switch(ApiParam<t_size> param, ApiResult<bool> & result) {
+      t_size p_playlist = param.value();
+
+      bool success = playlist_manager->remove_playlist_switch(p_playlist);
+
+      result.setResult(success);
+    }
+
+    void playlist_is_item_selected(ApiParam<tuple<t_size, t_size>> param, ApiResult<bool> & result) {
+      t_size p_playlist;
+      t_size p_item;
+      tie(p_playlist, p_item) = param.value();
+
+      bool success = playlist_manager->playlist_is_item_selected(p_playlist, p_item);
+
+      result.setResult(success);
+    }
+
+    /* TODO: can't implement over RPC:
+    bool playlist_get_item_handle(metadb_handle_ptr & p_out, t_size p_playlist, t_size p_item);
+    metadb_handle_ptr playlist_get_item_handle(t_size playlist, t_size item);
+    */
+
   };
 }
