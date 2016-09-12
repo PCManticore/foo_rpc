@@ -114,6 +114,27 @@ namespace foobar {
       result.setResult(success);
     }
 
+    void activeplaylist_reorder_items(ApiParam<vector<int>> param, ApiResult<bool> & result) {
+      t_size playlist = playlist_manager->get_active_playlist();
+      
+      ApiParam<tuple<t_size, vector<int>>> passthrough(make_tuple(playlist, param.value()));
+
+      playlist_reorder_items(passthrough, result);
+    }
+
+    void activeplaylist_set_selection(ApiParam<tuple<vector<t_size>, vector<bool>>> param, Event event) {
+      vector<t_size> p_affected;
+      vector<bool> p_status;
+      t_size playlist = playlist_manager->get_active_playlist();
+
+      tie(p_affected, p_status) = param.value();
+
+      ApiParam<tuple<t_size, vector<t_size>, vector<bool>>> passthrough(
+        make_tuple(playlist, p_affected, p_status));
+
+      playlist_set_selection(passthrough, event);
+    }
+
     void playlist_set_selection(ApiParam<tuple<t_size, vector<t_size>, vector<bool>>> param, Event event) {
       t_size p_playlist;
       vector<t_size> p_affected;
@@ -140,6 +161,15 @@ namespace foobar {
       playlist_manager->playlist_set_selection(p_playlist, bit_array_true(), p_status_array);
       event.set();
     }
+    
+    void activeplaylist_remove_items(ApiParam<vector<t_size>> param, ApiResult<bool> & result) {
+      t_size playlist = playlist_manager->get_active_playlist();
+
+      ApiParam<tuple<t_size, vector<t_size>>> passthrough(
+        make_tuple(playlist, param.value()));
+
+      playlist_remove_items(passthrough, result);
+    }
 
     void playlist_remove_items(ApiParam<tuple<t_size, vector<t_size>>> param, ApiResult<bool> & result) {
       t_size p_playlist;
@@ -153,6 +183,17 @@ namespace foobar {
 
       bool successful = playlist_manager->playlist_remove_items(p_playlist, table);
       result.setResult(successful);
+    }
+
+    void activeplaylist_replace_item(ApiParam<tuple<t_size, string>> param,
+                                     ApiResult<bool> & result) {
+      t_size playlist = playlist_manager->get_active_playlist();
+
+      ApiParam<tuple<t_size, t_size, string>> passthrough(
+        tuple_cat(make_tuple(playlist), param.value()));
+
+      playlist_replace_item(passthrough, result);
+
     }
 
     void playlist_replace_item(ApiParam<tuple<t_size, t_size, string>> param, ApiResult<bool> & result) {
@@ -178,6 +219,25 @@ namespace foobar {
       event.set();
     }
 
+    void activeplaylist_set_focus_item(ApiParam<t_size> param, Event event) {
+      t_size playlist = playlist_manager->get_active_playlist();
+
+      ApiParam<tuple<t_size, t_size>> passthrough(
+        make_tuple(playlist, param.value()));
+      playlist_set_focus_item(passthrough, event);
+    }
+
+    void activeplaylist_insert_items(ApiParam<tuple<t_size, vector<string>>> param,
+                                     ApiResult<t_size> & result) {
+      t_size playlist = playlist_manager->get_active_playlist();
+
+      ApiParam<tuple<t_size, t_size, vector<string>>> passthrough(
+        tuple_cat(make_tuple(playlist), param.value()));
+
+      playlist_insert_items(passthrough, result);
+
+    }
+
     void playlist_insert_items(ApiParam<tuple<t_size, t_size, vector<string>>> param,
                                ApiResult<t_size> & result) {
       t_size p_playlist, p_base;
@@ -199,6 +259,14 @@ namespace foobar {
       result.setResult(res);
     }
 
+    void activeplaylist_ensure_visible(ApiParam<t_size> param, Event event) {
+      t_size playlist = playlist_manager->get_active_playlist();
+
+      ApiParam<tuple<t_size, t_size>> passthrough(
+        make_tuple(playlist, param.value()));
+
+      playlist_ensure_visible(passthrough, event);
+    }
 
     void playlist_ensure_visible(ApiParam<tuple<t_size, t_size>> param, Event event) {
       t_size p_playlist, p_item;
@@ -207,6 +275,15 @@ namespace foobar {
       playlist_manager->playlist_ensure_visible(p_playlist, p_item);
 
       event.set();
+    }
+
+    void activeplaylist_rename(ApiParam<string> param, ApiResult<bool> & result) {
+      t_size playlist = playlist_manager->get_active_playlist();
+
+     ApiParam<tuple<t_size, string>> passthrough(
+       make_tuple(playlist, param.value()));
+
+      playlist_rename(passthrough, result);
     }
 
     void playlist_rename(ApiParam<tuple<t_size, string>> param,
@@ -222,10 +299,26 @@ namespace foobar {
 
     }
 
+    void activeplaylist_undo_backup(Event event) {
+      t_size playlist = playlist_manager->get_active_playlist();
+      
+      ApiParam<t_size> param(playlist);
+
+      playlist_undo_backup(param, event);
+    }
+
     void playlist_undo_backup(ApiParam<t_size> param, Event event) {
       t_size p_playlist = param.value();
       playlist_manager->playlist_undo_backup(p_playlist);
       event.set();
+    }
+
+    void activeplaylist_undo_restore(ApiResult<bool> & result) {
+      t_size playlist = playlist_manager->get_active_playlist();
+
+      ApiParam<t_size> param(playlist);
+
+      playlist_undo_restore(param, result);
     }
 
     void playlist_undo_restore(ApiParam<t_size> param, ApiResult<bool> & result) {
@@ -236,6 +329,14 @@ namespace foobar {
       result.setResult(success);
     }
 
+    void activeplaylist_redo_restore(ApiResult<bool> & result) {
+      t_size playlist = playlist_manager->get_active_playlist();
+
+      ApiParam<t_size> param(playlist);
+
+      playlist_redo_restore(param, result);
+    }
+
     void playlist_redo_restore(ApiParam<t_size> param, ApiResult<bool> & result) {
       t_size p_playlist = param.value();
 
@@ -244,12 +345,28 @@ namespace foobar {
       result.setResult(success);
     }
 
+    void activeplaylist_is_undo_available(ApiResult<bool> & result) {
+      t_size playlist = playlist_manager->get_active_playlist();
+
+      ApiParam<t_size> param(playlist);
+
+      playlist_is_undo_available(param, result);
+    }
+
     void playlist_is_undo_available(ApiParam<t_size> param, ApiResult<bool> & result) {
       t_size p_playlist = param.value();
 
       bool success = playlist_manager->playlist_is_undo_available(p_playlist);
 
       result.setResult(success);
+    }
+
+    void activeplaylist_is_redo_available(ApiResult<bool> & result) {
+      t_size playlist = playlist_manager->get_active_playlist();
+
+      ApiParam<t_size> param(playlist);
+
+      playlist_is_redo_available(param, result);
     }
 
     void playlist_is_redo_available(ApiParam<t_size> param, ApiResult<bool> & result) {
@@ -289,6 +406,15 @@ namespace foobar {
       bool success = playlist_manager->get_playing_item_location(&p_playlist, &p_index);
 
       result.setResult(make_tuple(success, p_playlist, p_index));
+    }
+
+    void activeplaylist_sort_by_format(ApiParam<tuple<string, bool>> param, ApiResult<bool> & result) {
+      t_size playlist = playlist_manager->get_active_playlist();
+
+      ApiParam<tuple<t_size, string, bool>> passthrough(
+        tuple_cat(make_tuple(playlist), param.value())
+      );
+      playlist_sort_by_format(passthrough, result);
     }
 
     void playlist_sort_by_format(ApiParam<tuple<t_size, string, bool>> param, ApiResult<bool> & result) {
@@ -424,6 +550,15 @@ namespace foobar {
       result.setResult(success);
     }
 
+    void activeplaylist_is_item_selected(ApiParam<t_size> param, ApiResult<bool> & result) {
+      t_size p_playlist = playlist_manager->get_active_playlist();
+
+      ApiParam<tuple<t_size, t_size>> passthrough(
+        make_tuple(p_playlist, param.value()));
+
+      playlist_is_item_selected(passthrough, result);
+    }
+
     void playlist_is_item_selected(ApiParam<tuple<t_size, t_size>> param, ApiResult<bool> & result) {
       t_size p_playlist;
       t_size p_item;
@@ -434,9 +569,252 @@ namespace foobar {
       result.setResult(success);
     }
 
-    /* TODO: can't implement over RPC:
+    void activeplaylist_move_selection(ApiParam<int> param, ApiResult<bool> & result) {
+      t_size playlist = playlist_manager->get_active_playlist();
+
+      ApiParam<tuple<t_size, int>> passthrough(
+        make_tuple(playlist, param.value())
+      );
+
+      playlist_move_selection(passthrough, result);
+    }
+
+    void playlist_move_selection(ApiParam<tuple<t_size, int>> param, ApiResult<bool> & result) {
+      int p_delta;
+      t_size p_playlist;
+      tie(p_playlist, p_delta) = param.value();
+
+      bool success = playlist_manager->playlist_move_selection(p_playlist, p_delta);
+
+      result.setResult(success);
+    }
+
+    void activeplaylist_clear(Event event) {
+      t_size playlist = playlist_manager->get_active_playlist();
+
+      ApiParam<t_size> param(playlist);
+
+      playlist_clear(param, event);
+    }
+
+    void playlist_clear(ApiParam<t_size> param, Event event) {
+      t_size p_playlist = param.value();
+
+      playlist_manager->playlist_clear(p_playlist);
+
+      event.set();
+    }
+
+    void activeplaylist_clear_selection(Event event) {
+      t_size playlist = playlist_manager->get_active_playlist();
+
+      ApiParam<t_size> param(playlist);
+
+      playlist_clear_selection(param, event);
+    }
+
+    void playlist_clear_selection(ApiParam<t_size> param, Event event) {
+      t_size p_selection = param.value();
+
+      playlist_manager->playlist_clear_selection(p_selection);
+
+      event.set();
+
+    }
+
+    void activeplaylist_remove_selection(ApiParam<bool> param, Event event) {
+      t_size playlist = playlist_manager->get_active_playlist();
+
+      ApiParam<tuple<t_size, bool>> passthrough(
+        make_tuple(playlist, param.value()));
+
+      playlist_remove_selection(passthrough, event);
+
+    }
+
+    void playlist_remove_selection(ApiParam<tuple<t_size, bool>> param, Event event) {
+      t_size p_playlist;
+      bool p_crop;
+
+      tie(p_playlist, p_crop) = param.value();
+
+      playlist_manager->playlist_remove_selection(p_playlist, p_crop);
+
+      event.set();
+    }
+
+    void active_playlist_get_name(ApiResult<pfc::string8> & result) {      
+      pfc::string8 temp;
+      bool success = playlist_manager->activeplaylist_get_name(temp);
+
+      result.setResult(temp);
+    }
+
+    void activeplaylist_get_item_count(ApiResult<t_size> & result) {
+      t_size count = playlist_manager->activeplaylist_get_item_count();
+
+      result.setResult(count);
+    }
+
+    void activeplaylist_get_focus_item(ApiResult<t_size> & result) {
+      t_size focus_item = playlist_manager->activeplaylist_get_focus_item();
+
+      result.setResult(focus_item);
+    }
+
+    void create_playlist_autoname(ApiParam<t_size> param, ApiResult<t_size> & result) {
+      t_size playlist = param.value();
+
+      t_size playlist_id = playlist_manager->create_playlist_autoname(
+        playlist
+      );
+
+      result.setResult(playlist_id);
+    }
+
+    void reset_playing_playlist(Event event) {
+      playlist_manager->reset_playing_playlist();
+
+      event.set();
+    }
+
+    void find_playlist(ApiParam<tuple<string, t_size>> param, ApiResult<t_size> & result) {
+      string name;
+      t_size length;
+      tie(name, length) = param.value();
+
+      t_size index = playlist_manager->find_playlist(name.c_str(), length);
+
+      result.setResult(index);
+    }
+
+    void find_or_playlist(ApiParam<tuple<string, t_size>> param, ApiResult<t_size> & result) {
+      string name;
+      t_size length;
+      tie(name, length) = param.value();
+
+      t_size index = playlist_manager->find_or_create_playlist(name.c_str(), length);
+
+      result.setResult(index);
+    }
+
+    void find_or_create_playlist_unlocked(ApiParam<tuple<string, t_size>> param,
+                                          ApiResult<t_size> & result) {
+      string name;
+      t_size length;
+      tie(name, length) = param.value();
+
+      t_size index = playlist_manager->find_or_create_playlist_unlocked(
+        name.c_str(), length);
+
+      result.setResult(index);
+    }
+
+    void active_playlist_fix(Event event) {
+      playlist_manager->active_playlist_fix();
+
+      event.set();
+    }
+
+    void playlist_activate_delta(ApiParam<int> param, Event event) {
+      int t_delta = param.value();
+
+      playlist_manager->playlist_activate_delta(t_delta);
+
+      event.set();
+
+    }
+
+    void playlist_activate_next(Event event) {
+      playlist_manager->playlist_activate_next();
+
+      event.set();
+    }
+
+    void playlist_activate_previous(Event event) {
+      playlist_manager->playlist_activate_previous();
+
+      event.set();
+    }
+
+    void playlist_get_selection_count(ApiParam<tuple<t_size, t_size>> param, ApiResult<t_size> & result) {
+      t_size playlist;
+      t_size p_max;
+      tie(playlist, p_max) = param.value();
+
+      t_size count = playlist_manager->playlist_get_selection_count(playlist, p_max);
+
+      result.setResult(count);
+
+    }
+
+    void activeplaylist_get_selection_count(ApiParam<t_size> param, ApiResult<t_size> & result) {
+      t_size playlist = playlist_manager->get_active_playlist();
+
+      ApiParam<tuple<t_size, t_size>> passthrough(
+        make_tuple(playlist, param.value()));
+
+      playlist_get_selection_count(passthrough, result);
+    }
+
+    void playlist_set_selection_single(ApiParam<tuple<t_size, t_size, bool>> param, Event event) {
+      t_size playlist;
+      t_size item;
+      bool state;
+      tie(playlist, item, state) = param.value();
+
+      playlist_manager->playlist_set_selection_single(playlist, item, state);
+      
+      event.set();
+    }
+
+    void activeplaylist_set_selection_single(ApiParam<tuple<t_size, bool>> param, Event event) {
+      t_size playlist = playlist_manager->get_active_playlist();
+
+      ApiParam<tuple<t_size, t_size, bool>> passthrough(
+        tuple_cat(make_tuple(playlist), param.value())
+      );
+
+      playlist_set_selection_single(passthrough, event);
+    }
+
+                
+    /*      
+    TODO: can't implement over RPC:
     bool playlist_get_item_handle(metadb_handle_ptr & p_out, t_size p_playlist, t_size p_item);
     metadb_handle_ptr playlist_get_item_handle(t_size playlist, t_size item);
+
+    void playlist_get_items(t_size p_playlist,pfc::list_base_t<metadb_handle_ptr> & out,const bit_array & p_mask);
+    void playlist_get_all_items(t_size p_playlist,pfc::list_base_t<metadb_handle_ptr> & out);
+    void playlist_get_selected_items(t_size p_playlist,pfc::list_base_t<metadb_handle_ptr> & out);
+    bool playlist_add_items(t_size playlist,const pfc::list_base_const_t<metadb_handle_ptr> & data,const bit_array & p_selection);
+
+    //! Changes contents of the specified playlist to the specified items, trying to reuse existing playlist content as much as possible (preserving selection/focus/etc). Order of items in playlist not guaranteed to be the same as in the specified item list.
+    //! @returns true if the playlist has been altered, false if there was nothing to update.
+    bool playlist_update_content(t_size playlist, metadb_handle_list_cref content, bool bUndoBackup);
+    void activeplaylist_enum_items(enum_items_callback & p_callback,const bit_array & p_mask);
+    
+    bool activeplaylist_get_item_handle(metadb_handle_ptr & item,t_size p_item);
+    metadb_handle_ptr activeplaylist_get_item_handle(t_size p_item);        
+    void activeplaylist_get_items(pfc::list_base_t<metadb_handle_ptr> & out,const bit_array & p_mask);
+    void activeplaylist_get_all_items(pfc::list_base_t<metadb_handle_ptr> & out);
+    void activeplaylist_get_selected_items(pfc::list_base_t<metadb_handle_ptr> & out);    
+    bool activeplaylist_add_items(const pfc::list_base_const_t<metadb_handle_ptr> & data,const bit_array & p_selection);
+    bool playlist_insert_items_filter(t_size p_playlist,t_size p_base,const pfc::list_base_const_t<metadb_handle_ptr> & p_data,bool p_select);
+    bool activeplaylist_insert_items_filter(t_size p_base,const pfc::list_base_const_t<metadb_handle_ptr> & p_data,bool p_select);    
+    bool playlist_add_items_filter(t_size p_playlist,const pfc::list_base_const_t<metadb_handle_ptr> & p_data,bool p_select);
+    bool activeplaylist_add_items_filter(const pfc::list_base_const_t<metadb_handle_ptr> & p_data,bool p_select);    
+    void activeplaylist_item_format_title(t_size p_item,titleformat_hook * p_hook,pfc::string_base & out,const service_ptr_t<titleformat_object> & p_script,titleformat_text_filter * p_filter,play_control::t_display_level p_playback_info_level);
+    bool playlist_get_focus_item_handle(metadb_handle_ptr & p_item,t_size p_playlist);
+    bool activeplaylist_get_focus_item_handle(metadb_handle_ptr & item);        
+    void remove_items_from_all_playlists(const pfc::list_base_const_t<metadb_handle_ptr> & p_data);    
+    bool get_all_items(pfc::list_base_t<metadb_handle_ptr> & out);
+    bool playlist_find_item(t_size p_playlist,metadb_handle_ptr p_item,t_size & p_result);//inefficient, walks entire playlist
+    bool playlist_find_item_selected(t_size p_playlist,metadb_handle_ptr p_item,t_size & p_result);//inefficient, walks entire playlist
+    t_size playlist_set_focus_by_handle(t_size p_playlist,metadb_handle_ptr p_item);
+    bool activeplaylist_find_item(metadb_handle_ptr p_item,t_size & p_result);//inefficient, walks entire playlist
+    t_size activeplaylist_set_focus_by_handle(metadb_handle_ptr p_item);
+    static void g_make_selection_move_permutation(t_size * p_output,t_size p_count,const bit_array & p_selection,int p_delta);
     */
 
   };
