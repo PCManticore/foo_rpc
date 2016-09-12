@@ -12,7 +12,6 @@ namespace msgpack {
   MSGPACK_API_VERSION_NAMESPACE(MSGPACK_DEFAULT_API_NS) {
     namespace adaptor {
 
-
       template<>
       struct pack<pfc::string8> {
         template <typename Stream>
