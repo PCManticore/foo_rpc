@@ -7,7 +7,7 @@ environment:
 install:
 - cmd: git submodule update --init --recursive
 artifacts:
-  - path: foo_rpc-$(APPVEYOR_BUILD_NUMBER).zip
+  - path: foo_rpc*.zip
     name: foo_rpc
 build_script:
 - ps: >-
@@ -20,7 +20,8 @@ build_script:
     $host.SetShouldExit($LASTEXITCODE)
 
 after_build:
-  - ps: 7z a foo_rpc-$(APPVEYOR_BUILD_NUMBER).zip Release\foo_rpc.dll 
+  - ps: env
+  - ps: 7z a foo_rpc.zip Release\foo_rpc.dll 
 
 on_success:
   - ps: appveyor PushArtifact foo_rpc.zip
