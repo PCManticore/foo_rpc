@@ -21,10 +21,10 @@ build_script:
 
 after_build:
   - ps: env
-  - ps: 7z a foo_rpc-${APPVEYOR_BUILD_NUMBER}.zip Release\foo_rpc.dll 
+  - ps: 7z a foo_rpc-$ENV:APPVEYOR_BUILD_NUMBER.zip Release\foo_rpc.dll 
 
 on_success:
-  - ps: appveyor PushArtifact foo_rpc-${APPVEYOR_BUILD_NUMBER}.zip
+  - ps: appveyor PushArtifact foo_rpc-$ENV:APPVEYOR_BUILD_NUMBER.zip
 
 deploy:
 - provider: BinTray
