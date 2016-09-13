@@ -1,10 +1,10 @@
 [submodule "foobar2000/foobar2000"]
-	path = foobar2000/foobar2000
+	path = dependencies/foobar2000
 	url = https://github.com/reupen/foobar2000-sdk
 [submodule "foobar2000/pfc"]
-	path = foobar2000/pfc
+	path = dependencies/pfc
 	url = https://github.com/reupen/pfc
 [submodule "msgpack-c"]
-	path = msgpack-c
+	path = dependencies/msgpack-c
 	url = https://github.com/msgpack/msgpack-c
         branch = cpp-2.0.0
