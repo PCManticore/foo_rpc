@@ -21,3 +21,16 @@ build_script:
 
 on_success:
   - ps: appveyor PushArtifact Release\foo_rpc.dll
+
+deploy:
+- provider: BinTray
+  username: PCManticore
+  api_key:
+    secure: ${BINTRAY_API_KEY}
+  subject: PCManticore
+  repo: foo_rpc
+  package: foo_rpc
+  publish: true
+  override: true
+  explode: true
+
