@@ -27,7 +27,7 @@ deploy:
   username: PCManticore
   api_key:
     secure: gD4t00YJoTUyIEQMr/4ssXgo0PZkqNtdFa1cgUkFPQM7EPhQSHmJKwpJG1OLH2WJ
-  subject: PCManticore
+  subject: pcmanticore
   repo: foo_rpc
   package: foo_rpc
   publish: true
