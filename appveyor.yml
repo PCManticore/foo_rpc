@@ -6,6 +6,9 @@ environment:
     Configuration: Release
 install:
 - cmd: git submodule update --init --recursive
+artifacts:
+  - path: Release\foo_rpc.dll
+    name: foo_rpc
 build_script:
 - ps: >-
     $toolset = If ($Env:PlatformToolset -ne "Default") {"/p:PlatformToolset=" + $Env:PlatformToolset} Else {""}
@@ -15,3 +18,6 @@ build_script:
     iex $command
 
     $host.SetShouldExit($LASTEXITCODE)
+
+on_success:
+  - ps: appveyor PushArtifact Release\foo_rpc.dll
