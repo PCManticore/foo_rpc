@@ -7,7 +7,7 @@ environment:
 install:
 - cmd: git submodule update --init --recursive
 artifacts:
-  - path: foo_rpc.zip
+  - path: foo_rpc-$(build).zip
     name: foo_rpc
 build_script:
 - ps: >-
@@ -20,10 +20,10 @@ build_script:
     $host.SetShouldExit($LASTEXITCODE)
 
 after_build:
-  - ps: 7z a foo_rpc.zip Release\foo_rpc.dll 
+  - ps: 7z a foo_rpc-$(build).zip Release\foo_rpc.dll 
 
 on_success:
-  - ps: appveyor PushArtifact foo_rpc.zip
+  - ps: appveyor PushArtifact foo_rpc-$(build).zip
 
 deploy:
 - provider: BinTray
@@ -35,4 +35,5 @@ deploy:
   package: foo_rpc
   publish: true
   override: true
+  artifact: .*\.zip
 
