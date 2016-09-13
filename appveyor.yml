@@ -12,7 +12,7 @@ build_script:
 - ps: >-
     $toolset = If ($Env:PlatformToolset -ne "Default") {"/p:PlatformToolset=" + $Env:PlatformToolset} Else {""}
 
-    $command = 'msbuild "foo_rpc.sln" /m /verbosity:normal ' + $toolset +' /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"'
+    $command = 'msbuild "foo_rpc.sln" /m /verbosity:normal /p:Configuration=Release /p:Platform="X86" /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"'
 
     iex $command
 
