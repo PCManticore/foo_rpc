@@ -32,3 +32,7 @@
 *.app
 
 *.bak
+Debug/
+Release/
+.vs/
+*.VC.*
