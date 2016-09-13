@@ -19,8 +19,10 @@ build_script:
 
     $host.SetShouldExit($LASTEXITCODE)
 
-on_success:
+after_build:
   - ps: 7z a foo_rpc.zip Release\foo_rpc.dll 
+
+on_success:
   - ps: appveyor PushArtifact foo_rpc.zip
 
 deploy:
