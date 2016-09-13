@@ -26,7 +26,7 @@ deploy:
 - provider: BinTray
   username: PCManticore
   api_key:
-    secure: ${BINTRAY_API_KEY}
+    secure: gD4t00YJoTUyIEQMr/4ssXgo0PZkqNtdFa1cgUkFPQM7EPhQSHmJKwpJG1OLH2WJ
   subject: PCManticore
   repo: foo_rpc
   package: foo_rpc
