@@ -30,7 +30,6 @@ deploy:
   subject: pcmanticore
   repo: foo_rpc
   package: foo_rpc
-  version: version
   publish: true
   override: true
   explode: true
