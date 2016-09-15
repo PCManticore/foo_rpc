@@ -15,6 +15,7 @@
 
 using namespace std;
 
+#define RPC_ADDRESS "\\\\.\\pipe\\foobar2000"
 
 DECLARE_COMPONENT_VERSION(
 "foo_rpc",
@@ -25,9 +26,7 @@ DECLARE_COMPONENT_VERSION(
 class foobar2000api : public initquit {
 private:
   DWORD ThreadID;
-  
-  // TODO: get this from a config file
-  PipeListener listener = PipeListener("\\\\.\\pipe\\foobar2000");
+  PipeListener listener = PipeListener(RPC_ADDRESS);
 
 public:
 
