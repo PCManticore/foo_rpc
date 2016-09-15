@@ -104,13 +104,12 @@ public:
     }
     OverlappedObject* overlapped = result.result();
 
-    // TODO handle exceptional case
-    int res = wait_overlapped_event(overlapped);
+    wait_overlapped_event(overlapped);
 
     Result<DWORD> overlappedResult = get_overlapped_result(overlapped);
-    if (overlappedResult.isFailed()) {
+    if (overlappedResult.isFailed() || overlappedResult.result() != 0) {
       logToFoobarConsole("Getting overlapped event failed with %d.",
-        overlappedResult.error());
+                         overlappedResult.error());
       return NULL;
     }
 
