@@ -62,6 +62,12 @@
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);$(SolutionDir)dependencies/foobar2000/shared/shared.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\dependencies\msgpack-c\include\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>copy "$(TargetPath)" "$(SolutionDir)/portable_test/components"</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copy DLL to a portable installation of foobar2000</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -79,6 +85,12 @@
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);$(SolutionDir)dependencies/foobar2000/shared/shared.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\dependencies\msgpack-c\include\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>copy "$(TargetPath)" "$(SolutionDir)/portable_test/components"</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copy DLL to a portable installation of foobar2000</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="foo_rpc.cpp" />

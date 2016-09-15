@@ -7,3 +7,14 @@ foo_rpc
 Automate foobar2000 audio player through a RPC interface.
 
 Pretty much work in progress.
+
+
+Building
+=========
+
+The built DLL is going to be copied in a local directory, where it expects
+a similar structure with the foobar2000's portable installation, the directory
+being `portable_test\components`.
+
+If you don't have this location already existing, you can omit the post build
+step with ``/p:PostBuildEventUseInBuild=false``.
