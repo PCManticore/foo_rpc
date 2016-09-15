@@ -56,7 +56,6 @@ public:
         logToFoobarConsole("Error while dispatching: %s", e.what());
         connection.send(e.what());
       }
-      connection.close();
     }
     return 0;
 
@@ -68,17 +67,14 @@ public:
     return This->listen_commands();
   }
 
-  virtual void on_init()
+  void on_init()
   {
     // Start the named pipe server
     CreateThread(NULL, 0, named_pipe_thread, (void*) this, 0, &ThreadID);
   }
 
-  virtual void on_quit()
+  void on_quit()
   {
-    /*
-    TODO DisconnectNamedPipe(pipe)?;
-    */
     listener.close();
   }
 };

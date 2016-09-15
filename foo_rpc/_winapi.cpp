@@ -71,7 +71,6 @@ Result<OverlappedObject*> connect_pipe(HANDLE handle) {
   /* Overlapped ConnectNamedPipe never returns a success code */
   assert(success == 0);
   if (err == ERROR_IO_PENDING) {
-    // TODO HOW TO HANDLE THIS?
     overlapped->pending = 1;
   }
   else if (err == ERROR_PIPE_CONNECTED) {
@@ -157,11 +156,10 @@ Result<tuple<DWORD, DWORD>> read_from_pipe(HANDLE handle,
   err = ret ? 0 : GetLastError();
   if (!ret) {
     if (err == ERROR_IO_PENDING)
-      // TODO: what to do with this pending field?
       overlapped->pending = 1;
     else if (err != ERROR_MORE_DATA) {
       logToFoobarConsole("Cannot read from pipe. "
-        "The operation failed with error %d.", err);
+                         "The operation failed with error %d.", err);
       return Result<tuple<DWORD, DWORD>>::withError(err);
     }
   }
@@ -242,7 +240,7 @@ Result<DWORD> send_bytes(HANDLE handle, string writeBuffer, int len) {
   }
   lastError = resultOverlapped.result();
   assert(lastError == 0);
-  // TODO: assert nwritten == len(buf)	
+  assert(written == len);
   return Result<DWORD>(lastError);
 
 }
@@ -289,19 +287,3 @@ Result<tuple<DWORD, DWORD>> recv_bytes(HANDLE handle, char * readBuffer, int siz
   }
   return Result<tuple<DWORD, DWORD>>::withError(lastError);
 }
-
-
-/*
-
-TODO:
-
-1. pasez bufferii dintr-o parte in alta sau ii pun in Overlapped
-2. folosesc char * sau altceva
-3. think about a protocolbetween foo_automation and foobar_callback, including proxying
-    of methods from former to the latter
-4. receive / write json at th epipe layer
-5. API for passing callbacks between threads
-6. configuration object for various settings
-7. close overlapped using cancelio
-8. recv urmat de send si close poate duce la o eroare in client (there is no other process at the end of pipe)
-*/

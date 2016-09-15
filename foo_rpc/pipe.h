@@ -9,11 +9,12 @@
 
 using namespace std;
 
-// TODO: move in a .cpp file?
+
 class PipeConnection {
-public:
-  // TODO: should be public?
+private:
   OverlappedObject * overlapped;
+
+public:
 
   PipeConnection(OverlappedObject * overlappedObj) : overlapped(overlappedObj) {}
 
@@ -76,8 +77,6 @@ public:
     }
 
     SetLastError(err);
-    // TODO: is this correct?
-    DisconnectNamedPipe(overlapped->handle);
     CloseHandle(overlapped->handle);
     CloseHandle(overlapped->overlapped.hEvent);
   }
@@ -122,7 +121,7 @@ public:
     while (handles.size() > 0) {
       HANDLE handle = handles.front();
       handles.pop_front();
-      CloseHandle(handle);
+      DisconnectNamedPipe(handle);
     }
   }
 
