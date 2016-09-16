@@ -4,12 +4,19 @@ environment:
   matrix:
   - PlatformToolset: Default
     Configuration: Release
-    PYTHON: "C:\\Python35"
 
 install:
   - cmd: git submodule update --init --recursive
   - 'powershell ./ci/install.ps1'
-  - "python -m pip install msgpack-python pytest"
+  # This is here just for handling https://github.com/pypa/pip/issues/3964,
+  # while it is not fixed yet.
+  - git clone https://github.com/PCManticore/pip
+  - cd pip
+  - py -3.6 -m pip install -e .
+  - cd ..
+
+  - py -3.6 -m pip install msgpack-python pytest
+
 
 artifacts:
   - path: foo_rpc*.zip
@@ -49,7 +56,7 @@ after_build:
 
 test_script:
 
-  - 'python -m pytest tests'
+  - 'py -3.6 -m pytest tests'
 
 on_success:
   - ps: appveyor PushArtifact foo_rpc-$ENV:APPVEYOR_BUILD_VERSION.zip

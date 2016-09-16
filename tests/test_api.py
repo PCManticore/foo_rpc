@@ -3,6 +3,7 @@ from multiprocessing.connection import Client
 import msgpack
 import contextlib
 
+#from helpers import get_name
 
 def get_name():
     param = msgpack.packb(0)
@@ -14,5 +15,5 @@ def test_default():
         l = msgpack.packb("")
         client.send_bytes(get_name())
         f = client.recv_bytes()
-        assert msgpack.unpackb(f) == 'Default'
+        assert msgpack.unpackb(f) == b"Default"
 
