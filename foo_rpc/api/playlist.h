@@ -412,8 +412,6 @@ namespace foobar {
       result.setResult(success);
     }
 
-    void activeplaylist_item_format_title(t_size p_item, titleformat_hook * p_hook, pfc::string_base & out, const service_ptr_t<titleformat_object> & p_script, titleformat_text_filter * p_filter, play_control::t_display_level p_playback_info_level);
-
     void activeplaylist_item_format_title(ApiParam<tuple<t_size, string>> param, ApiResult<pfc::string8>& result) {
       t_size playlist = playlist_manager->get_active_playlist();
 

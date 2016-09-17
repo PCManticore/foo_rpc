@@ -1,4 +1,4 @@
-// Generated on 2016-10-08 16:09:48
+// Generated on 2016-15-18 01:09:44
 #pragma once
 #include <string>
 #include <map>
@@ -8,7 +8,7 @@
 #include "event.h"
 #include "percolate.h"
 #include "api/playback_control.h"
-#include "../factory.h"
+#include "factory.h"
 
 using namespace std;
 using namespace serialization;
@@ -18,6 +18,15 @@ class RpcPlaybackControl {
   private:
     foobar::PlaybackControl api;
   public:
+
+    Payload get_now_playing(vector<char> & buffer) {
+      ApiResult<tuple<bool, vector<Track> > > result;
+      fb2k::inMainThread([&] {
+        api.get_now_playing(result);
+      });
+      result.wait();            
+      return serialization::serializer.packed_result(result);
+    }
 
     Payload start(vector<char> & buffer) {
       ApiParam<tuple<play_control::t_track_command, bool> > param(serialization::serializer.unpack<tuple<play_control::t_track_command, bool>>(buffer));
