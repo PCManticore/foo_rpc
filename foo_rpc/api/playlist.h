@@ -412,6 +412,22 @@ namespace foobar {
       result.setResult(success);
     }
 
+    void activeplaylist_item_format_title(t_size p_item, titleformat_hook * p_hook, pfc::string_base & out, const service_ptr_t<titleformat_object> & p_script, titleformat_text_filter * p_filter, play_control::t_display_level p_playback_info_level);
+
+    void activeplaylist_item_format_title(ApiParam<tuple<t_size, string>> param, ApiResult<pfc::string8>& result) {
+      t_size playlist = playlist_manager->get_active_playlist();
+
+      ApiParam<tuple<t_size, t_size, string>> passthrough(
+        tuple_cat(
+          make_tuple(playlist),
+          param.value()
+        )
+      );
+
+      playlist_item_format_title(passthrough, result);
+
+    }
+    
     void playlist_item_format_title(ApiParam<tuple<t_size, t_size, string>> param, ApiResult<pfc::string8>& result) {
       string format;
       pfc::string8 temp;
@@ -909,18 +925,36 @@ namespace foobar {
       result.setResult(callback.m_out);
     }
 
-    /*              
-    bool playlist_insert_items_filter(t_size p_playlist,t_size p_base,const pfc::list_base_const_t<metadb_handle_ptr> & p_data,bool p_select);
-    bool activeplaylist_insert_items_filter(t_size p_base,const pfc::list_base_const_t<metadb_handle_ptr> & p_data,bool p_select);    
-    bool playlist_add_items_filter(t_size p_playlist,const pfc::list_base_const_t<metadb_handle_ptr> & p_data,bool p_select);
-    bool activeplaylist_add_items_filter(const pfc::list_base_const_t<metadb_handle_ptr> & p_data,bool p_select);    
-    void activeplaylist_item_format_title(t_size p_item,titleformat_hook * p_hook,pfc::string_base & out,const service_ptr_t<titleformat_object> & p_script,titleformat_text_filter * p_filter,play_control::t_display_level p_playback_info_level);
-    void remove_items_from_all_playlists(const pfc::list_base_const_t<metadb_handle_ptr> & p_data);        
-    bool playlist_find_item(t_size p_playlist,metadb_handle_ptr p_item,t_size & p_result);//inefficient, walks entire playlist
-    bool playlist_find_item_selected(t_size p_playlist,metadb_handle_ptr p_item,t_size & p_result);//inefficient, walks entire playlist
-    bool activeplaylist_find_item(metadb_handle_ptr p_item,t_size & p_result);//inefficient, walks entire playlist
-    static void g_make_selection_move_permutation(t_size * p_output,t_size p_count,const bit_array & p_selection,int p_delta);
-    */
+    void playlist_insert_items_filter(ApiParam<tuple<t_size, t_size, bool, vector<string>>> param, ApiResult<bool> & result) {
+      vector<string> files;
+      t_size playlist;
+      t_size p_base;
+      bool p_select;
+
+      tie(playlist, p_base, p_select, files) = param.value();
+
+      metadb_handle_list temp;
+      static_api_ptr_t<playlist_incoming_item_filter> api;
+
+      // Build the required handles.
+      pfc::list_t<metadb_handle_ptr> handles;
+      for (auto file : files) {
+        metadb_handle_ptr handle;
+        metadb_manager->handle_create(handle, make_playable_location(file.c_str(), 0));
+        handles.add_item(handle);
+      }
+
+      if (!api->filter_items(handles, temp)) {
+        result.setResult(false);
+        return;
+      }
+
+      t_size result_value = playlist_manager->playlist_insert_items(
+        playlist, p_base, temp, bit_array_val(p_select)
+      );
+
+      result.setResult(result_value != pfc_infinite);      
+  }
 
   };
 }
