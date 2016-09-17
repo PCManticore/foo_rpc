@@ -4,6 +4,8 @@
 
 #include "../stdafx.h"
 #include "../percolate.h"
+#include "track.h"
+#include "callbacks.h"
 
 using namespace std;
 
@@ -13,6 +15,15 @@ namespace foobar {
   private:
     static_api_ptr_t<playlist_manager> playlist_manager;
     static_api_ptr_t<metadb> metadb_manager;
+
+    vector<Track> get_item_as_track(t_size p_item, t_size p_playlist) {
+      enum_items_callback_retrieve_item callback;
+      playlist_manager->playlist_enum_items(
+        p_playlist, callback, bit_array_one(p_item));
+
+      return callback.get_item();
+    }
+
     
   public:
     void get_playlist_count(ApiResult<t_size> & result) {
@@ -233,6 +244,30 @@ namespace foobar {
 
       ApiParam<tuple<t_size, t_size, vector<string>>> passthrough(
         tuple_cat(make_tuple(playlist), param.value()));
+
+      playlist_insert_items(passthrough, result);
+
+    }
+
+    void activeplaylist_add_items(ApiParam<vector<string>> param, ApiResult<t_size> & result) {
+      t_size playlist = playlist_manager->get_active_playlist();
+
+      ApiParam<tuple<t_size, vector<string>>> passthrough(
+        make_tuple(playlist, param.value())
+      );
+
+      playlist_add_items(passthrough, result);
+    }
+
+    void playlist_add_items(ApiParam<tuple<t_size, vector<string>>> param,
+                            ApiResult<t_size> & result) {
+      t_size playlist;
+      vector<string> paths;
+      tie(playlist, paths) = param.value();;
+
+      ApiParam<tuple<t_size, t_size, vector<string>>> passthrough(
+        make_tuple(playlist, pfc_infinite, paths)
+      );
 
       playlist_insert_items(passthrough, result);
 
@@ -778,42 +813,112 @@ namespace foobar {
       playlist_set_selection_single(passthrough, event);
     }
 
-                
-    /*      
-    TODO: can't implement over RPC:
-    bool playlist_get_item_handle(metadb_handle_ptr & p_out, t_size p_playlist, t_size p_item);
-    metadb_handle_ptr playlist_get_item_handle(t_size playlist, t_size item);
+    void activeplaylist_get_all_items(ApiResult<vector<Track>> & result) {
+      t_size playlist = playlist_manager->get_active_playlist();
 
-    void playlist_get_items(t_size p_playlist,pfc::list_base_t<metadb_handle_ptr> & out,const bit_array & p_mask);
-    void playlist_get_all_items(t_size p_playlist,pfc::list_base_t<metadb_handle_ptr> & out);
-    void playlist_get_selected_items(t_size p_playlist,pfc::list_base_t<metadb_handle_ptr> & out);
-    bool playlist_add_items(t_size playlist,const pfc::list_base_const_t<metadb_handle_ptr> & data,const bit_array & p_selection);
+      ApiParam<t_size> param(playlist);
 
-    //! Changes contents of the specified playlist to the specified items, trying to reuse existing playlist content as much as possible (preserving selection/focus/etc). Order of items in playlist not guaranteed to be the same as in the specified item list.
-    //! @returns true if the playlist has been altered, false if there was nothing to update.
-    bool playlist_update_content(t_size playlist, metadb_handle_list_cref content, bool bUndoBackup);
-    void activeplaylist_enum_items(enum_items_callback & p_callback,const bit_array & p_mask);
+      playlist_get_all_items(param, result);
+    }
+
+    void playlist_get_all_items(ApiParam<t_size> param,
+                                ApiResult<vector<Track>> & result) {
+
+      t_size playlist = param.value();
+
+      enum_items_callback_all enum_callback;
+      playlist_manager->playlist_enum_items(playlist, enum_callback, bit_array_true());
+
+      result.setResult(enum_callback.m_out);
+    }
+
+    void activeplaylist_get_selected_items(ApiResult<vector<Track>> & result) {
+      t_size playlist = playlist_manager->get_active_playlist();
+
+      ApiParam<t_size> param(playlist);
+
+      playlist_get_selected_items(param, result);
+    }
     
-    bool activeplaylist_get_item_handle(metadb_handle_ptr & item,t_size p_item);
-    metadb_handle_ptr activeplaylist_get_item_handle(t_size p_item);        
-    void activeplaylist_get_items(pfc::list_base_t<metadb_handle_ptr> & out,const bit_array & p_mask);
-    void activeplaylist_get_all_items(pfc::list_base_t<metadb_handle_ptr> & out);
-    void activeplaylist_get_selected_items(pfc::list_base_t<metadb_handle_ptr> & out);    
-    bool activeplaylist_add_items(const pfc::list_base_const_t<metadb_handle_ptr> & data,const bit_array & p_selection);
+    void playlist_get_selected_items(ApiParam<t_size> param, ApiResult<vector<Track>> & result) {
+      t_size playlist = param.value();
+
+      enum_items_callback_retrieve_selected_items enum_callback;
+
+      playlist_manager->playlist_enum_items(playlist, enum_callback, bit_array_true());
+
+      result.setResult(enum_callback.m_out);
+    }
+
+    void activeplaylist_get_item_handle(ApiParam<t_size> param, ApiResult<vector<Track>> & result) {
+      t_size playlist = playlist_manager->get_active_playlist();
+
+      ApiParam<tuple<t_size, t_size>> passthrough(
+        make_tuple(playlist, param.value()));
+
+      playlist_get_item_handle(passthrough, result);
+
+    }
+
+    void playlist_get_item_handle(ApiParam<tuple<t_size, t_size>> param, ApiResult<vector<Track>> & result)
+    {
+      t_size p_playlist, p_item;
+      tie(p_playlist, p_item) = param.value();
+      result.setResult(get_item_as_track(p_item, p_playlist));
+    }
+
+    void playlist_get_focus_item_handle(ApiParam<t_size> param, ApiResult<vector<Track>> & result) {
+      t_size playlist = param.value();
+      t_size item = playlist_manager->playlist_get_focus_item(playlist);
+      auto track = get_item_as_track(item, playlist);
+
+      result.setResult(track);
+    }
+
+    void activeplaylist_get_focus_item_handle(ApiResult<vector<Track>> & result) {
+      t_size playlist = playlist_manager->get_active_playlist();
+      ApiParam<t_size> param(playlist);
+
+      playlist_get_focus_item_handle(param, result);
+    }
+
+    void activeplaylist_get_items(ApiParam<vector<t_size>> param, ApiResult<vector<Track>> & result) {
+      t_size playlist = playlist_manager->get_active_playlist();
+
+      ApiParam<tuple<t_size, vector<t_size>>> passthrough(
+        make_tuple(playlist, param.value())
+      );
+
+      playlist_get_items(passthrough, result);
+    }
+
+    void playlist_get_items(ApiParam<tuple<t_size, vector<t_size>>> param, ApiResult<vector<Track>> & result) {
+      t_size playlist;
+      vector<t_size> masks;
+      vector<Track> tracks;
+      tie(playlist, masks) = param.value();
+
+      bit_array_bittable table(masks.size());
+      for (auto elem : masks) {
+        table.set(elem, true);
+      }
+
+      enum_items_callback_all callback;
+      playlist_manager->playlist_enum_items(playlist, callback, table);
+
+      result.setResult(callback.m_out);
+    }
+
+    /*              
     bool playlist_insert_items_filter(t_size p_playlist,t_size p_base,const pfc::list_base_const_t<metadb_handle_ptr> & p_data,bool p_select);
     bool activeplaylist_insert_items_filter(t_size p_base,const pfc::list_base_const_t<metadb_handle_ptr> & p_data,bool p_select);    
     bool playlist_add_items_filter(t_size p_playlist,const pfc::list_base_const_t<metadb_handle_ptr> & p_data,bool p_select);
     bool activeplaylist_add_items_filter(const pfc::list_base_const_t<metadb_handle_ptr> & p_data,bool p_select);    
     void activeplaylist_item_format_title(t_size p_item,titleformat_hook * p_hook,pfc::string_base & out,const service_ptr_t<titleformat_object> & p_script,titleformat_text_filter * p_filter,play_control::t_display_level p_playback_info_level);
-    bool playlist_get_focus_item_handle(metadb_handle_ptr & p_item,t_size p_playlist);
-    bool activeplaylist_get_focus_item_handle(metadb_handle_ptr & item);        
-    void remove_items_from_all_playlists(const pfc::list_base_const_t<metadb_handle_ptr> & p_data);    
-    bool get_all_items(pfc::list_base_t<metadb_handle_ptr> & out);
+    void remove_items_from_all_playlists(const pfc::list_base_const_t<metadb_handle_ptr> & p_data);        
     bool playlist_find_item(t_size p_playlist,metadb_handle_ptr p_item,t_size & p_result);//inefficient, walks entire playlist
     bool playlist_find_item_selected(t_size p_playlist,metadb_handle_ptr p_item,t_size & p_result);//inefficient, walks entire playlist
-    t_size playlist_set_focus_by_handle(t_size p_playlist,metadb_handle_ptr p_item);
     bool activeplaylist_find_item(metadb_handle_ptr p_item,t_size & p_result);//inefficient, walks entire playlist
-    t_size activeplaylist_set_focus_by_handle(metadb_handle_ptr p_item);
     static void g_make_selection_move_permutation(t_size * p_output,t_size p_count,const bit_array & p_selection,int p_delta);
     */
 

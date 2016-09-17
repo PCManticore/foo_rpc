@@ -3,6 +3,7 @@
 #include "base.h"
 #include "../../logging.h"
 #include "../../local_exceptions.h"
+#include "../../api/track.h"
 
 #include "msgpack.hpp"
 
@@ -29,6 +30,15 @@ namespace msgpack {
           playback_item["item"] = v.m_item;
           playback_item["playlist"] = v.m_playlist;
           o.pack(playback_item);
+          return o;
+        }
+      };
+
+      template<>
+      struct pack<Track> {
+        template <typename Stream>
+        packer<Stream>& operator()(msgpack::packer<Stream>& o, Track const& v) const {
+          o.pack(v.as_map());
           return o;
         }
       };
