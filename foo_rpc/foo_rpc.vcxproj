@@ -63,7 +63,7 @@
       <AdditionalLibraryDirectories>..\dependencies\msgpack-c\include\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetPath)" "$(SolutionDir)/portable_test/components"</Command>
+      <Command>copy "$(TargetPath)" "$(SolutionDir)portable_test\components"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy DLL to a portable installation of foobar2000</Message>
@@ -86,7 +86,7 @@
       <AdditionalLibraryDirectories>..\dependencies\msgpack-c\include\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetPath)" "$(SolutionDir)/portable_test/components"</Command>
+      <Command>copy "$(TargetPath)" "$(SolutionDir)portable_test\components"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy DLL to a portable installation of foobar2000</Message>
