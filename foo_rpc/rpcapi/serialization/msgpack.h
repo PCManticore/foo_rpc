@@ -38,7 +38,11 @@ namespace msgpack {
       struct pack<Track> {
         template <typename Stream>
         packer<Stream>& operator()(msgpack::packer<Stream>& o, Track const& v) const {
-          o.pack(v.as_map());
+          o.pack_array(4);
+          o.pack(make_tuple("index", v.index));
+          o.pack(make_tuple("path", v.path));
+          o.pack(make_tuple("selected", v.selected));
+          o.pack(make_tuple("subsong_index", v.subsong_index));
           return o;
         }
       };

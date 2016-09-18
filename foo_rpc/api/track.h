@@ -14,19 +14,13 @@ public:
   bool selected;
   std::string path;
 
-  static Track newTrack(t_size index, const metadb_handle_ptr & location, bool selected) {
+  static Track newTrack(t_size index, const metadb_handle_ptr & location, bool selected) {    
     return Track(
       index,
       location->get_subsong_index(),
       selected,
       string(location->get_path())
     );
-  }
-
-  map<t_size, tuple<std::string, t_uint32, bool>> as_map() const {
-    map<t_size, tuple<std::string, t_uint32, bool>> item;
-    item[index] = { path, subsong_index, selected };
-    return item;    
   }
 
   Track(t_size index_value,        
