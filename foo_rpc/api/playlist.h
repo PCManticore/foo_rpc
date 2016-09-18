@@ -14,6 +14,7 @@ namespace foobar {
   class Playlist {
   private:
     static_api_ptr_t<playlist_manager> playlist_manager;
+    static_api_ptr_t<playlist_manager_v4> playlist_manager_v4;
     static_api_ptr_t<metadb> metadb_manager;
 
     OptionalTrack get_item_as_track(t_size p_item, t_size p_playlist) {
@@ -24,6 +25,15 @@ namespace foobar {
       return callback.get_item();
     }
 
+    pfc::list_t<metadb_handle_ptr> metadb_handles_from_files(vector<string> files) {      
+      pfc::list_t<metadb_handle_ptr> handles;
+      for (auto file : files) {
+        metadb_handle_ptr handle;
+        metadb_manager->handle_create(handle, make_playable_location(file.c_str(), 0));
+        handles.add_item(handle);
+      }
+      return handles;
+    }
     
   public:
     void get_playlist_count(ApiResult<t_size> & result) {
@@ -64,15 +74,37 @@ namespace foobar {
       event.set();
     }
 
-    void create_playlist(ApiParam <tuple<vector<char>, t_size, t_size>> param,
+    void create_playlist(ApiParam <tuple<string, t_size, t_size>> param,
                          ApiResult<t_size> & result) {
-      vector<char> p_name;
+      string p_name;
       t_size p_name_length, p_index;
       tie(p_name, p_name_length, p_index) = param.value();
 
       t_size created_index = playlist_manager->create_playlist(p_name.data(), p_name_length, p_index);
       result.setResult(created_index);
     }
+
+    void create_playlist_ex(ApiParam<tuple<string, t_size, t_size, vector<string>>> param,
+                            ApiResult<t_size> & result) {
+      string p_name;
+      t_size p_name_length, p_index;
+      vector<string> files;
+
+      tie(p_name, p_name_length, p_index, files) = param.value();
+
+      auto handles = metadb_handles_from_files(files);
+
+      abort_callback_dummy abort;
+      stream_reader_dummy dummy_reader;
+
+      metadb_handle_list contents;
+      contents.add_items(handles);
+
+      t_size index = playlist_manager_v4->create_playlist_ex(
+        p_name.c_str(), p_name_length, p_index, contents, &dummy_reader, abort);
+      result.setResult(index);
+
+   }
     
    void reorder(ApiParam<vector<int>> param,
                  ApiResult<bool> & result) {
@@ -279,14 +311,8 @@ namespace foobar {
       vector<string> files;
       
       tie(p_playlist, p_base, files) = param.value();
-
-      // Build the required handles.
-      pfc::list_t<metadb_handle_ptr> handles;
-      for (auto file : files) {
-        metadb_handle_ptr handle;
-        metadb_manager->handle_create(handle, make_playable_location(file.c_str(), 0));        
-        handles.add_item(handle);
-      }
+      
+      auto handles = metadb_handles_from_files(files);
       
       t_size res = playlist_manager->playlist_insert_items(
         p_playlist, p_base, handles, bit_array_true());
@@ -934,13 +960,7 @@ namespace foobar {
       metadb_handle_list temp;
       static_api_ptr_t<playlist_incoming_item_filter> api;
 
-      // Build the required handles.
-      pfc::list_t<metadb_handle_ptr> handles;
-      for (auto file : files) {
-        metadb_handle_ptr handle;
-        metadb_manager->handle_create(handle, make_playable_location(file.c_str(), 0));
-        handles.add_item(handle);
-      }
+      auto handles = metadb_handles_from_files(files);
 
       if (!api->filter_items(handles, temp)) {
         result.setResult(false);
@@ -951,7 +971,7 @@ namespace foobar {
         playlist, p_base, temp, bit_array_val(p_select)
       );
 
-      result.setResult(result_value != pfc_infinite);      
+      result.setResult(result_value != pfc_infinite);            
   }
 
   };

@@ -25,7 +25,7 @@ namespace foobar {
       bool success = pm->get_playing_item_location(&p_playlist, &p_index);
       if (success) {
         metadb_handle_ptr now_playing = pm->playlist_get_item_handle(p_playlist, p_index);
-        // Do we care if it is selected or not?
+        
         auto track = Track::newTrack(
           p_index,
           now_playing,

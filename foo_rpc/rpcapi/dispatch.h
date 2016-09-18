@@ -431,6 +431,10 @@ namespace foobar {
         return rpc_playlist.activeplaylist_get_items(param);
       };
 
+      registry["Playlist.create_playlist_ex"] = [&](vector<char> & param) {
+        return rpc_playlist.create_playlist_ex(param);
+      };
+
       registry["Playlist.playlist_get_items"] = [&](vector<char> & param) {
         return rpc_playlist.playlist_get_items(param);
       };
