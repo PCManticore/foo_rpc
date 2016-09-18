@@ -44,8 +44,13 @@ public:
     return false;
   }
 
-  inline const vector<Track> & get_item() {
-    return m_out;
+  inline const OptionalTrack & get_item() {
+    if (m_out.size() > 0) {
+      return OptionalTrack(m_out.front());
+    }
+    else {
+      return OptionalTrack();
+    }
   }
 
 };

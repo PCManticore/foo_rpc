@@ -20,7 +20,7 @@ class RpcPlaybackControl {
   public:
 
     Payload get_now_playing(vector<char> & buffer) {
-      ApiResult<tuple<bool, vector<Track> > > result;
+      ApiResult<tuple<bool, OptionalTrack>> result;
       fb2k::inMainThread([&] {
         api.get_now_playing(result);
       });

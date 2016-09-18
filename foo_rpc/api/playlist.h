@@ -16,7 +16,7 @@ namespace foobar {
     static_api_ptr_t<playlist_manager> playlist_manager;
     static_api_ptr_t<metadb> metadb_manager;
 
-    vector<Track> get_item_as_track(t_size p_item, t_size p_playlist) {
+    OptionalTrack get_item_as_track(t_size p_item, t_size p_playlist) {
       enum_items_callback_retrieve_item callback;
       playlist_manager->playlist_enum_items(
         p_playlist, callback, bit_array_one(p_item));
@@ -864,7 +864,7 @@ namespace foobar {
       result.setResult(enum_callback.m_out);
     }
 
-    void activeplaylist_get_item_handle(ApiParam<t_size> param, ApiResult<vector<Track>> & result) {
+    void activeplaylist_get_item_handle(ApiParam<t_size> param, ApiResult<OptionalTrack> & result) {
       t_size playlist = playlist_manager->get_active_playlist();
 
       ApiParam<tuple<t_size, t_size>> passthrough(
@@ -874,14 +874,14 @@ namespace foobar {
 
     }
 
-    void playlist_get_item_handle(ApiParam<tuple<t_size, t_size>> param, ApiResult<vector<Track>> & result)
+    void playlist_get_item_handle(ApiParam<tuple<t_size, t_size>> param, ApiResult<OptionalTrack> & result)
     {
       t_size p_playlist, p_item;
       tie(p_playlist, p_item) = param.value();
       result.setResult(get_item_as_track(p_item, p_playlist));
     }
 
-    void playlist_get_focus_item_handle(ApiParam<t_size> param, ApiResult<vector<Track>> & result) {
+    void playlist_get_focus_item_handle(ApiParam<t_size> param, ApiResult<OptionalTrack> & result) {
       t_size playlist = param.value();
       t_size item = playlist_manager->playlist_get_focus_item(playlist);
       auto track = get_item_as_track(item, playlist);
@@ -889,7 +889,7 @@ namespace foobar {
       result.setResult(track);
     }
 
-    void activeplaylist_get_focus_item_handle(ApiResult<vector<Track>> & result) {
+    void activeplaylist_get_focus_item_handle(ApiResult<OptionalTrack> & result) {
       t_size playlist = playlist_manager->get_active_playlist();
       ApiParam<t_size> param(playlist);
 

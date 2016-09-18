@@ -46,6 +46,21 @@ namespace msgpack {
           return o;
         }
       };
+
+      template<>
+      struct pack<OptionalTrack> {
+        template <typename Stream>
+        packer<Stream>& operator()(msgpack::packer<Stream>& o, OptionalTrack const& v) const {
+          if (v.is_defined()) {
+            Track & track = v.get();
+            o.pack(track);
+          }
+          else {
+            o.pack_nil();
+          }
+          return o;
+        }
+      };
     }
   }
 }

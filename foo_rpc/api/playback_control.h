@@ -19,7 +19,7 @@ namespace foobar {
   public:
     PlaybackControl() {}
     
-    void get_now_playing(ApiResult<tuple<bool, vector<Track>>> & result) {
+    void get_now_playing(ApiResult<tuple<bool, OptionalTrack>> & result) {
       static_api_ptr_t<playlist_manager> pm;
       t_size p_playlist, p_index;        
       bool success = pm->get_playing_item_location(&p_playlist, &p_index);
@@ -29,12 +29,11 @@ namespace foobar {
         auto track = Track::newTrack(
           p_index,
           now_playing,
-          pm->playlist_is_item_selected(p_playlist, p_index));
-        vector<Track> tracks = { track };
-        result.setResult(make_tuple(success, tracks));
+          pm->playlist_is_item_selected(p_playlist, p_index));        
+        result.setResult(make_tuple(success, OptionalTrack(track)));
       }
       else {
-        result.setResult(make_tuple(false, vector<Track>({})));
+        result.setResult(make_tuple(false, OptionalTrack()));
       }
     }
 
