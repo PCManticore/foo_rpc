@@ -77,10 +77,20 @@ class RpcPlaylist {
     }
 
     Payload create_playlist(vector<char> & buffer) {
-      ApiParam<tuple<vector<char>, t_size, t_size> > param(serialization::serializer.unpack<tuple<vector<char>, t_size, t_size>>(buffer));
+      ApiParam<tuple<string, t_size, t_size> > param(serialization::serializer.unpack<tuple<string, t_size, t_size>>(buffer));
       ApiResult<t_size> result;
       fb2k::inMainThread([&] {
         api.create_playlist(param, result);
+      });
+      result.wait();
+      return serialization::serializer.packed_result(result);
+    }
+
+    Payload create_playlist_ex(vector<char> & buffer) {
+      ApiParam<tuple<string, t_size, t_size, vector<string> > > param(serialization::serializer.unpack<tuple<string, t_size, t_size, vector<string> >>(buffer));
+      ApiResult<t_size> result;
+      fb2k::inMainThread([&] {
+        api.create_playlist_ex(param, result);
       });
       result.wait();
       return serialization::serializer.packed_result(result);

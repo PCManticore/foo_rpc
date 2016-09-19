@@ -114,6 +114,7 @@
     <ClInclude Include="api\debug.h" />
     <ClInclude Include="api\playback_control.h" />
     <ClInclude Include="api\playlist.h" />
+    <ClInclude Include="api\playlist_loader.h" />
     <ClInclude Include="api\track.h" />
     <ClInclude Include="local_exceptions.h" />
     <ClInclude Include="percolate.h" />
@@ -126,6 +127,7 @@
     <ClInclude Include="rpcapi\rpc\coreversion.h" />
     <ClInclude Include="rpcapi\rpc\playback_control.h" />
     <ClInclude Include="rpcapi\rpc\playlist.h" />
+    <ClInclude Include="rpcapi\rpc\playlist_loader.h" />
     <ClInclude Include="rpcapi\serialization\base.h" />
     <ClInclude Include="rpcapi\serialization\msgpack.h" />
     <ClInclude Include="_winapi.h" />

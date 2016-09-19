@@ -5,6 +5,7 @@
 #include "rpc/playback_control.h"
 #include "rpc/coreversion.h"
 #include "rpc/playlist.h"
+#include "rpc/playlist_loader.h"
 #include "factory.h"
 
 using namespace std;
@@ -18,6 +19,7 @@ namespace foobar {
     RpcPlaybackControl rpc_playback_control;
     RpcCoreVersion rpc_core_version;
     RpcPlaylist rpc_playlist;
+    RpcPlaylistLoader rpc_playlist_loader;
     dispatch_map registry;
     
   public:
@@ -558,6 +560,13 @@ namespace foobar {
 
       registry["PlaybackControl.get_volume_step"] = [&](vector<char> & param) {
         return rpc_playback_control.get_volume_step(param);
+      };
+      registry["PlaylistLoader.load_playlist"] = [&](vector<char> & param) {
+        return rpc_playlist_loader.load_playlist(param);
+      };
+
+      registry["PlaylistLoader.save_playlist"] = [&](vector<char> & param) {
+        return rpc_playlist_loader.save_playlist(param);
       };
 
 
