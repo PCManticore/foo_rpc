@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-#include "api/debug.h"
+#include "api/common/debug.h"
 
 #include "tinyformat.h"
 

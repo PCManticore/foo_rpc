@@ -4,8 +4,8 @@
 
 #include "../stdafx.h"
 #include "../percolate.h"
-#include "track.h"
-#include "callbacks.h"
+#include "common/track.h"
+#include "common/callbacks.h"
 
 using namespace std;
 

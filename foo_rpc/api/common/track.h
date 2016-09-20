@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "../stdafx.h"
+#include "../../stdafx.h"
 
 // A track contains the path and the index of a particular
 // playlist item. This is used as a transport object between

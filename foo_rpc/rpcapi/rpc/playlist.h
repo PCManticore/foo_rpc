@@ -8,7 +8,7 @@
 #include "event.h"
 #include "percolate.h"
 #include "api/playlist.h"
-#include "factory.h"
+#include "../factory.h"
 
 using namespace std;
 using namespace serialization;

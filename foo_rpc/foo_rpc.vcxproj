@@ -109,13 +109,14 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="api\callbacks.h" />
+    <ClInclude Include="api\common\callbacks.h" />
+    <ClInclude Include="api\common\debug.h" />
+    <ClInclude Include="api\common\track.h" />
     <ClInclude Include="api\coreversion.h" />
-    <ClInclude Include="api\debug.h" />
+    <ClInclude Include="api\metadb_handle.h" />
     <ClInclude Include="api\playback_control.h" />
     <ClInclude Include="api\playlist.h" />
     <ClInclude Include="api\playlist_loader.h" />
-    <ClInclude Include="api\track.h" />
     <ClInclude Include="local_exceptions.h" />
     <ClInclude Include="percolate.h" />
     <ClInclude Include="event.h" />

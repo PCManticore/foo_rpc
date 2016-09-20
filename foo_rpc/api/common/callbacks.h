@@ -4,7 +4,7 @@
 
 using namespace std;
 
-#include "../stdafx.h"
+#include "../../stdafx.h"
 #include "track.h"
 
 // Callback used for getting a list all the items from a playlist.

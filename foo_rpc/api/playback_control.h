@@ -4,7 +4,7 @@
 #include "../stdafx.h"
 #include "../event.h"
 #include "../percolate.h"
-#include "track.h"
+#include "common/track.h"
 
 using namespace std;
 
