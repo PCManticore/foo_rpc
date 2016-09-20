@@ -111,6 +111,7 @@
   <ItemGroup>
     <ClInclude Include="api\common\callbacks.h" />
     <ClInclude Include="api\common\debug.h" />
+    <ClInclude Include="api\common\helpers.h" />
     <ClInclude Include="api\common\track.h" />
     <ClInclude Include="api\coreversion.h" />
     <ClInclude Include="api\metadb_handle.h" />

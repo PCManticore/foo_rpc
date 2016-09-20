@@ -5,6 +5,7 @@
 
 #include "../stdafx.h"
 #include "../percolate.h"
+#include "common/helpers.h"
 
 
 class playlist_loader_cb : public playlist_loader_callback
@@ -57,16 +58,6 @@ namespace foobar {
   private:    
     static_api_ptr_t<metadb> metadb_manager;
     static_api_ptr_t<playlist_manager_v4> playlist_manager;
-    
-    pfc::list_t<metadb_handle_ptr> metadb_handles_from_files(vector<string> files) {
-      pfc::list_t<metadb_handle_ptr> handles;
-      for (auto file : files) {
-        metadb_handle_ptr handle;
-        metadb_manager->handle_create(handle, make_playable_location(file.c_str(), 0));
-        handles.add_item(handle);
-      }
-      return handles;
-    }
 
   public:
 
