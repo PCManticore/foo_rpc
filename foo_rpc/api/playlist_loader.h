@@ -80,8 +80,16 @@ namespace foobar {
 
       metadb_handle_list contents;
       contents.add_items(handles);
-      playlist_loader::g_save_playlist(path.c_str(), contents, abort);
-      result.setResult(true);
+
+      try {
+        playlist_loader::g_save_playlist(path.c_str(), contents, abort);
+        result.setResult(true);
+      }
+      catch (exception_io_not_found) {
+        console::formatter() << "Cannot save file: " << path.c_str();
+        result.setResult(false);
+      }
+
     }
 
     void load_playlist(ApiParam<string> param, ApiResult<bool> & result) {
