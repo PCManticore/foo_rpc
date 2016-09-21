@@ -9,8 +9,10 @@
 #include "percolate.h"
 #include "api/playlist.h"
 #include "../factory.h"
+#include "optional.hpp"
 
 using namespace std;
+using namespace std::experimental;
 using namespace serialization;
 
 
@@ -884,7 +886,7 @@ class RpcPlaylist {
 
     Payload activeplaylist_get_item_handle(vector<char> & buffer) {
       ApiParam<t_size> param(serialization::serializer.unpack<t_size>(buffer));
-      ApiResult<OptionalTrack> result;
+      ApiResult<optional<Track>> result;
       fb2k::inMainThread([&] {
         api.activeplaylist_get_item_handle(param, result);
       });
@@ -894,7 +896,7 @@ class RpcPlaylist {
 
     Payload playlist_get_item_handle(vector<char> & buffer) {
       ApiParam<tuple<t_size, t_size> > param(serialization::serializer.unpack<tuple<t_size, t_size>>(buffer));
-      ApiResult<OptionalTrack> result;
+      ApiResult<std::experimental::optional<Track>> result;
       fb2k::inMainThread([&] {
         api.playlist_get_item_handle(param, result);
       });
@@ -904,7 +906,7 @@ class RpcPlaylist {
 
     Payload playlist_get_focus_item_handle(vector<char> & buffer) {
       ApiParam<t_size> param(serialization::serializer.unpack<t_size>(buffer));
-      ApiResult<OptionalTrack> result;
+      ApiResult<optional<Track>> result;
       fb2k::inMainThread([&] {
         api.playlist_get_focus_item_handle(param, result);
       });
@@ -913,7 +915,7 @@ class RpcPlaylist {
     }
 
     Payload activeplaylist_get_focus_item_handle(vector<char> & buffer) {
-      ApiResult<OptionalTrack> result;
+      ApiResult<optional<Track>> result;
       fb2k::inMainThread([&] {
         api.activeplaylist_get_focus_item_handle(result);
       });

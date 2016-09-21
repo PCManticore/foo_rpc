@@ -6,11 +6,14 @@
 #include "track.h"
 #include "callbacks.h"
 #include "../../stdafx.h"
+#include "optional.hpp"
 
-OptionalTrack get_item_as_track(t_size p_item, t_size p_playlist) {
+using namespace std::experimental;
+
+optional<Track> get_item_as_track(t_size p_item, t_size p_playlist) {
   static_api_ptr_t<playlist_manager> manager;
 
-  enum_items_callback_retrieve_item callback;
+  enum_items_callback_retrieve_item_opt callback;
   manager->playlist_enum_items(
     p_playlist, callback, bit_array_one(p_item));
 

@@ -3,6 +3,7 @@
 #include <string>
 
 #include "../../stdafx.h"
+#include "../../Optional/optional.hpp"
 
 // A track contains the path and the index of a particular
 // playlist item. This is used as a transport object between
@@ -36,23 +37,4 @@ public:
     path(path_value),
     handle(handle_value) {}
 
-};
-
-class OptionalTrack {
-  vector<Track> tracks;
-
-public:
-  OptionalTrack(Track track) {
-    tracks.push_back(track);
-  }
-
-  OptionalTrack() {}
-
-  Track get() const {
-    return tracks.front();
-  }
-
-  bool is_defined() const {
-    return tracks.size() > 0;
-  }
 };

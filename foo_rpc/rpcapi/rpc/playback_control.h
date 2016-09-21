@@ -9,8 +9,10 @@
 #include "percolate.h"
 #include "api/playback_control.h"
 #include "../factory.h"
+#include "optional.hpp"
 
 using namespace std;
+using namespace std::experimental;
 using namespace serialization;
 
 
@@ -20,7 +22,7 @@ class RpcPlaybackControl {
   public:
 
     Payload get_now_playing(vector<char> & buffer) {
-      ApiResult<tuple<bool, OptionalTrack>> result;
+      ApiResult<tuple<bool, optional<Track>>> result;
       fb2k::inMainThread([&] {
         api.get_now_playing(result);
       });

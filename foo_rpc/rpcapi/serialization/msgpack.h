@@ -4,8 +4,10 @@
 #include "../../logging.h"
 #include "../../local_exceptions.h"
 #include "../../api/common/track.h"
-
+#include "optional.hpp"
 #include "msgpack.hpp"
+
+using namespace std::experimental;
 
 MSGPACK_ADD_ENUM(play_control::t_track_command);
 
@@ -48,11 +50,11 @@ namespace msgpack {
       };
 
       template<>
-      struct pack<OptionalTrack> {
+      struct pack<optional<Track>> {
         template <typename Stream>
-        packer<Stream>& operator()(msgpack::packer<Stream>& o, OptionalTrack const& v) const {
-          if (v.is_defined()) {
-            Track & track = v.get();
+        packer<Stream>& operator()(msgpack::packer<Stream>& o, optional<Track> const& v) const {          
+          if (v) {
+            Track track = *v;
             o.pack(track);
           }
           else {

@@ -8,3 +8,6 @@
 	path = dependencies/msgpack-c
 	url = https://github.com/msgpack/msgpack-c
         branch = cpp-2.0.0
+[submodule "dependencies/Optional"]
+	path = dependencies/Optional
+	url = https://github.com/akrzemi1/Optional

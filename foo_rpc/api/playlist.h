@@ -7,8 +7,10 @@
 #include "common/track.h"
 #include "common/callbacks.h"
 #include "common/helpers.h"
+#include "optional.hpp"
 
 using namespace std;
+using namespace std::experimental;
 
 
 namespace foobar {
@@ -873,7 +875,8 @@ namespace foobar {
       result.setResult(enum_callback.m_out);
     }
 
-    void activeplaylist_get_item_handle(ApiParam<t_size> param, ApiResult<OptionalTrack> & result) {
+    void activeplaylist_get_item_handle(ApiParam<t_size> param,
+                                        ApiResult<optional<Track>> & result) {
       t_size playlist = playlist_manager->get_active_playlist();
 
       ApiParam<tuple<t_size, t_size>> passthrough(
@@ -883,14 +886,15 @@ namespace foobar {
 
     }
 
-    void playlist_get_item_handle(ApiParam<tuple<t_size, t_size>> param, ApiResult<OptionalTrack> & result)
+    void playlist_get_item_handle(ApiParam<tuple<t_size, t_size>> param,
+                                  ApiResult<optional<Track>> & result)
     {
       t_size p_playlist, p_item;
       tie(p_playlist, p_item) = param.value();
       result.setResult(get_item_as_track(p_item, p_playlist));
     }
 
-    void playlist_get_focus_item_handle(ApiParam<t_size> param, ApiResult<OptionalTrack> & result) {
+    void playlist_get_focus_item_handle(ApiParam<t_size> param, ApiResult<optional<Track>> & result) {
       t_size playlist = param.value();
       t_size item = playlist_manager->playlist_get_focus_item(playlist);
       auto track = get_item_as_track(item, playlist);
@@ -898,7 +902,7 @@ namespace foobar {
       result.setResult(track);
     }
 
-    void activeplaylist_get_focus_item_handle(ApiResult<OptionalTrack> & result) {
+    void activeplaylist_get_focus_item_handle(ApiResult<optional<Track>> & result) {
       t_size playlist = playlist_manager->get_active_playlist();
       ApiParam<t_size> param(playlist);
 

@@ -5,8 +5,10 @@
 #include "../event.h"
 #include "../percolate.h"
 #include "common/track.h"
+#include "optional.hpp"
 
 using namespace std;
+using namespace std::experimental;
 
 namespace foobar {
 
@@ -19,7 +21,7 @@ namespace foobar {
   public:
     PlaybackControl() {}
     
-    void get_now_playing(ApiResult<tuple<bool, OptionalTrack>> & result) {
+    void get_now_playing(ApiResult<tuple<bool, optional<Track>>> & result) {
       static_api_ptr_t<playlist_manager> pm;
       t_size p_playlist, p_index;        
       bool success = pm->get_playing_item_location(&p_playlist, &p_index);
@@ -30,10 +32,11 @@ namespace foobar {
           p_index,
           now_playing,
           pm->playlist_is_item_selected(p_playlist, p_index));        
-        result.setResult(make_tuple(success, OptionalTrack(track)));
+        result.setResult(make_tuple(success, optional<Track>(track)));
       }
       else {
-        result.setResult(make_tuple(false, OptionalTrack()));
+        optional<Track> opt;
+        result.setResult(make_tuple(false,opt));
       }
     }
 
