@@ -6,6 +6,7 @@
 #include "rpc/coreversion.h"
 #include "rpc/playlist.h"
 #include "rpc/playlist_loader.h"
+#include "rpc/metadb_handle.h"
 #include "factory.h"
 
 using namespace std;
@@ -20,6 +21,7 @@ namespace foobar {
     RpcCoreVersion rpc_core_version;
     RpcPlaylist rpc_playlist;
     RpcPlaylistLoader rpc_playlist_loader;
+    RpcMetadbHandle rpc_metadb_handle;
     dispatch_map registry;
     
   public:
@@ -569,6 +571,9 @@ namespace foobar {
         return rpc_playlist_loader.save_playlist(param);
       };
 
+      registry["MetadbHandle.format_title"] = [&](vector<char> & param) {
+        return rpc_metadb_handle.format_title(param);
+      };
 
     }
 

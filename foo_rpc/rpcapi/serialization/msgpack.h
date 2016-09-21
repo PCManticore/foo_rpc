@@ -52,7 +52,7 @@ namespace msgpack {
       template<>
       struct pack<optional<Track>> {
         template <typename Stream>
-        packer<Stream>& operator()(msgpack::packer<Stream>& o, optional<Track> const& v) const {          
+        packer<Stream>& operator()(msgpack::packer<Stream>& o, optional<Track> const& v) const {
           if (v) {
             Track track = *v;
             o.pack(track);
@@ -60,12 +60,28 @@ namespace msgpack {
           else {
             o.pack_nil();
           }
-          return o;
+          return o;          
         }
       };
-    }
-  }
-}
+
+        template<>
+        struct pack<optional<string>> {
+          template <typename Stream>
+          packer<Stream>& operator()(msgpack::packer<Stream>& o, optional<string> const& v) const {
+            if (v) {
+              auto value = *v;
+              o.pack(value);
+            }
+            else {
+              o.pack_nil();
+            }
+            return o;
+          };
+        };
+    };
+  };
+};
+
 
 namespace serialization {  
  

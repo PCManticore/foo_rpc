@@ -127,6 +127,7 @@
     <ClInclude Include="rpcapi\dispatch.h" />
     <ClInclude Include="rpcapi\factory.h" />
     <ClInclude Include="rpcapi\rpc\coreversion.h" />
+    <ClInclude Include="rpcapi\rpc\metadb_handle.h" />
     <ClInclude Include="rpcapi\rpc\playback_control.h" />
     <ClInclude Include="rpcapi\rpc\playlist.h" />
     <ClInclude Include="rpcapi\rpc\playlist_loader.h" />
