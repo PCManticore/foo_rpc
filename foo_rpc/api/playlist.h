@@ -460,8 +460,8 @@ namespace foobar {
     }
 
     void get_playing_item_location(ApiResult<tuple<bool, t_size, t_size>> & result) {
-      t_size p_playlist = INFINITY;
-      t_size p_index = INFINITY;
+      t_size p_playlist = pfc::infinite32;
+      t_size p_index = pfc::infinite32;
 
       bool success = playlist_manager->get_playing_item_location(&p_playlist, &p_index);
 

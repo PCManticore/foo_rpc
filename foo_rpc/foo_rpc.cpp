@@ -112,11 +112,8 @@ public:
         logToFoobarConsole("Failed connecting to pipe with error %s", e.what());
         return;
       }
-
     }
   }
-
-
 
   void on_init()
   {
