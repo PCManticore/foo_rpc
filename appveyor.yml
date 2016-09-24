@@ -19,7 +19,7 @@ install:
 
 
 artifacts:
-  - path: foo_rpc*.zip
+  - path: foo_rpc*.fb2k-component
     name: foo_rpc
 
 build_script:
@@ -52,14 +52,14 @@ build_script:
     $host.SetShouldExit($LASTEXITCODE)
 
 after_build:
-  - ps: 7z a foo_rpc-$ENV:APPVEYOR_BUILD_VERSION.zip Release\foo_rpc.dll 
+  - ps: 7z a foo_rpc-$ENV:APPVEYOR_BUILD_VERSION.fb2k-component Release\foo_rpc.dll 
 
 test_script:
 
   - 'py -3.6 -m pytest tests'
 
 on_success:
-  - ps: appveyor PushArtifact foo_rpc-$ENV:APPVEYOR_BUILD_VERSION.zip
+  - ps: appveyor PushArtifact foo_rpc-$ENV:APPVEYOR_BUILD_VERSION.fb2k-component
 
 deploy:
 - provider: BinTray
