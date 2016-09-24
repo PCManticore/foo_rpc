@@ -18,12 +18,6 @@ using namespace std;
 
 #define RPC_ADDRESS "\\\\.\\pipe\\foobar2000"
 
-DECLARE_COMPONENT_VERSION(
-"foo_rpc",
-"0.0.1",
-"Access foobar2000's internal API programmatically..\n"
-);
-
 class Thread {
 private:
   std::thread thr;
@@ -134,5 +128,12 @@ initquit_factory_t<foobar2000api> g_foo;
 
 // The module attribute is specified in order to implement DllMain,
 // DllRegisterServer and DllUnregisterServer
-[module(dll, name = "foo_rpc", helpstring = "Foobar automation component")];
-[emitidl];
+//[module(dll, name = "foo_rpc", helpstring = "Foobar automation component")];
+//[emitidl];
+VALIDATE_COMPONENT_FILENAME("foo_rpc.dll");
+
+DECLARE_COMPONENT_VERSION(
+"foo_rpc",
+"0.0.1",
+"Access foobar2000's internal API programmatically..\n"
+);
