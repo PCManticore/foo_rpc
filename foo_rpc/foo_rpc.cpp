@@ -126,10 +126,6 @@ public:
 
 initquit_factory_t<foobar2000api> g_foo;
 
-// The module attribute is specified in order to implement DllMain,
-// DllRegisterServer and DllUnregisterServer
-//[module(dll, name = "foo_rpc", helpstring = "Foobar automation component")];
-//[emitidl];
 VALIDATE_COMPONENT_FILENAME("foo_rpc.dll");
 
 DECLARE_COMPONENT_VERSION(
