@@ -52,7 +52,8 @@ build_script:
     $host.SetShouldExit($LASTEXITCODE)
 
 after_build:
-  - ps: 7z a foo_rpc-$ENV:APPVEYOR_BUILD_VERSION.fb2k-component .\Release\foo_rpc.dll 
+  - ps: 7z a foo_rpc-$ENV:APPVEYOR_BUILD_VERSION.zip .\Release\foo_rpc.dll
+  - ps: mv foo_rpc-$ENV:APPVEYOR_BUILD_VERSION.zip foo_rpc-$ENV:APPVEYOR_BUILD_VERSION.fb2k-component
 
 test_script:
 
