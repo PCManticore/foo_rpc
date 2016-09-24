@@ -1,6 +1,7 @@
 #pragma once
 #include <tuple>
 #include <string>
+#include <vector>
 #include <windows.h>
 
 #include "result.h"

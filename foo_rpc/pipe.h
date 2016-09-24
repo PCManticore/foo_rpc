@@ -16,6 +16,7 @@ private:
 
 public:
 
+
   PipeConnection(OverlappedObject * overlappedObj) : overlapped(overlappedObj) {}
 
   Result<DWORD> send(string bytes, int length) {
@@ -99,18 +100,21 @@ public:
 
     Result<OverlappedObject*> result = connect_pipe(handle);
     if (result.isFailed()) {
-      logToFoobarConsole("Could not connect to pipe %d", result.error());
-      return NULL;
+      std::string msg = tfm::format(
+        "Could not connect to pipe. Failed with error %d",
+        result.error());      
+      throw PipeException(msg);
     }
-    OverlappedObject* overlapped = result.result();
 
+    OverlappedObject* overlapped = result.result();
     wait_overlapped_event(overlapped);
 
     Result<DWORD> overlappedResult = get_overlapped_result(overlapped);
     if (overlappedResult.isFailed() || overlappedResult.result() != 0) {
-      logToFoobarConsole("Getting overlapped event failed with %d.",
-                         overlappedResult.error());
-      return NULL;
+      std::string msg = tfm::format(
+        "Getting overlapped event failed with %d.",
+         overlappedResult.error());
+      throw PipeException(msg);      
     }
 
     return PipeConnection(overlapped);

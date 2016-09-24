@@ -1,6 +1,7 @@
+#include <condition_variable>
 #include <string>
 #include <deque>
-#include <future>
+#include <thread>
 
 #include "local_exceptions.h"
 #include "event.h"
@@ -23,26 +24,54 @@ DECLARE_COMPONENT_VERSION(
 "Access foobar2000's internal API programmatically..\n"
 );
 
+class Thread {
+private:
+  std::thread thr;
+  HANDLE event;
+
+public:
+  Thread(std::thread & thread, HANDLE & eventObj) {
+    thr.swap(thread);
+    event = eventObj;
+  }
+
+  void join() {
+    SetEvent(event);
+    thr.join();
+  }
+};
+
 class foobar2000api : public initquit {
 private:
+  vector<Thread> underlying_threads;
+
+  // TODO: need createnewthread API?
   DWORD ThreadID;
   PipeListener listener = PipeListener(RPC_ADDRESS);
 
-public:
+  bool is_signaled(HANDLE event) {
+    auto res = WaitForSingleObject(event, 0);
+    switch (res) {
+    case WAIT_TIMEOUT:
+      return false;
+    case WAIT_OBJECT_0:
+      return true;
+    default:
+      return true;
+    }
+  }
 
-  DWORD listen_commands() {
-
-    vector<char> received;    
+  void process_incoming_connection(PipeConnection connection, HANDLE event) {
+    vector<char> received;
     auto dispatcher = foobar::MethodDispatcher();
 
-    while (true) {
-      
-      PipeConnection connection = listener.accept();      
+    while (!is_signaled(event)) {
       Result<tuple<DWORD, vector<char>>> result = connection.recv();
 
       if (result.isFailed()) {
         logToFoobarConsole("Failed receiving data from pipe %d", result.error());
-        return result.error();
+        connection.close();
+        break;
       }
 
       tie(ignore, received) = result.result();
@@ -56,15 +85,38 @@ public:
         connection.send(e.what());
       }
     }
-    return 0;
 
   }
 
-  static DWORD WINAPI named_pipe_thread(void* Param)
-  {
+  static DWORD WINAPI named_pipe_thread(void* Param) {
     foobar2000api* This = (foobar2000api*)Param;
-    return This->listen_commands();
+    This->listen_commands();
+    return 0;
   }
+
+public:
+
+  void listen_commands() {
+
+    while (true) {
+
+      try {
+        PipeConnection connection = listener.accept();
+        HANDLE event = CreateEvent(NULL, TRUE, FALSE, NULL);
+        underlying_threads.push_back(Thread(
+          std::thread([&] {
+          process_incoming_connection(connection, event);
+        }), event));
+      }
+      catch (PipeException & e) {
+        logToFoobarConsole("Failed connecting to pipe with error %s", e.what());
+        return;
+      }
+
+    }
+  }
+
+
 
   void on_init()
   {
@@ -75,9 +127,11 @@ public:
   void on_quit()
   {
     listener.close();
+    for (auto &thread : underlying_threads) {
+      thread.join();
+    }
   }
 };
-
 
 initquit_factory_t<foobar2000api> g_foo;
 

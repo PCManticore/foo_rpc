@@ -2,12 +2,12 @@
 
 using namespace std;
 
-
-class RPCException : public exception {
+class BaseException : public exception {
 public:
-  RPCException(const char* message) : m(message) {}
+  BaseException(const char* message) : m(message) {}
+  BaseException(std::string message) : m(message) {}
 
-  virtual ~RPCException() throw() {}
+  virtual ~BaseException() throw() {}
 
   virtual const char* what() const throw() {
     return m.c_str();
@@ -17,5 +17,15 @@ protected:
   std::string m;
 
 private:
-  RPCException();
+  BaseException();
+};
+
+
+class RPCException : public BaseException {
+public:
+  using BaseException::BaseException;
+};
+class PipeException : public BaseException {
+public:
+  using BaseException::BaseException;
 };
