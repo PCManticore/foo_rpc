@@ -87,7 +87,7 @@ public:
 class PipeListener {
 public:
   PipeListener(string address) : pipeAddress(address) {
-    create_name_pipe(true);
+    create_named_pipe(true);
   }
 
   PipeConnection accept() {
