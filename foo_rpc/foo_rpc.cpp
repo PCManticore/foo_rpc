@@ -21,16 +21,16 @@ using namespace std;
 class Thread {
 private:
   std::thread thr;
-  HANDLE event;
+  Event event;
 
 public:
-  Thread(std::thread & thread, HANDLE & eventObj) {
+  Thread(std::thread & thread, Event & eventObj) {
     thr.swap(thread);
     event = eventObj;
   }
 
   void join() {
-    SetEvent(event);
+    event.set();
     thr.join();
   }
 };
@@ -43,23 +43,11 @@ private:
   DWORD ThreadID;
   PipeListener listener = PipeListener(RPC_ADDRESS);
 
-  bool is_signaled(HANDLE event) {
-    auto res = WaitForSingleObject(event, 0);
-    switch (res) {
-    case WAIT_TIMEOUT:
-      return false;
-    case WAIT_OBJECT_0:
-      return true;
-    default:
-      return true;
-    }
-  }
-
-  void process_incoming_connection(PipeConnection connection, HANDLE event) {
+  void process_incoming_connection(PipeConnection connection, Event event) {
     vector<char> received;
     auto dispatcher = foobar::MethodDispatcher();
 
-    while (!is_signaled(event)) {
+    while (!event.isReady()) {
       Result<tuple<DWORD, vector<char>>> result = connection.recv();
 
       if (result.isFailed()) {
@@ -97,7 +85,7 @@ public:
 
       try {
         PipeConnection connection = listener.accept();
-        HANDLE event = CreateEvent(NULL, TRUE, FALSE, NULL);
+        Event event;
         underlying_threads.push_back(Thread(
           std::thread([&] {
           process_incoming_connection(connection, event);
