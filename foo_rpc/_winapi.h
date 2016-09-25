@@ -28,4 +28,3 @@ Result<tuple<DWORD, DWORD>> recv_bytes(HANDLE handle, char * readBuffer, int siz
 Result<OverlappedObject*> connect_pipe(HANDLE handle);
 Result<DWORD> get_overlapped_result(OverlappedObject * overlapped);
 Result<tuple<DWORD, vector<char>>> get_more_data(HANDLE handle);
-

@@ -29,6 +29,6 @@ public:
       api.format_title(param, result);
     });
     result.wait();
-    return serialization::serializer.packed_result(result);
+    return serialization::serializer.packed(result);
   }
 };

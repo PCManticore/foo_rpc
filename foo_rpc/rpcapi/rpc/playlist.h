@@ -27,7 +27,7 @@ class RpcPlaylist {
         api.get_playlist_count(result);
       });
       result.wait();            
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload get_active_playlist(vector<char> & buffer) {
@@ -36,7 +36,7 @@ class RpcPlaylist {
         api.get_active_playlist(result);
       });
       result.wait();            
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload set_active_playlist(vector<char> & buffer) {
@@ -46,7 +46,7 @@ class RpcPlaylist {
         api.set_active_playlist(param, event);
       });
       event.wait();
-      return serialization::serializer.packed_bool(true);
+      return serialization::serializer.packed(true);
     }
 
     Payload get_playing_playlist(vector<char> & buffer) {
@@ -55,7 +55,7 @@ class RpcPlaylist {
         api.get_playing_playlist(result);
       });
       result.wait();            
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload set_playing_playlist(vector<char> & buffer) {
@@ -65,7 +65,7 @@ class RpcPlaylist {
         api.set_playing_playlist(param, event);
       });
       event.wait();
-      return serialization::serializer.packed_bool(true);
+      return serialization::serializer.packed(true);
     }
 
     Payload remove_playlists(vector<char> & buffer) {
@@ -75,7 +75,7 @@ class RpcPlaylist {
         api.remove_playlists(param, event);
       });
       event.wait();
-      return serialization::serializer.packed_bool(true);
+      return serialization::serializer.packed(true);
     }
 
     Payload create_playlist(vector<char> & buffer) {
@@ -85,7 +85,7 @@ class RpcPlaylist {
         api.create_playlist(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload create_playlist_ex(vector<char> & buffer) {
@@ -95,7 +95,7 @@ class RpcPlaylist {
         api.create_playlist_ex(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload reorder(vector<char> & buffer) {
@@ -105,7 +105,7 @@ class RpcPlaylist {
         api.reorder(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload playlist_get_item_count(vector<char> & buffer) {
@@ -115,7 +115,7 @@ class RpcPlaylist {
         api.playlist_get_item_count(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload playlist_get_focus_item(vector<char> & buffer) {
@@ -125,7 +125,7 @@ class RpcPlaylist {
         api.playlist_get_focus_item(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload playlist_get_name(vector<char> & buffer) {
@@ -135,7 +135,7 @@ class RpcPlaylist {
         api.playlist_get_name(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload playlist_reorder_items(vector<char> & buffer) {
@@ -145,7 +145,7 @@ class RpcPlaylist {
         api.playlist_reorder_items(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload activeplaylist_reorder_items(vector<char> & buffer) {
@@ -155,7 +155,7 @@ class RpcPlaylist {
         api.activeplaylist_reorder_items(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload activeplaylist_set_selection(vector<char> & buffer) {
@@ -165,7 +165,7 @@ class RpcPlaylist {
         api.activeplaylist_set_selection(param, event);
       });
       event.wait();
-      return serialization::serializer.packed_bool(true);
+      return serialization::serializer.packed(true);
     }
 
     Payload playlist_set_selection(vector<char> & buffer) {
@@ -175,7 +175,7 @@ class RpcPlaylist {
         api.playlist_set_selection(param, event);
       });
       event.wait();
-      return serialization::serializer.packed_bool(true);
+      return serialization::serializer.packed(true);
     }
 
     Payload activeplaylist_remove_items(vector<char> & buffer) {
@@ -185,7 +185,7 @@ class RpcPlaylist {
         api.activeplaylist_remove_items(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload playlist_remove_items(vector<char> & buffer) {
@@ -195,7 +195,7 @@ class RpcPlaylist {
         api.playlist_remove_items(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload activeplaylist_replace_item(vector<char> & buffer) {
@@ -205,7 +205,7 @@ class RpcPlaylist {
         api.activeplaylist_replace_item(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload playlist_replace_item(vector<char> & buffer) {
@@ -215,7 +215,7 @@ class RpcPlaylist {
         api.playlist_replace_item(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload playlist_set_focus_item(vector<char> & buffer) {
@@ -225,7 +225,7 @@ class RpcPlaylist {
         api.playlist_set_focus_item(param, event);
       });
       event.wait();
-      return serialization::serializer.packed_bool(true);
+      return serialization::serializer.packed(true);
     }
 
     Payload activeplaylist_set_focus_item(vector<char> & buffer) {
@@ -235,7 +235,7 @@ class RpcPlaylist {
         api.activeplaylist_set_focus_item(param, event);
       });
       event.wait();
-      return serialization::serializer.packed_bool(true);
+      return serialization::serializer.packed(true);
     }
 
     Payload activeplaylist_insert_items(vector<char> & buffer) {
@@ -245,7 +245,7 @@ class RpcPlaylist {
         api.activeplaylist_insert_items(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload activeplaylist_add_items(vector<char> & buffer) {
@@ -255,7 +255,7 @@ class RpcPlaylist {
         api.activeplaylist_add_items(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload playlist_add_items(vector<char> & buffer) {
@@ -265,7 +265,7 @@ class RpcPlaylist {
         api.playlist_add_items(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload playlist_insert_items(vector<char> & buffer) {
@@ -275,7 +275,7 @@ class RpcPlaylist {
         api.playlist_insert_items(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload activeplaylist_ensure_visible(vector<char> & buffer) {
@@ -285,7 +285,7 @@ class RpcPlaylist {
         api.activeplaylist_ensure_visible(param, event);
       });
       event.wait();
-      return serialization::serializer.packed_bool(true);
+      return serialization::serializer.packed(true);
     }
 
     Payload playlist_ensure_visible(vector<char> & buffer) {
@@ -295,7 +295,7 @@ class RpcPlaylist {
         api.playlist_ensure_visible(param, event);
       });
       event.wait();
-      return serialization::serializer.packed_bool(true);
+      return serialization::serializer.packed(true);
     }
 
     Payload activeplaylist_rename(vector<char> & buffer) {
@@ -305,7 +305,7 @@ class RpcPlaylist {
         api.activeplaylist_rename(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload playlist_rename(vector<char> & buffer) {
@@ -315,7 +315,7 @@ class RpcPlaylist {
         api.playlist_rename(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload activeplaylist_undo_backup(vector<char> & _unused) {
@@ -324,7 +324,7 @@ class RpcPlaylist {
         api.activeplaylist_undo_backup(event);
       });
       event.wait();
-      return serialization::serializer.packed_bool(true);
+      return serialization::serializer.packed(true);
     }
 
     Payload playlist_undo_backup(vector<char> & buffer) {
@@ -334,7 +334,7 @@ class RpcPlaylist {
         api.playlist_undo_backup(param, event);
       });
       event.wait();
-      return serialization::serializer.packed_bool(true);
+      return serialization::serializer.packed(true);
     }
 
     Payload activeplaylist_undo_restore(vector<char> & buffer) {
@@ -343,7 +343,7 @@ class RpcPlaylist {
         api.activeplaylist_undo_restore(result);
       });
       result.wait();            
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload playlist_undo_restore(vector<char> & buffer) {
@@ -353,7 +353,7 @@ class RpcPlaylist {
         api.playlist_undo_restore(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload activeplaylist_redo_restore(vector<char> & buffer) {
@@ -362,7 +362,7 @@ class RpcPlaylist {
         api.activeplaylist_redo_restore(result);
       });
       result.wait();            
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload playlist_redo_restore(vector<char> & buffer) {
@@ -372,7 +372,7 @@ class RpcPlaylist {
         api.playlist_redo_restore(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload activeplaylist_is_undo_available(vector<char> & buffer) {
@@ -381,7 +381,7 @@ class RpcPlaylist {
         api.activeplaylist_is_undo_available(result);
       });
       result.wait();            
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload playlist_is_undo_available(vector<char> & buffer) {
@@ -391,7 +391,7 @@ class RpcPlaylist {
         api.playlist_is_undo_available(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload activeplaylist_is_redo_available(vector<char> & buffer) {
@@ -400,7 +400,7 @@ class RpcPlaylist {
         api.activeplaylist_is_redo_available(result);
       });
       result.wait();            
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload playlist_is_redo_available(vector<char> & buffer) {
@@ -410,7 +410,7 @@ class RpcPlaylist {
         api.playlist_is_redo_available(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload activeplaylist_item_format_title(vector<char> & buffer) {
@@ -420,7 +420,7 @@ class RpcPlaylist {
         api.activeplaylist_item_format_title(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload playlist_item_format_title(vector<char> & buffer) {
@@ -430,7 +430,7 @@ class RpcPlaylist {
         api.playlist_item_format_title(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload get_playing_item_location(vector<char> & buffer) {
@@ -439,7 +439,7 @@ class RpcPlaylist {
         api.get_playing_item_location(result);
       });
       result.wait();            
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload activeplaylist_sort_by_format(vector<char> & buffer) {
@@ -449,7 +449,7 @@ class RpcPlaylist {
         api.activeplaylist_sort_by_format(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload playlist_sort_by_format(vector<char> & buffer) {
@@ -459,7 +459,7 @@ class RpcPlaylist {
         api.playlist_sort_by_format(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload playback_order_get_count(vector<char> & buffer) {
@@ -468,7 +468,7 @@ class RpcPlaylist {
         api.playback_order_get_count(result);
       });
       result.wait();            
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload playback_order_get_name(vector<char> & buffer) {
@@ -478,7 +478,7 @@ class RpcPlaylist {
         api.playback_order_get_name(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload playback_order_get_active(vector<char> & buffer) {
@@ -487,7 +487,7 @@ class RpcPlaylist {
         api.playback_order_get_active(result);
       });
       result.wait();            
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload playback_order_set_active(vector<char> & buffer) {
@@ -497,7 +497,7 @@ class RpcPlaylist {
         api.playback_order_set_active(param, event);
       });
       event.wait();
-      return serialization::serializer.packed_bool(true);
+      return serialization::serializer.packed(true);
     }
 
     Payload queue_add_item_playlist(vector<char> & buffer) {
@@ -507,7 +507,7 @@ class RpcPlaylist {
         api.queue_add_item_playlist(param, event);
       });
       event.wait();
-      return serialization::serializer.packed_bool(true);
+      return serialization::serializer.packed(true);
     }
 
     Payload queue_add_item(vector<char> & buffer) {
@@ -517,7 +517,7 @@ class RpcPlaylist {
         api.queue_add_item(param, event);
       });
       event.wait();
-      return serialization::serializer.packed_bool(true);
+      return serialization::serializer.packed(true);
     }
 
     Payload queue_get_count(vector<char> & buffer) {
@@ -526,7 +526,7 @@ class RpcPlaylist {
         api.queue_get_count(result);
       });
       result.wait();            
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload queue_get_contents(vector<char> & buffer) {
@@ -535,7 +535,7 @@ class RpcPlaylist {
         api.queue_get_contents(result);
       });
       result.wait();            
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload queue_remove_mask(vector<char> & buffer) {
@@ -545,7 +545,7 @@ class RpcPlaylist {
         api.queue_remove_mask(param, event);
       });
       event.wait();
-      return serialization::serializer.packed_bool(true);
+      return serialization::serializer.packed(true);
     }
 
     Payload queue_flush(vector<char> & _unused) {
@@ -554,7 +554,7 @@ class RpcPlaylist {
         api.queue_flush(event);
       });
       event.wait();
-      return serialization::serializer.packed_bool(true);
+      return serialization::serializer.packed(true);
     }
 
     Payload queue_is_active(vector<char> & buffer) {
@@ -563,7 +563,7 @@ class RpcPlaylist {
         api.queue_is_active(result);
       });
       result.wait();            
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload highlight_playing_item(vector<char> & buffer) {
@@ -572,7 +572,7 @@ class RpcPlaylist {
         api.highlight_playing_item(result);
       });
       result.wait();            
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload remove_playlist(vector<char> & buffer) {
@@ -582,7 +582,7 @@ class RpcPlaylist {
         api.remove_playlist(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload remove_playlist_switch(vector<char> & buffer) {
@@ -592,7 +592,7 @@ class RpcPlaylist {
         api.remove_playlist_switch(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload activeplaylist_is_item_selected(vector<char> & buffer) {
@@ -602,7 +602,7 @@ class RpcPlaylist {
         api.activeplaylist_is_item_selected(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload playlist_is_item_selected(vector<char> & buffer) {
@@ -612,7 +612,7 @@ class RpcPlaylist {
         api.playlist_is_item_selected(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload activeplaylist_move_selection(vector<char> & buffer) {
@@ -622,7 +622,7 @@ class RpcPlaylist {
         api.activeplaylist_move_selection(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload playlist_move_selection(vector<char> & buffer) {
@@ -632,7 +632,7 @@ class RpcPlaylist {
         api.playlist_move_selection(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload activeplaylist_clear(vector<char> & _unused) {
@@ -641,7 +641,7 @@ class RpcPlaylist {
         api.activeplaylist_clear(event);
       });
       event.wait();
-      return serialization::serializer.packed_bool(true);
+      return serialization::serializer.packed(true);
     }
 
     Payload playlist_clear(vector<char> & buffer) {
@@ -651,7 +651,7 @@ class RpcPlaylist {
         api.playlist_clear(param, event);
       });
       event.wait();
-      return serialization::serializer.packed_bool(true);
+      return serialization::serializer.packed(true);
     }
 
     Payload activeplaylist_clear_selection(vector<char> & _unused) {
@@ -660,7 +660,7 @@ class RpcPlaylist {
         api.activeplaylist_clear_selection(event);
       });
       event.wait();
-      return serialization::serializer.packed_bool(true);
+      return serialization::serializer.packed(true);
     }
 
     Payload playlist_clear_selection(vector<char> & buffer) {
@@ -670,7 +670,7 @@ class RpcPlaylist {
         api.playlist_clear_selection(param, event);
       });
       event.wait();
-      return serialization::serializer.packed_bool(true);
+      return serialization::serializer.packed(true);
     }
 
     Payload activeplaylist_remove_selection(vector<char> & buffer) {
@@ -680,7 +680,7 @@ class RpcPlaylist {
         api.activeplaylist_remove_selection(param, event);
       });
       event.wait();
-      return serialization::serializer.packed_bool(true);
+      return serialization::serializer.packed(true);
     }
 
     Payload playlist_remove_selection(vector<char> & buffer) {
@@ -690,7 +690,7 @@ class RpcPlaylist {
         api.playlist_remove_selection(param, event);
       });
       event.wait();
-      return serialization::serializer.packed_bool(true);
+      return serialization::serializer.packed(true);
     }
 
     Payload active_playlist_get_name(vector<char> & buffer) {
@@ -699,7 +699,7 @@ class RpcPlaylist {
         api.active_playlist_get_name(result);
       });
       result.wait();            
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload activeplaylist_get_item_count(vector<char> & buffer) {
@@ -708,7 +708,7 @@ class RpcPlaylist {
         api.activeplaylist_get_item_count(result);
       });
       result.wait();            
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload activeplaylist_get_focus_item(vector<char> & buffer) {
@@ -717,7 +717,7 @@ class RpcPlaylist {
         api.activeplaylist_get_focus_item(result);
       });
       result.wait();            
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload create_playlist_autoname(vector<char> & buffer) {
@@ -727,7 +727,7 @@ class RpcPlaylist {
         api.create_playlist_autoname(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload reset_playing_playlist(vector<char> & _unused) {
@@ -736,7 +736,7 @@ class RpcPlaylist {
         api.reset_playing_playlist(event);
       });
       event.wait();
-      return serialization::serializer.packed_bool(true);
+      return serialization::serializer.packed(true);
     }
 
     Payload find_playlist(vector<char> & buffer) {
@@ -746,7 +746,7 @@ class RpcPlaylist {
         api.find_playlist(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload find_or_playlist(vector<char> & buffer) {
@@ -756,7 +756,7 @@ class RpcPlaylist {
         api.find_or_playlist(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload find_or_create_playlist_unlocked(vector<char> & buffer) {
@@ -766,7 +766,7 @@ class RpcPlaylist {
         api.find_or_create_playlist_unlocked(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload active_playlist_fix(vector<char> & _unused) {
@@ -775,7 +775,7 @@ class RpcPlaylist {
         api.active_playlist_fix(event);
       });
       event.wait();
-      return serialization::serializer.packed_bool(true);
+      return serialization::serializer.packed(true);
     }
 
     Payload playlist_activate_delta(vector<char> & buffer) {
@@ -785,7 +785,7 @@ class RpcPlaylist {
         api.playlist_activate_delta(param, event);
       });
       event.wait();
-      return serialization::serializer.packed_bool(true);
+      return serialization::serializer.packed(true);
     }
 
     Payload playlist_activate_next(vector<char> & _unused) {
@@ -794,7 +794,7 @@ class RpcPlaylist {
         api.playlist_activate_next(event);
       });
       event.wait();
-      return serialization::serializer.packed_bool(true);
+      return serialization::serializer.packed(true);
     }
 
     Payload playlist_activate_previous(vector<char> & _unused) {
@@ -803,7 +803,7 @@ class RpcPlaylist {
         api.playlist_activate_previous(event);
       });
       event.wait();
-      return serialization::serializer.packed_bool(true);
+      return serialization::serializer.packed(true);
     }
 
     Payload playlist_get_selection_count(vector<char> & buffer) {
@@ -813,7 +813,7 @@ class RpcPlaylist {
         api.playlist_get_selection_count(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload activeplaylist_get_selection_count(vector<char> & buffer) {
@@ -823,7 +823,7 @@ class RpcPlaylist {
         api.activeplaylist_get_selection_count(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload playlist_set_selection_single(vector<char> & buffer) {
@@ -833,7 +833,7 @@ class RpcPlaylist {
         api.playlist_set_selection_single(param, event);
       });
       event.wait();
-      return serialization::serializer.packed_bool(true);
+      return serialization::serializer.packed(true);
     }
 
     Payload activeplaylist_set_selection_single(vector<char> & buffer) {
@@ -843,7 +843,7 @@ class RpcPlaylist {
         api.activeplaylist_set_selection_single(param, event);
       });
       event.wait();
-      return serialization::serializer.packed_bool(true);
+      return serialization::serializer.packed(true);
     }
 
     Payload activeplaylist_get_all_items(vector<char> & buffer) {
@@ -852,7 +852,7 @@ class RpcPlaylist {
         api.activeplaylist_get_all_items(result);
       });
       result.wait();            
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload playlist_get_all_items(vector<char> & buffer) {
@@ -862,7 +862,7 @@ class RpcPlaylist {
         api.playlist_get_all_items(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload activeplaylist_get_selected_items(vector<char> & buffer) {
@@ -871,7 +871,7 @@ class RpcPlaylist {
         api.activeplaylist_get_selected_items(result);
       });
       result.wait();            
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload playlist_get_selected_items(vector<char> & buffer) {
@@ -881,7 +881,7 @@ class RpcPlaylist {
         api.playlist_get_selected_items(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload activeplaylist_get_item_handle(vector<char> & buffer) {
@@ -891,7 +891,7 @@ class RpcPlaylist {
         api.activeplaylist_get_item_handle(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload playlist_get_item_handle(vector<char> & buffer) {
@@ -901,7 +901,7 @@ class RpcPlaylist {
         api.playlist_get_item_handle(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload playlist_get_focus_item_handle(vector<char> & buffer) {
@@ -911,7 +911,7 @@ class RpcPlaylist {
         api.playlist_get_focus_item_handle(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload activeplaylist_get_focus_item_handle(vector<char> & buffer) {
@@ -920,7 +920,7 @@ class RpcPlaylist {
         api.activeplaylist_get_focus_item_handle(result);
       });
       result.wait();            
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload activeplaylist_get_items(vector<char> & buffer) {
@@ -930,7 +930,7 @@ class RpcPlaylist {
         api.activeplaylist_get_items(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload playlist_get_items(vector<char> & buffer) {
@@ -940,7 +940,7 @@ class RpcPlaylist {
         api.playlist_get_items(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 
     Payload playlist_insert_items_filter(vector<char> & buffer) {
@@ -950,6 +950,6 @@ class RpcPlaylist {
         api.playlist_insert_items_filter(param, result);
       });
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }
 };

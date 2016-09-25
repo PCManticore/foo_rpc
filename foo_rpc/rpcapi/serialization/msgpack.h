@@ -112,14 +112,15 @@ namespace serialization {
         throw RPCException(e.what());
       }
     };
-    
-    Payload packed_bool(bool value) {
+
+    Payload packed(bool value) {
       return packed_generic(to_string(value));
-    };
+    }
 
     template<typename T>
-    Payload packed_result(ApiResult<T> result) {
+    Payload packed(ApiResult<T> result) {
       return packed_generic(result.result());
     }
+
   };
 };

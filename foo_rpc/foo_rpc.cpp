@@ -76,6 +76,7 @@ private:
       }
       catch (RPCException & e) {
         logToFoobarConsole("Error while dispatching: %s", e.what());
+        // TODO: this is not serialized which is why the client is crashing when receiving
         connection.send(e.what());
       }
     }

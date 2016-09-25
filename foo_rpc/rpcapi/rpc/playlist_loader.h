@@ -25,7 +25,7 @@ public:
       api.load_playlist(param, result);
     });
     result.wait();
-    return serialization::serializer.packed_result(result);
+    return serialization::serializer.packed(result);
   }
 
   Payload save_playlist(vector<char> & buffer) {
@@ -35,7 +35,7 @@ public:
       api.save_playlist(param, result);
     });
     result.wait();
-    return serialization::serializer.packed_result(result);
+    return serialization::serializer.packed(result);
   }
 
 };

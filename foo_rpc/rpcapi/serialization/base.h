@@ -19,9 +19,9 @@ namespace serialization {
     T unpack(vector<char> buf) {};
 
     template<typename T>
-    Payload packed_bool(bool value) {};
+    Payload packed(T value) {};
 
     template<typename T>
-    Payload packed_result(ApiResult<T> result) {};
+    Payload packed(ApiResult<T> result) {};
   };
 }

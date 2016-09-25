@@ -77,7 +77,8 @@ Result<OverlappedObject*> connect_pipe(HANDLE handle) {
     SetEvent(overlapped->overlapped.hEvent);
   }
   else {
-    logToFoobarConsole("Could not connect to the named pipe. "
+    logToFoobarConsole(
+      "Could not connect to the named pipe. "
       "The operation failed with error %d.", err);
     return Result<OverlappedObject*>::withError(err);
   }
@@ -215,7 +216,8 @@ Result<DWORD> send_bytes(HANDLE handle, string writeBuffer, int len) {
 
   OverlappedObject * overlapped = new_overlapped(handle);
   if (!overlapped) {
-    logToFoobarConsole("Cannot get an overlapped object: %d.",
+    logToFoobarConsole(
+      "Cannot get an overlapped object: %d.",
       GetLastError());
     return Result<DWORD>::withError(GetLastError());
   }

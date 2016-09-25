@@ -41,7 +41,7 @@ EVENT_ONLY = """
         api.{name}(event);
       }});
       event.wait();
-      return serialization::serializer.packed_bool(true);
+      return serialization::serializer.packed(true);
     }}"""
 
 PARAM_ONLY = """
@@ -52,7 +52,7 @@ PARAM_ONLY = """
         api.{name}(param, event);
       }});
       event.wait();
-      return serialization::serializer.packed_bool(true);
+      return serialization::serializer.packed(true);
     }}"""
 
 RESULT_ONLY = """
@@ -62,7 +62,7 @@ RESULT_ONLY = """
         api.{name}(result);
       }});
       result.wait();            
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }}"""
 
 RESULT_AND_PARAM = """
@@ -73,7 +73,7 @@ RESULT_AND_PARAM = """
         api.{name}(param, result);
       }});
       result.wait();
-      return serialization::serializer.packed_result(result);
+      return serialization::serializer.packed(result);
     }}"""
 
 DISPATCH_ENTRY = '''
