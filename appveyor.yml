@@ -64,6 +64,9 @@ on_success:
 
 deploy:
 - provider: BinTray
+  on:
+    branch: master
+    appveyor_repo_tag: true
   username: PCManticore
   api_key:
     secure: gD4t00YJoTUyIEQMr/4ssXgo0PZkqNtdFa1cgUkFPQM7EPhQSHmJKwpJG1OLH2WJ
