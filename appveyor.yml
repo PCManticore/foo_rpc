@@ -63,6 +63,9 @@ on_success:
   - ps: appveyor PushArtifact foo_rpc-$ENV:APPVEYOR_BUILD_VERSION.fb2k-component
 
 deploy:
+  on:
+    branch: master
+    appveyor_repo_tag: true
 - provider: BinTray
   username: PCManticore
   api_key:
