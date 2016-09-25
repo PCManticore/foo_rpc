@@ -87,14 +87,14 @@ public:
 class PipeListener {
 public:
   PipeListener(string address) : pipeAddress(address) {
-    createNamedPipe(true);
+    create_name_pipe(true);
   }
 
   PipeConnection accept() {
 
     HANDLE handle;
 
-    createNamedPipe(false);
+    create_named_pipe(false);
     handle = handles.front();
     handles.pop_front();
 
@@ -136,7 +136,7 @@ private:
 
   Returns 0 when the pipe couldn't be created, 1 otherwise.
   */
-  DWORD createNamedPipe(bool isFirst) {
+  DWORD create_named_pipe(bool isFirst) {
     HANDLE pipe;
     DWORD result = create_pipe(pipeAddress, &pipe, isFirst);
     if (result == OPERATION_SUCCESS) {
