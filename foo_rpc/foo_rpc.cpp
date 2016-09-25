@@ -119,6 +119,6 @@ VALIDATE_COMPONENT_FILENAME("foo_rpc.dll");
 
 DECLARE_COMPONENT_VERSION(
 "foo_rpc",
-"0.0.1",
+"0.1.0",
 "Access foobar2000's internal API programmatically..\n"
 );
