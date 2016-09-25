@@ -1,4 +1,4 @@
-version: 0.1-{build}
+version: APPVEYOR_REPO_TAG_NAME.{build}
 environment:
   Platform: Win32
   matrix:
@@ -53,17 +53,20 @@ build_script:
 
 after_build:
   - ps: 7z a foo_rpc-$ENV:APPVEYOR_BUILD_VERSION.zip .\Release\foo_rpc.dll
-  - ps: mv foo_rpc-$ENV:APPVEYOR_BUILD_VERSION.zip foo_rpc-$ENV:APPVEYOR_BUILD_VERSION.fb2k-component
+  - ps: mv foo_rpc-$ENV:APPVEYOR_BUILD_VERSION.zip foo_rpc-$ENV:APPVEYOR_REPO_TAG_NAME.fb2k-component
 
 test_script:
 
   - 'py -3.6 -m pytest tests'
 
 on_success:
-  - ps: appveyor PushArtifact foo_rpc-$ENV:APPVEYOR_BUILD_VERSION.fb2k-component
+  - ps: appveyor PushArtifact foo_rpc-$ENV:APPVEYOR_REPO_TAG_NAME.fb2k-component
 
 deploy:
 - provider: BinTray
+  on:
+    branch: test_deploy
+    appveyor_repo_tag: true
   username: PCManticore
   api_key:
     secure: gD4t00YJoTUyIEQMr/4ssXgo0PZkqNtdFa1cgUkFPQM7EPhQSHmJKwpJG1OLH2WJ
@@ -72,3 +75,4 @@ deploy:
   package: foo_rpc
   publish: true
   override: true
+  version: $(APPVEYOR_REPO_TAG_NAME)
