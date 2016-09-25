@@ -1,4 +1,4 @@
-version: APPVEYOR_REPO_TAG_NAME.{build}
+version: ${APPVEYOR_REPO_TAG_NAME}.{build}
 environment:
   Platform: Win32
   matrix:
@@ -75,4 +75,4 @@ deploy:
   package: foo_rpc
   publish: true
   override: true
-  version: $(APPVEYOR_REPO_TAG_NAME)
+  version: ${APPVEYOR_REPO_TAG_NAME}
