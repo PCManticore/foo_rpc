@@ -7,15 +7,9 @@ environment:
 
 install:
   - cmd: git submodule update --init --recursive
-  - 'powershell ./ci/install.ps1'
-  # This is here just for handling https://github.com/pypa/pip/issues/3964,
-  # while it is not fixed yet.
-  - git clone https://github.com/PCManticore/pip
-  - cd pip
-  - py -3.6 -m pip install -e .
-  - cd ..
+  - ps: Start-Process -FilePath "python" -ArgumentList "-m ensurepip"
 
-  - py -3.6 -m pip install msgpack-python pytest
+  - py -3 -m pip install msgpack-python pytest
 
 
 artifacts:
@@ -57,7 +51,7 @@ after_build:
 
 test_script:
 
-  - 'py -3.6 -m pytest tests'
+  - 'py -3 -m pytest tests'
 
 on_success:
   - ps: appveyor PushArtifact foo_rpc-$ENV:APPVEYOR_BUILD_VERSION.fb2k-component
