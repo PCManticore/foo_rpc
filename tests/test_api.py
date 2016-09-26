@@ -1,19 +1,12 @@
-import sys
-from multiprocessing.connection import Client
 import msgpack
-import contextlib
 
-#from helpers import get_name
-
-def get_name():
-    param = msgpack.packb(0)
-    return msgpack.packb(["Playlist.playlist_get_name", param])
+from fixtures import client
+from fixtures import get_name
 
 
-def test_default():
-    with contextlib.closing(Client('\\\\.\\pipe\\foobar2000')) as client:
-        l = msgpack.packb("")
+def test_default_playlist(client):
+    with client:
         client.send_bytes(get_name())
-        f = client.recv_bytes()
-        assert msgpack.unpackb(f) == b"Default"
+        result = client.recv_bytes()
 
+        assert msgpack.unpackb(result) == b"Default"
