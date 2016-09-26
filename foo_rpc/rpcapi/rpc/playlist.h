@@ -4,10 +4,10 @@
 #include <map>
 #include <tuple>
 
-#include "stdafx.h"
-#include "event.h"
-#include "percolate.h"
-#include "api/playlist.h"
+#include "../../stdafx.h"
+#include "../../event.h"
+#include "../../percolate.h"
+#include "../api/playlist.h"
 #include "../factory.h"
 #include "optional.hpp"
 

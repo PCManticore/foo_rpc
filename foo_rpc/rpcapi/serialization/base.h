@@ -1,12 +1,17 @@
 #pragma once
 
+#include <vector>
+#include <string>
+
+#include "../../percolate.h"
+
 namespace serialization {  
   class Payload {
   public:
-    string data;
+    std::string data;
     int size;
 
-    Payload(string value, int value_size) {
+    Payload(std::string value, int value_size) {
       data = value;
       size = value_size;
     }
@@ -16,7 +21,7 @@ namespace serialization {
   public:    
 
     template<typename T>
-    T unpack(vector<char> buf) {};
+    T unpack(std::vector<char> buf) {};
 
     template<typename T>
     Payload packed(T value) {};
