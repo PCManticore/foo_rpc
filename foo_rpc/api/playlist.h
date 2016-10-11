@@ -204,9 +204,9 @@ namespace foobar {
       vector<t_size> array_mask;
       tie(p_playlist, array_mask) = param.value();
 
-      bit_array_bittable table(array_mask.size());
+      pfc::bit_array_var_impl table;
       for (auto elem : array_mask) {
-        table.set(elem, true);
+        table.set(elem);
       }
 
       bool successful = playlist_manager->playlist_remove_items(p_playlist, table);
