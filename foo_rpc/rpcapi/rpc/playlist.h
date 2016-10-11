@@ -299,7 +299,8 @@ class RpcPlaylist {
     }
 
     Payload activeplaylist_rename(vector<char> & buffer) {
-      ApiParam<string> param(serialization::serializer.unpack<string>(buffer));
+      ApiParam<tuple<string, t_size>> param(
+        serialization::serializer.unpack<tuple<string, t_size>>(buffer));
       ApiResult<bool> result;
       fb2k::inMainThread([&] {
         api.activeplaylist_rename(param, result);
@@ -309,7 +310,8 @@ class RpcPlaylist {
     }
 
     Payload playlist_rename(vector<char> & buffer) {
-      ApiParam<tuple<t_size, string> > param(serialization::serializer.unpack<tuple<t_size, string>>(buffer));
+      ApiParam<tuple<t_size, string, t_size>> param(
+        serialization::serializer.unpack<tuple<t_size, string, t_size>>(buffer));
       ApiResult<bool> result;
       fb2k::inMainThread([&] {
         api.playlist_rename(param, result);

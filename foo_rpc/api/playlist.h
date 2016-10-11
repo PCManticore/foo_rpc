@@ -323,23 +323,28 @@ namespace foobar {
       event.set();
     }
 
-    void activeplaylist_rename(ApiParam<string> param, ApiResult<bool> & result) {
+    void activeplaylist_rename(ApiParam<tuple<string, t_size>> param, ApiResult<bool> & result) {
+      t_size length;
       t_size playlist = playlist_manager->get_active_playlist();
 
-     ApiParam<tuple<t_size, string>> passthrough(
-       make_tuple(playlist, param.value()));
+     ApiParam<tuple<t_size, string, t_size>> passthrough(
+       tuple_cat(
+         make_tuple(playlist),
+         param.value()
+       ));
 
       playlist_rename(passthrough, result);
     }
 
-    void playlist_rename(ApiParam<tuple<t_size, string>> param,
+    void playlist_rename(ApiParam<tuple<t_size, string, t_size>> param,
                          ApiResult<bool> &  result) {
       string name;
       t_size p_playlist;
-      tie(p_playlist, name) = param.value();
+      t_size length;
+      tie(p_playlist, name, length) = param.value();
 
       bool success = playlist_manager->playlist_rename(
-        p_playlist, name.c_str(), name.length());
+        p_playlist, name.c_str(), length);
 
       result.setResult(success);
 
