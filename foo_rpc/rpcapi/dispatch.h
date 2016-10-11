@@ -335,8 +335,8 @@ namespace foobar {
         return rpc_playlist.playlist_remove_selection(param);
       };
 
-      registry["Playlist.active_playlist_get_name"] = [&](vector<char> & param) {
-        return rpc_playlist.active_playlist_get_name(param);
+      registry["Playlist.activeplaylist_get_name"] = [&](vector<char> & param) {
+        return rpc_playlist.activeplaylist_get_name(param);
       };
 
       registry["Playlist.activeplaylist_get_item_count"] = [&](vector<char> & param) {
@@ -359,8 +359,8 @@ namespace foobar {
         return rpc_playlist.find_playlist(param);
       };
 
-      registry["Playlist.find_or_playlist"] = [&](vector<char> & param) {
-        return rpc_playlist.find_or_playlist(param);
+      registry["Playlist.find_or_create_playlist"] = [&](vector<char> & param) {
+        return rpc_playlist.find_or_create_playlist(param);
       };
 
       registry["Playlist.find_or_create_playlist_unlocked"] = [&](vector<char> & param) {
