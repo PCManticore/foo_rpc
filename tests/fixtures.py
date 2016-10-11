@@ -75,8 +75,8 @@ class APIClient(metaclass=BaseAPIClient):
         params = msgpack.packb(p_playlist)
         return msgpack.packb(["Playlist.playlist_get_focus_item", params])
 
-    def playlist_get_name(self, p_playlist, p_out):
-        params = msgpack.packb([p_playlist, p_out])
+    def playlist_get_name(self, p_playlist):
+        params = msgpack.packb(p_playlist)
         return msgpack.packb(["Playlist.playlist_get_name", params])
 
     def playlist_reorder_items(self, p_playlist, p_order, p_count):
@@ -224,9 +224,8 @@ class APIClient(metaclass=BaseAPIClient):
         params = msgpack.packb([p_playlist, p_crop])
         return msgpack.packb(["Playlist.playlist_remove_selection", params])
 
-    def activeplaylist_get_name(self, p_out):
-        params = msgpack.packb(p_out)
-        return msgpack.packb(["Playlist.activeplaylist_get_name", params])
+    def activeplaylist_get_name(self):
+        return msgpack.packb(["Playlist.activeplaylist_get_name"])
 
     def activeplaylist_get_item_count(self):
         return msgpack.packb(["Playlist.activeplaylist_get_item_count"])
