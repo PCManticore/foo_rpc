@@ -49,10 +49,10 @@ namespace foobar {
     }
 
     void remove_playlists(ApiParam<vector<t_size>> param, Event event) {
-      vector<t_size> elements = param.value();
-      bit_array_bittable table(elements.size());
+      vector<t_size> elements = param.value();      
+      pfc::bit_array_var_impl table;
       for (auto elem : elements) {           
-        table.set(elem, true);
+        table.set(elem);
       }
 
       playlist_manager->remove_playlists(table);
