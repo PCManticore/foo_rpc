@@ -693,10 +693,10 @@ class RpcPlaylist {
       return serialization::serializer.packed(true);
     }
 
-    Payload active_playlist_get_name(vector<char> & buffer) {
+    Payload activeplaylist_get_name(vector<char> & buffer) {
       ApiResult<pfc::string8> result;
       fb2k::inMainThread([&] {
-        api.active_playlist_get_name(result);
+        api.activeplaylist_get_name(result);
       });
       result.wait();            
       return serialization::serializer.packed(result);
@@ -749,11 +749,11 @@ class RpcPlaylist {
       return serialization::serializer.packed(result);
     }
 
-    Payload find_or_playlist(vector<char> & buffer) {
+    Payload find_or_create_playlist(vector<char> & buffer) {
       ApiParam<tuple<string, t_size> > param(serialization::serializer.unpack<tuple<string, t_size>>(buffer));
       ApiResult<t_size> result;
       fb2k::inMainThread([&] {
-        api.find_or_playlist(param, result);
+        api.find_or_create_playlist(param, result);
       });
       result.wait();
       return serialization::serializer.packed(result);

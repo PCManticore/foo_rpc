@@ -703,7 +703,7 @@ namespace foobar {
       event.set();
     }
 
-    void active_playlist_get_name(ApiResult<pfc::string8> & result) {      
+    void activeplaylist_get_name(ApiResult<pfc::string8> & result) {      
       pfc::string8 temp;
       bool success = playlist_manager->activeplaylist_get_name(temp);
 
@@ -748,7 +748,7 @@ namespace foobar {
       result.setResult(index);
     }
 
-    void find_or_playlist(ApiParam<tuple<string, t_size>> param, ApiResult<t_size> & result) {
+    void find_or_create_playlist(ApiParam<tuple<string, t_size>> param, ApiResult<t_size> & result) {
       string name;
       t_size length;
       tie(name, length) = param.value();
