@@ -1,14 +1,39 @@
 import inspect
 import multiprocessing.connection
+import os
+import tempfile
 import types
 
+import chippy
 import msgpack
 import pytest
 
 
-
 def _foobar_pipe_client():
     return multiprocessing.connection.Client('\\\\.\\pipe\\foobar2000')
+
+
+class TestSoundFile:
+
+    @staticmethod
+    def _generate_wave_file(path, length):
+        synth = chippy.Synthesizer(framerate=44100)
+        sine_wave = synth.sine_pcm(length=length)
+        synth.save_wave(sine_wave, path)
+
+    def __init__(self):
+        fd, path = tempfile.mkstemp(suffix=".wav")
+        os.close(fd)
+
+        self.path = path
+        self.length = 20
+        self._generate_wave_file(self.path, self.length)
+
+    def remove(self):
+        try:
+            os.remove(self.path)
+        except OSError:
+            pass
 
 
 class BaseAPIClient(type):
@@ -63,28 +88,24 @@ class APIClient(metaclass=BaseAPIClient):
         params = msgpack.packb([p_name, p_name_length, p_index, content])
         return msgpack.packb(["Playlist.create_playlist_ex", params])
 
-    def reorder(self, p_order, p_count):
-        params = msgpack.packb([p_order, p_count])
+    def reorder(self, p_order):
+        params = msgpack.packb(p_order)
         return msgpack.packb(["Playlist.reorder", params])
 
     def playlist_get_item_count(self, p_playlist):
         params = msgpack.packb(p_playlist)
         return msgpack.packb(["Playlist.playlist_get_item_count", params])
 
-    def playlist_get_focus_item(self, p_playlist):
-        params = msgpack.packb(p_playlist)
-        return msgpack.packb(["Playlist.playlist_get_focus_item", params])
-
     def playlist_get_name(self, p_playlist):
         params = msgpack.packb(p_playlist)
         return msgpack.packb(["Playlist.playlist_get_name", params])
 
-    def playlist_reorder_items(self, p_playlist, p_order, p_count):
-        params = msgpack.packb([p_playlist, p_order, p_count])
+    def playlist_reorder_items(self, p_playlist, p_order):
+        params = msgpack.packb([p_playlist, p_order])
         return msgpack.packb(["Playlist.playlist_reorder_items", params])
 
-    def activeplaylist_reorder_items(self, order, count):
-        params = msgpack.packb([order, count])
+    def activeplaylist_reorder_items(self, p_order):
+        params = msgpack.packb(p_order)
         return msgpack.packb(["Playlist.activeplaylist_reorder_items", params])
 
     def activeplaylist_remove_items(self, mask):
@@ -103,19 +124,19 @@ class APIClient(metaclass=BaseAPIClient):
         params = msgpack.packb([p_playlist, p_item, p_new_item])
         return msgpack.packb(["Playlist.playlist_replace_item", params])
 
-    def activeplaylist_insert_items(self, p_base, data, p_selection):
+    def activeplaylist_insert_items(self, p_base, data, p_selection): # TODO
         params = msgpack.packb([p_base, data, p_selection])
         return msgpack.packb(["Playlist.activeplaylist_insert_items", params])
 
-    def activeplaylist_add_items(data, p_selection):
+    def activeplaylist_add_items(data, p_selection): # TODO
         params = msgpack.packb([data, p_selection])
         return msgpack.packb(["Playlist.activeplaylist_add_items", params])
 
-    def playlist_add_items(self, playlist, data, p_selection):
+    def playlist_add_items(self, playlist, data, p_selection): # TODO
         params = msgpack.packb([playlist, data, p_selection])
         return msgpack.packb(["Playlist.playlist_add_items", params])
 
-    def playlist_insert_items(self, p_playlist, p_base, data, p_selection):
+    def playlist_insert_items(self, p_playlist, p_base, data, p_selection): # TODO
         params = msgpack.packb([p_playlist, p_base, data, p_selection])
         return msgpack.packb(["Playlist.playlist_insert_items", params])
 
@@ -139,11 +160,11 @@ class APIClient(metaclass=BaseAPIClient):
         params = msgpack.packb([p_playlist, p_index])
         return msgpack.packb(["Playlist.get_playing_item_location", params])
 
-    def activeplaylist_sort_by_format(self, spec, p_sel_only):
+    def activeplaylist_sort_by_format(self, spec, p_sel_only): # TODO  maybe we need selection methods back?
         params = msgpack.packb([spec, p_sel_only])
         return msgpack.packb(["Playlist.activeplaylist_sort_by_format", params])
 
-    def playlist_sort_by_format(self, p_playlist, p_pattern, p_sel_only):
+    def playlist_sort_by_format(self, p_playlist, p_pattern, p_sel_only): # TODO
         params = msgpack.packb([p_playlist, p_pattern, p_sel_only])
         return msgpack.packb(["Playlist.playlist_sort_by_format", params])
 
@@ -165,16 +186,11 @@ class APIClient(metaclass=BaseAPIClient):
         params = msgpack.packb([p_playlist, p_item])
         return msgpack.packb(["Playlist.queue_add_item_playlist", params])
 
-    def queue_add_item(self, p_item):
-        params = msgpack.packb(p_item)
-        return msgpack.packb(["Playlist.queue_add_item", params])
-
     def queue_get_count(self):
         return msgpack.packb(["Playlist.queue_get_count"])
 
-    def queue_get_contents(self, p_out):
-        params = msgpack.packb(p_out)
-        return msgpack.packb(["Playlist.queue_get_contents", params])
+    def queue_get_contents(self):
+        return msgpack.packb(["Playlist.queue_get_contents"])
 
     def queue_remove_mask(self, p_mask):
         params = msgpack.packb(p_mask)
@@ -194,14 +210,6 @@ class APIClient(metaclass=BaseAPIClient):
         params = msgpack.packb(p_playlist)
         return msgpack.packb(["Playlist.remove_playlist_switch", params])
 
-    def activeplaylist_is_item_selected(self, p_item):
-        params = msgpack.packb(p_item)
-        return msgpack.packb(["Playlist.activeplaylist_is_item_selected", params])
-
-    def playlist_is_item_selected(self, p_playlist, p_item):
-        params = msgpack.packb([p_playlist, p_item])
-        return msgpack.packb(["Playlist.playlist_is_item_selected", params])
-
     def activeplaylist_clear(self):
         return msgpack.packb(["Playlist.activeplaylist_clear"])
 
@@ -209,29 +217,11 @@ class APIClient(metaclass=BaseAPIClient):
         params = msgpack.packb(p_playlist)
         return msgpack.packb(["Playlist.playlist_clear", params])
 
-    def activeplaylist_clear_selection(self):
-        return msgpack.packb(["Playlist.activeplaylist_clear_selection"])
-
-    def playlist_clear_selection(self, p_playlist):
-        params = msgpack.packb(p_playlist)
-        return msgpack.packb(["Playlist.playlist_clear_selection", params])
-
-    def activeplaylist_remove_selection(self, p_crop):
-        params = msgpack.packb(p_crop)
-        return msgpack.packb(["Playlist.activeplaylist_remove_selection", params])
-
-    def playlist_remove_selection(self, p_playlist, p_crop):
-        params = msgpack.packb([p_playlist, p_crop])
-        return msgpack.packb(["Playlist.playlist_remove_selection", params])
-
     def activeplaylist_get_name(self):
         return msgpack.packb(["Playlist.activeplaylist_get_name"])
 
     def activeplaylist_get_item_count(self):
         return msgpack.packb(["Playlist.activeplaylist_get_item_count"])
-
-    def activeplaylist_get_focus_item(self):
-        return msgpack.packb(["Playlist.activeplaylist_get_focus_item"])
 
     def create_playlist_autoname(self, p_index):
         params = msgpack.packb(p_index)
@@ -252,10 +242,7 @@ class APIClient(metaclass=BaseAPIClient):
         params = msgpack.packb([p_name, p_name_length])
         return msgpack.packb(["Playlist.find_or_create_playlist_unlocked", params])
 
-    def active_playlist_fix(self):
-        return msgpack.packb(["Playlist.active_playlist_fix"])
-
-    def playlist_activate_delta(self, p_delta):
+    def playlist_activate_delta(self, p_delta):# TODO
         params = msgpack.packb(p_delta)
         return msgpack.packb(["Playlist.playlist_activate_delta", params])
 
@@ -264,21 +251,12 @@ class APIClient(metaclass=BaseAPIClient):
 
     def playlist_activate_previous(self):
         return msgpack.packb(["Playlist.playlist_activate_previous"])
-
-    def playlist_get_selection_count(self, p_playlist, p_max):
-        params = msgpack.packb([p_playlist, p_max])
-        return msgpack.packb(["Playlist.playlist_get_selection_count", params])
-
-    def activeplaylist_get_selection_count(self, p_max):
-        params = msgpack.packb(p_max)
-        return msgpack.packb(["Playlist.activeplaylist_get_selection_count", params])
      
-    def activeplaylist_get_all_items(self, out):
-        params = msgpack.packb(out)
-        return msgpack.packb(["Playlist.activeplaylist_get_all_items", params])
+    def activeplaylist_get_all_items(self):
+        return msgpack.packb(["Playlist.activeplaylist_get_all_items"])
 
-    def playlist_get_all_items(self, p_playlist, out):
-        params = msgpack.packb([p_playlist, out])
+    def playlist_get_all_items(self, p_playlist):
+        params = msgpack.packb(p_playlist)
         return msgpack.packb(["Playlist.playlist_get_all_items", params])
 
     def activeplaylist_get_item_handle(self, p_item):
@@ -289,15 +267,15 @@ class APIClient(metaclass=BaseAPIClient):
         params = msgpack.packb([playlist, item])
         return msgpack.packb(["Playlist.playlist_get_item_handle", params])
 
-    def activeplaylist_get_items(self, out, p_mask):
-        params = msgpack.packb([out, p_mask])
+    def activeplaylist_get_items(self, p_mask):
+        params = msgpack.packb(p_mask)
         return msgpack.packb(["Playlist.activeplaylist_get_items", params])
 
-    def playlist_get_items(self, p_playlist, out, p_mask):
-        params = msgpack.packb([p_playlist, out, p_mask])
+    def playlist_get_items(self, p_playlist, p_mask):
+        params = msgpack.packb([p_playlist, p_mask])
         return msgpack.packb(["Playlist.playlist_get_items", params])
 
-    def playlist_insert_items_filter(self, p_playlist, p_base, p_data, p_select):
+    def playlist_insert_items_filter(self, p_playlist, p_base, p_data, p_select):# TODO
         params = msgpack.packb([p_playlist, p_base, p_data, p_select])
         return msgpack.packb(["Playlist.playlist_insert_items_filter", params])
 
@@ -316,10 +294,6 @@ class APIClient(metaclass=BaseAPIClient):
     def test_version(self, major, minor1, minor2, minor3):
         params = msgpack.packb([major, minor1, minor2, minor3])
         return msgpack.packb(["CoreVersion.test_version", params])
-
-    def format_title(self, p_playlist, p_item, p_script):
-        params = msgpack.packb([p_playlist, p_item, p_script])
-        return msgpack.packb(["MetadbHandle.format_title", params])
 
     def get_now_playing(self):
         return msgpack.packb(["PlaybackControl.get_now_playing"])
@@ -412,7 +386,73 @@ class APIClient(metaclass=BaseAPIClient):
     def get_volume_step(self):
         return msgpack.packb(["PlaybackControl.get_volume_step"])
 
+    def load_playlist(self, path):
+        params = msgpack.packb(path)
+        return msgpack.packb(["PlaylistLoader.load_playlist", params])
+
+    def save_playlist(self, path, files):
+        params = msgpack.packb([path, files])
+        return msgpack.packb(["PlaylistLoader.save_playlist", params])
+
+
+def _test_files_finalizer(test_files):
+    for test_file in test_files:
+        test_file.remove()
+
+
+def _remove_from_playlist_finalizer(index, client, length):
+    client.playlist_remove_items(index, list(range(length)))
+
 
 @pytest.fixture
 def client():
     return APIClient()
+
+
+@pytest.fixture
+def created_playlist(request, client):
+    index = client.create_playlist("test", 4, 1)
+
+    def playlist_teardown():
+        client.remove_playlist(index)
+    request.addfinalizer(playlist_teardown)
+
+    return index
+
+
+@pytest.fixture
+def test_files(request, number_of_files=5):
+    files = [TestSoundFile() for _ in range(number_of_files)]
+    request.addfinalizer(lambda: _test_files_finalizer(files))
+
+    return files
+
+
+def _playlist_with_items(request, client, index, test_files):
+    files = [test_file.path for test_file in test_files]
+    client.playlist_add_items(index, files, False)
+
+    request.addfinalizer(lambda: _test_files_finalizer(test_files))
+    request.addfinalizer(
+        lambda: _remove_from_playlist_finalizer(index, client, len(test_files)))
+    return types.SimpleNamespace(index=index, files=test_files)
+
+
+@pytest.fixture
+def new_playlist_with_items(request, client, test_files):
+    index = client.create_playlist("test", 4, 1)
+    request.addfinalizer(lambda: client.remove_playlist(index))
+    return _playlist_with_items(request, client, index, test_files)
+
+
+@pytest.fixture
+def active_playlist_with_items(request, client, test_files):
+    index = client.get_active_playlist()
+    return _playlist_with_items(request, client, index, test_files)
+
+
+@pytest.fixture
+def active_playlist_with_item(request, client):
+    index = client.get_active_playlist()
+    test_files = [TestSoundFile()]
+    return _playlist_with_items(request, client, index, test_files)
