@@ -113,12 +113,6 @@ namespace foobar {
 
     }
 
-    void playlist_get_focus_item(ApiParam<t_size> param, ApiResult<t_size> & result) {
-      t_size p_playlist = param.value();
-      t_size focus = playlist_manager->playlist_get_focus_item(p_playlist);
-      result.setResult(focus);
-    }
-
     void playlist_get_name(ApiParam<t_size> param, ApiResult<pfc::string8> & result) {
       t_size p_playlist = param.value();
       pfc::string8 temp;
@@ -148,46 +142,6 @@ namespace foobar {
       ApiParam<tuple<t_size, vector<int>>> passthrough(make_tuple(playlist, param.value()));
 
       playlist_reorder_items(passthrough, result);
-    }
-
-    void activeplaylist_set_selection(ApiParam<tuple<vector<t_size>, vector<bool>>> param, Event event) {
-      vector<t_size> p_affected;
-      vector<bool> p_status;
-      t_size playlist = playlist_manager->get_active_playlist();
-
-      tie(p_affected, p_status) = param.value();
-
-      ApiParam<tuple<t_size, vector<t_size>, vector<bool>>> passthrough(
-        make_tuple(playlist, p_affected, p_status));
-
-      playlist_set_selection(passthrough, event);
-    }
-
-    void playlist_set_selection(ApiParam<tuple<t_size, vector<t_size>, vector<bool>>> param, Event event) {
-      t_size p_playlist;
-      vector<t_size> p_affected;
-      vector<bool> p_status;
-      tie(p_playlist, p_affected, p_status) = param.value();
-
-      if (p_status.size() != p_affected.size()) {
-        console::formatter() << "The arrays passed to playlist_set_selection have different size.";
-        event.set();
-        return;
-      }
-
-      pfc::bit_array_var_impl p_affected_array;
-      bit_array_bittable p_status_array(p_affected.size());      
-      
-      for (size_t index = 0; index < p_affected.size(); index++) {
-        auto elem = p_affected[index];
-        auto status = p_status[index];
-
-        p_affected_array.set(elem);
-        p_status_array.set(elem, status);
-      }
-
-      playlist_manager->playlist_set_selection(p_playlist, bit_array_true(), p_status_array);
-      event.set();
     }
     
     void activeplaylist_remove_items(ApiParam<vector<t_size>> param, ApiResult<bool> & result) {
@@ -236,23 +190,6 @@ namespace foobar {
       bool success = playlist_manager->playlist_replace_item(p_playlist, p_item, handle);
 
       result.setResult(success);
-    }
-
-    void playlist_set_focus_item(ApiParam<tuple<t_size, t_size>> param, Event event) {
-      t_size p_playlist, p_item;
-      tie(p_playlist, p_item) = param.value();
-
-      playlist_manager->playlist_set_focus_item(p_playlist, p_item);
-
-      event.set();
-    }
-
-    void activeplaylist_set_focus_item(ApiParam<t_size> param, Event event) {
-      t_size playlist = playlist_manager->get_active_playlist();
-
-      ApiParam<tuple<t_size, t_size>> passthrough(
-        make_tuple(playlist, param.value()));
-      playlist_set_focus_item(passthrough, event);
     }
 
     void activeplaylist_insert_items(ApiParam<tuple<t_size, vector<string>>> param,
@@ -602,45 +539,6 @@ namespace foobar {
       result.setResult(success);
     }
 
-    void activeplaylist_is_item_selected(ApiParam<t_size> param, ApiResult<bool> & result) {
-      t_size p_playlist = playlist_manager->get_active_playlist();
-
-      ApiParam<tuple<t_size, t_size>> passthrough(
-        make_tuple(p_playlist, param.value()));
-
-      playlist_is_item_selected(passthrough, result);
-    }
-
-    void playlist_is_item_selected(ApiParam<tuple<t_size, t_size>> param, ApiResult<bool> & result) {
-      t_size p_playlist;
-      t_size p_item;
-      tie(p_playlist, p_item) = param.value();
-
-      bool success = playlist_manager->playlist_is_item_selected(p_playlist, p_item);
-
-      result.setResult(success);
-    }
-
-    void activeplaylist_move_selection(ApiParam<int> param, ApiResult<bool> & result) {
-      t_size playlist = playlist_manager->get_active_playlist();
-
-      ApiParam<tuple<t_size, int>> passthrough(
-        make_tuple(playlist, param.value())
-      );
-
-      playlist_move_selection(passthrough, result);
-    }
-
-    void playlist_move_selection(ApiParam<tuple<t_size, int>> param, ApiResult<bool> & result) {
-      int p_delta;
-      t_size p_playlist;
-      tie(p_playlist, p_delta) = param.value();
-
-      bool success = playlist_manager->playlist_move_selection(p_playlist, p_delta);
-
-      result.setResult(success);
-    }
-
     void activeplaylist_clear(Event event) {
       t_size playlist = playlist_manager->get_active_playlist();
 
@@ -653,44 +551,6 @@ namespace foobar {
       t_size p_playlist = param.value();
 
       playlist_manager->playlist_clear(p_playlist);
-
-      event.set();
-    }
-
-    void activeplaylist_clear_selection(Event event) {
-      t_size playlist = playlist_manager->get_active_playlist();
-
-      ApiParam<t_size> param(playlist);
-
-      playlist_clear_selection(param, event);
-    }
-
-    void playlist_clear_selection(ApiParam<t_size> param, Event event) {
-      t_size p_selection = param.value();
-
-      playlist_manager->playlist_clear_selection(p_selection);
-
-      event.set();
-
-    }
-
-    void activeplaylist_remove_selection(ApiParam<bool> param, Event event) {
-      t_size playlist = playlist_manager->get_active_playlist();
-
-      ApiParam<tuple<t_size, bool>> passthrough(
-        make_tuple(playlist, param.value()));
-
-      playlist_remove_selection(passthrough, event);
-
-    }
-
-    void playlist_remove_selection(ApiParam<tuple<t_size, bool>> param, Event event) {
-      t_size p_playlist;
-      bool p_crop;
-
-      tie(p_playlist, p_crop) = param.value();
-
-      playlist_manager->playlist_remove_selection(p_playlist, p_crop);
 
       event.set();
     }
@@ -789,47 +649,6 @@ namespace foobar {
       event.set();
     }
 
-    void playlist_get_selection_count(ApiParam<tuple<t_size, t_size>> param, ApiResult<t_size> & result) {
-      t_size playlist;
-      t_size p_max;
-      tie(playlist, p_max) = param.value();
-
-      t_size count = playlist_manager->playlist_get_selection_count(playlist, p_max);
-
-      result.setResult(count);
-
-    }
-
-    void activeplaylist_get_selection_count(ApiParam<t_size> param, ApiResult<t_size> & result) {
-      t_size playlist = playlist_manager->get_active_playlist();
-
-      ApiParam<tuple<t_size, t_size>> passthrough(
-        make_tuple(playlist, param.value()));
-
-      playlist_get_selection_count(passthrough, result);
-    }
-
-    void playlist_set_selection_single(ApiParam<tuple<t_size, t_size, bool>> param, Event event) {
-      t_size playlist;
-      t_size item;
-      bool state;
-      tie(playlist, item, state) = param.value();
-
-      playlist_manager->playlist_set_selection_single(playlist, item, state);
-      
-      event.set();
-    }
-
-    void activeplaylist_set_selection_single(ApiParam<tuple<t_size, bool>> param, Event event) {
-      t_size playlist = playlist_manager->get_active_playlist();
-
-      ApiParam<tuple<t_size, t_size, bool>> passthrough(
-        tuple_cat(make_tuple(playlist), param.value())
-      );
-
-      playlist_set_selection_single(passthrough, event);
-    }
-
     void activeplaylist_get_all_items(ApiResult<vector<Track>> & result) {
       t_size playlist = playlist_manager->get_active_playlist();
 
@@ -844,24 +663,6 @@ namespace foobar {
       t_size playlist = param.value();
 
       enum_items_callback_all enum_callback;
-      playlist_manager->playlist_enum_items(playlist, enum_callback, bit_array_true());
-
-      result.setResult(enum_callback.m_out);
-    }
-
-    void activeplaylist_get_selected_items(ApiResult<vector<Track>> & result) {
-      t_size playlist = playlist_manager->get_active_playlist();
-
-      ApiParam<t_size> param(playlist);
-
-      playlist_get_selected_items(param, result);
-    }
-    
-    void playlist_get_selected_items(ApiParam<t_size> param, ApiResult<vector<Track>> & result) {
-      t_size playlist = param.value();
-
-      enum_items_callback_retrieve_selected_items enum_callback;
-
       playlist_manager->playlist_enum_items(playlist, enum_callback, bit_array_true());
 
       result.setResult(enum_callback.m_out);

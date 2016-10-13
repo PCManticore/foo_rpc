@@ -25,17 +25,6 @@ public:
   }
 };
 
-class enum_items_callback_retrieve_selected_items : public enum_items_callback_all
-{
-public:
-  bool on_item(t_size p_index, const metadb_handle_ptr & p_location, bool b_selected)
-  {
-    if (b_selected) enum_items_callback_all::on_item(p_index, p_location, b_selected);
-    return true;
-  }
-};
-
-
 class enum_items_callback_retrieve_item_opt : public playlist_manager::enum_items_callback
 {
   optional<Track> track;

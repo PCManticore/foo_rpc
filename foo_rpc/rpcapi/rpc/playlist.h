@@ -118,16 +118,6 @@ class RpcPlaylist {
       return serialization::serializer.packed(result);
     }
 
-    Payload playlist_get_focus_item(vector<char> & buffer) {
-      ApiParam<t_size> param(serialization::serializer.unpack<t_size>(buffer));
-      ApiResult<t_size> result;
-      fb2k::inMainThread([&] {
-        api.playlist_get_focus_item(param, result);
-      });
-      result.wait();
-      return serialization::serializer.packed(result);
-    }
-
     Payload playlist_get_name(vector<char> & buffer) {
       ApiParam<t_size> param(serialization::serializer.unpack<t_size>(buffer));
       ApiResult<pfc::string8> result;
@@ -156,26 +146,6 @@ class RpcPlaylist {
       });
       result.wait();
       return serialization::serializer.packed(result);
-    }
-
-    Payload activeplaylist_set_selection(vector<char> & buffer) {
-      ApiParam<tuple<vector<t_size>, vector<bool> > > param(serialization::serializer.unpack<tuple<vector<t_size>, vector<bool> >>(buffer));
-      Event event;
-      fb2k::inMainThread([&] {
-        api.activeplaylist_set_selection(param, event);
-      });
-      event.wait();
-      return serialization::serializer.packed(true);
-    }
-
-    Payload playlist_set_selection(vector<char> & buffer) {
-      ApiParam<tuple<t_size, vector<t_size>, vector<bool> > > param(serialization::serializer.unpack<tuple<t_size, vector<t_size>, vector<bool> >>(buffer));
-      Event event;
-      fb2k::inMainThread([&] {
-        api.playlist_set_selection(param, event);
-      });
-      event.wait();
-      return serialization::serializer.packed(true);
     }
 
     Payload activeplaylist_remove_items(vector<char> & buffer) {
@@ -216,26 +186,6 @@ class RpcPlaylist {
       });
       result.wait();
       return serialization::serializer.packed(result);
-    }
-
-    Payload playlist_set_focus_item(vector<char> & buffer) {
-      ApiParam<tuple<t_size, t_size> > param(serialization::serializer.unpack<tuple<t_size, t_size>>(buffer));
-      Event event;
-      fb2k::inMainThread([&] {
-        api.playlist_set_focus_item(param, event);
-      });
-      event.wait();
-      return serialization::serializer.packed(true);
-    }
-
-    Payload activeplaylist_set_focus_item(vector<char> & buffer) {
-      ApiParam<t_size> param(serialization::serializer.unpack<t_size>(buffer));
-      Event event;
-      fb2k::inMainThread([&] {
-        api.activeplaylist_set_focus_item(param, event);
-      });
-      event.wait();
-      return serialization::serializer.packed(true);
     }
 
     Payload activeplaylist_insert_items(vector<char> & buffer) {
@@ -587,46 +537,6 @@ class RpcPlaylist {
       return serialization::serializer.packed(result);
     }
 
-    Payload activeplaylist_is_item_selected(vector<char> & buffer) {
-      ApiParam<t_size> param(serialization::serializer.unpack<t_size>(buffer));
-      ApiResult<bool> result;
-      fb2k::inMainThread([&] {
-        api.activeplaylist_is_item_selected(param, result);
-      });
-      result.wait();
-      return serialization::serializer.packed(result);
-    }
-
-    Payload playlist_is_item_selected(vector<char> & buffer) {
-      ApiParam<tuple<t_size, t_size> > param(serialization::serializer.unpack<tuple<t_size, t_size>>(buffer));
-      ApiResult<bool> result;
-      fb2k::inMainThread([&] {
-        api.playlist_is_item_selected(param, result);
-      });
-      result.wait();
-      return serialization::serializer.packed(result);
-    }
-
-    Payload activeplaylist_move_selection(vector<char> & buffer) {
-      ApiParam<int> param(serialization::serializer.unpack<int>(buffer));
-      ApiResult<bool> result;
-      fb2k::inMainThread([&] {
-        api.activeplaylist_move_selection(param, result);
-      });
-      result.wait();
-      return serialization::serializer.packed(result);
-    }
-
-    Payload playlist_move_selection(vector<char> & buffer) {
-      ApiParam<tuple<t_size, int> > param(serialization::serializer.unpack<tuple<t_size, int>>(buffer));
-      ApiResult<bool> result;
-      fb2k::inMainThread([&] {
-        api.playlist_move_selection(param, result);
-      });
-      result.wait();
-      return serialization::serializer.packed(result);
-    }
-
     Payload activeplaylist_clear(vector<char> & _unused) {
       Event event;
       fb2k::inMainThread([&] {
@@ -641,45 +551,6 @@ class RpcPlaylist {
       Event event;
       fb2k::inMainThread([&] {
         api.playlist_clear(param, event);
-      });
-      event.wait();
-      return serialization::serializer.packed(true);
-    }
-
-    Payload activeplaylist_clear_selection(vector<char> & _unused) {
-      Event event;
-      fb2k::inMainThread([&] {
-        api.activeplaylist_clear_selection(event);
-      });
-      event.wait();
-      return serialization::serializer.packed(true);
-    }
-
-    Payload playlist_clear_selection(vector<char> & buffer) {
-      ApiParam<t_size> param(serialization::serializer.unpack<t_size>(buffer));
-      Event event;
-      fb2k::inMainThread([&] {
-        api.playlist_clear_selection(param, event);
-      });
-      event.wait();
-      return serialization::serializer.packed(true);
-    }
-
-    Payload activeplaylist_remove_selection(vector<char> & buffer) {
-      ApiParam<bool> param(serialization::serializer.unpack<bool>(buffer));
-      Event event;
-      fb2k::inMainThread([&] {
-        api.activeplaylist_remove_selection(param, event);
-      });
-      event.wait();
-      return serialization::serializer.packed(true);
-    }
-
-    Payload playlist_remove_selection(vector<char> & buffer) {
-      ApiParam<tuple<t_size, bool> > param(serialization::serializer.unpack<tuple<t_size, bool>>(buffer));
-      Event event;
-      fb2k::inMainThread([&] {
-        api.playlist_remove_selection(param, event);
       });
       event.wait();
       return serialization::serializer.packed(true);
@@ -798,46 +669,6 @@ class RpcPlaylist {
       return serialization::serializer.packed(true);
     }
 
-    Payload playlist_get_selection_count(vector<char> & buffer) {
-      ApiParam<tuple<t_size, t_size> > param(serialization::serializer.unpack<tuple<t_size, t_size>>(buffer));
-      ApiResult<t_size> result;
-      fb2k::inMainThread([&] {
-        api.playlist_get_selection_count(param, result);
-      });
-      result.wait();
-      return serialization::serializer.packed(result);
-    }
-
-    Payload activeplaylist_get_selection_count(vector<char> & buffer) {
-      ApiParam<t_size> param(serialization::serializer.unpack<t_size>(buffer));
-      ApiResult<t_size> result;
-      fb2k::inMainThread([&] {
-        api.activeplaylist_get_selection_count(param, result);
-      });
-      result.wait();
-      return serialization::serializer.packed(result);
-    }
-
-    Payload playlist_set_selection_single(vector<char> & buffer) {
-      ApiParam<tuple<t_size, t_size, bool> > param(serialization::serializer.unpack<tuple<t_size, t_size, bool>>(buffer));
-      Event event;
-      fb2k::inMainThread([&] {
-        api.playlist_set_selection_single(param, event);
-      });
-      event.wait();
-      return serialization::serializer.packed(true);
-    }
-
-    Payload activeplaylist_set_selection_single(vector<char> & buffer) {
-      ApiParam<tuple<t_size, bool> > param(serialization::serializer.unpack<tuple<t_size, bool>>(buffer));
-      Event event;
-      fb2k::inMainThread([&] {
-        api.activeplaylist_set_selection_single(param, event);
-      });
-      event.wait();
-      return serialization::serializer.packed(true);
-    }
-
     Payload activeplaylist_get_all_items(vector<char> & buffer) {
       ApiResult<vector<Track> > result;
       fb2k::inMainThread([&] {
@@ -852,25 +683,6 @@ class RpcPlaylist {
       ApiResult<vector<Track> > result;
       fb2k::inMainThread([&] {
         api.playlist_get_all_items(param, result);
-      });
-      result.wait();
-      return serialization::serializer.packed(result);
-    }
-
-    Payload activeplaylist_get_selected_items(vector<char> & buffer) {
-      ApiResult<vector<Track> > result;
-      fb2k::inMainThread([&] {
-        api.activeplaylist_get_selected_items(result);
-      });
-      result.wait();            
-      return serialization::serializer.packed(result);
-    }
-
-    Payload playlist_get_selected_items(vector<char> & buffer) {
-      ApiParam<t_size> param(serialization::serializer.unpack<t_size>(buffer));
-      ApiResult<vector<Track> > result;
-      fb2k::inMainThread([&] {
-        api.playlist_get_selected_items(param, result);
       });
       result.wait();
       return serialization::serializer.packed(result);

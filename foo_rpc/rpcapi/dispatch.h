@@ -98,11 +98,7 @@ namespace foobar {
       registry["Playlist.playlist_get_item_count"] = [&](vector<char> & param) {
         return rpc_playlist.playlist_get_item_count(param);
       };
-
-      registry["Playlist.playlist_get_focus_item"] = [&](vector<char> & param) {
-        return rpc_playlist.playlist_get_focus_item(param);
-      };
-
+      
       registry["Playlist.playlist_get_name"] = [&](vector<char> & param) {
         return rpc_playlist.playlist_get_name(param);
       };
@@ -113,14 +109,6 @@ namespace foobar {
 
       registry["Playlist.activeplaylist_reorder_items"] = [&](vector<char> & param) {
         return rpc_playlist.activeplaylist_reorder_items(param);
-      };
-
-      registry["Playlist.activeplaylist_set_selection"] = [&](vector<char> & param) {
-        return rpc_playlist.activeplaylist_set_selection(param);
-      };
-
-      registry["Playlist.playlist_set_selection"] = [&](vector<char> & param) {
-        return rpc_playlist.playlist_set_selection(param);
       };
 
       registry["Playlist.activeplaylist_remove_items"] = [&](vector<char> & param) {
@@ -137,14 +125,6 @@ namespace foobar {
 
       registry["Playlist.playlist_replace_item"] = [&](vector<char> & param) {
         return rpc_playlist.playlist_replace_item(param);
-      };
-
-      registry["Playlist.playlist_set_focus_item"] = [&](vector<char> & param) {
-        return rpc_playlist.playlist_set_focus_item(param);
-      };
-
-      registry["Playlist.activeplaylist_set_focus_item"] = [&](vector<char> & param) {
-        return rpc_playlist.activeplaylist_set_focus_item(param);
       };
 
       registry["Playlist.activeplaylist_insert_items"] = [&](vector<char> & param) {
@@ -291,44 +271,12 @@ namespace foobar {
         return rpc_playlist.remove_playlist_switch(param);
       };
 
-      registry["Playlist.activeplaylist_is_item_selected"] = [&](vector<char> & param) {
-        return rpc_playlist.activeplaylist_is_item_selected(param);
-      };
-
-      registry["Playlist.playlist_is_item_selected"] = [&](vector<char> & param) {
-        return rpc_playlist.playlist_is_item_selected(param);
-      };
-
-      registry["Playlist.activeplaylist_move_selection"] = [&](vector<char> & param) {
-        return rpc_playlist.activeplaylist_move_selection(param);
-      };
-
-      registry["Playlist.playlist_move_selection"] = [&](vector<char> & param) {
-        return rpc_playlist.playlist_move_selection(param);
-      };
-
       registry["Playlist.activeplaylist_clear"] = [&](vector<char> & param) {
         return rpc_playlist.activeplaylist_clear(param);
       };
 
       registry["Playlist.playlist_clear"] = [&](vector<char> & param) {
         return rpc_playlist.playlist_clear(param);
-      };
-
-      registry["Playlist.activeplaylist_clear_selection"] = [&](vector<char> & param) {
-        return rpc_playlist.activeplaylist_clear_selection(param);
-      };
-
-      registry["Playlist.playlist_clear_selection"] = [&](vector<char> & param) {
-        return rpc_playlist.playlist_clear_selection(param);
-      };
-
-      registry["Playlist.activeplaylist_remove_selection"] = [&](vector<char> & param) {
-        return rpc_playlist.activeplaylist_remove_selection(param);
-      };
-
-      registry["Playlist.playlist_remove_selection"] = [&](vector<char> & param) {
-        return rpc_playlist.playlist_remove_selection(param);
       };
 
       registry["Playlist.activeplaylist_get_name"] = [&](vector<char> & param) {
@@ -379,36 +327,12 @@ namespace foobar {
         return rpc_playlist.playlist_activate_previous(param);
       };
 
-      registry["Playlist.playlist_get_selection_count"] = [&](vector<char> & param) {
-        return rpc_playlist.playlist_get_selection_count(param);
-      };
-
-      registry["Playlist.activeplaylist_get_selection_count"] = [&](vector<char> & param) {
-        return rpc_playlist.activeplaylist_get_selection_count(param);
-      };
-
-      registry["Playlist.playlist_set_selection_single"] = [&](vector<char> & param) {
-        return rpc_playlist.playlist_set_selection_single(param);
-      };
-
-      registry["Playlist.activeplaylist_set_selection_single"] = [&](vector<char> & param) {
-        return rpc_playlist.activeplaylist_set_selection_single(param);
-      };
-
       registry["Playlist.activeplaylist_get_all_items"] = [&](vector<char> & param) {
         return rpc_playlist.activeplaylist_get_all_items(param);
       };
 
       registry["Playlist.playlist_get_all_items"] = [&](vector<char> & param) {
         return rpc_playlist.playlist_get_all_items(param);
-      };
-
-      registry["Playlist.activeplaylist_get_selected_items"] = [&](vector<char> & param) {
-        return rpc_playlist.activeplaylist_get_selected_items(param);
-      };
-
-      registry["Playlist.playlist_get_selected_items"] = [&](vector<char> & param) {
-        return rpc_playlist.playlist_get_selected_items(param);
       };
 
       registry["Playlist.activeplaylist_get_item_handle"] = [&](vector<char> & param) {
