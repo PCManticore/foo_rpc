@@ -259,10 +259,6 @@ namespace foobar {
         return rpc_playlist.queue_add_item_playlist(param);
       };
 
-      registry["Playlist.queue_add_item"] = [&](vector<char> & param) {
-        return rpc_playlist.queue_add_item(param);
-      };
-
       registry["Playlist.queue_get_count"] = [&](vector<char> & param) {
         return rpc_playlist.queue_get_count(param);
       };

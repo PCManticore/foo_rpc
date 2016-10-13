@@ -534,19 +534,6 @@ namespace foobar {
 
     }
 
-    void queue_add_item(ApiParam<string> param, Event event) {
-      metadb_handle_ptr handle;
-      string file;
-
-      file = param.value();
-      
-      metadb_manager->handle_create(handle, make_playable_location(file.c_str(), 0));
-      
-      playlist_manager->queue_add_item(handle);
-
-      event.set();
-    }
-
     void queue_get_count(ApiResult<t_size> & result) {
       t_size count = playlist_manager->queue_get_count();
 
@@ -560,7 +547,7 @@ namespace foobar {
 
       playlist_manager->queue_get_contents(handles);
 
-      handles.for_each([&](auto handle) {
+      handles.for_each([&](t_playback_queue_item handle) {
         contents.push_back(handle);
       });
       
@@ -570,10 +557,10 @@ namespace foobar {
 
     void queue_remove_mask(ApiParam<vector<t_size>> param, Event event) {
       vector<t_size> elems = param.value();
-      bit_array_bittable mask(elems.size());
+      pfc::bit_array_var_impl mask;
 
       for (auto elem : elems) {
-        mask.set(elem, true);
+        mask.set(elem);
       }
 
       playlist_manager->queue_remove_mask(mask);

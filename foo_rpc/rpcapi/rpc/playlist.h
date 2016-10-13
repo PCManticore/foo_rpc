@@ -512,16 +512,6 @@ class RpcPlaylist {
       return serialization::serializer.packed(true);
     }
 
-    Payload queue_add_item(vector<char> & buffer) {
-      ApiParam<string> param(serialization::serializer.unpack<string>(buffer));
-      Event event;
-      fb2k::inMainThread([&] {
-        api.queue_add_item(param, event);
-      });
-      event.wait();
-      return serialization::serializer.packed(true);
-    }
-
     Payload queue_get_count(vector<char> & buffer) {
       ApiResult<t_size> result;
       fb2k::inMainThread([&] {
