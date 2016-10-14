@@ -167,27 +167,27 @@ namespace foobar {
       result.setResult(successful);
     }
 
-    void activeplaylist_replace_item(ApiParam<tuple<t_size, string>> param,
+    void activeplaylist_replace_item(ApiParam<tuple<t_size, t_size>> param,
                                      ApiResult<bool> & result) {
       t_size playlist = playlist_manager->get_active_playlist();
 
-      ApiParam<tuple<t_size, t_size, string>> passthrough(
+      ApiParam<tuple<t_size, t_size, t_size>> passthrough(
         tuple_cat(make_tuple(playlist), param.value()));
 
       playlist_replace_item(passthrough, result);
 
     }
 
-    void playlist_replace_item(ApiParam<tuple<t_size, t_size, string>> param, ApiResult<bool> & result) {
+    void playlist_replace_item(ApiParam<tuple<t_size, t_size, t_size>> param, ApiResult<bool> & result) {
       t_size p_playlist;
-      t_size p_item;
+      t_size origin;
+      t_size replacee;
       string path;
-      tie(p_playlist, p_item, path) = param.value();
+      tie(p_playlist, origin, replacee) = param.value();
 
-      metadb_handle_ptr handle;
-      metadb_manager->handle_create(handle, make_playable_location(path.c_str(), 0));
+      metadb_handle_ptr handle = playlist_manager->playlist_get_item_handle(p_playlist, replacee);
 
-      bool success = playlist_manager->playlist_replace_item(p_playlist, p_item, handle);
+      bool success = playlist_manager->playlist_replace_item(p_playlist, origin, handle);
 
       result.setResult(success);
     }
