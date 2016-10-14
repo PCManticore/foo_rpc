@@ -115,7 +115,6 @@
     <ClInclude Include="api\common\helpers.h" />
     <ClInclude Include="api\common\track.h" />
     <ClInclude Include="api\coreversion.h" />
-    <ClInclude Include="api\metadb_handle.h" />
     <ClInclude Include="api\playback_control.h" />
     <ClInclude Include="api\playlist.h" />
     <ClInclude Include="api\playlist_loader.h" />
@@ -128,7 +127,6 @@
     <ClInclude Include="rpcapi\dispatch.h" />
     <ClInclude Include="rpcapi\factory.h" />
     <ClInclude Include="rpcapi\rpc\coreversion.h" />
-    <ClInclude Include="rpcapi\rpc\metadb_handle.h" />
     <ClInclude Include="rpcapi\rpc\playback_control.h" />
     <ClInclude Include="rpcapi\rpc\playlist.h" />
     <ClInclude Include="rpcapi\rpc\playlist_loader.h" />
