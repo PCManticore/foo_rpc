@@ -622,12 +622,6 @@ namespace foobar {
       result.setResult(index);
     }
 
-    void active_playlist_fix(Event event) {
-      playlist_manager->active_playlist_fix();
-
-      event.set();
-    }
-
     void playlist_activate_delta(ApiParam<int> param, Event event) {
       int t_delta = param.value();
 

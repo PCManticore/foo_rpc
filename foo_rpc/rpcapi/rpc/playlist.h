@@ -633,15 +633,6 @@ class RpcPlaylist {
       return serialization::serializer.packed(result);
     }
 
-    Payload active_playlist_fix(vector<char> & _unused) {
-      Event event;
-      fb2k::inMainThread([&] {
-        api.active_playlist_fix(event);
-      });
-      event.wait();
-      return serialization::serializer.packed(true);
-    }
-
     Payload playlist_activate_delta(vector<char> & buffer) {
       ApiParam<int> param(serialization::serializer.unpack<int>(buffer));
       Event event;

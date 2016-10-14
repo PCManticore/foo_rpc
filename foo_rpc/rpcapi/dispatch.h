@@ -311,10 +311,6 @@ namespace foobar {
         return rpc_playlist.find_or_create_playlist_unlocked(param);
       };
 
-      registry["Playlist.active_playlist_fix"] = [&](vector<char> & param) {
-        return rpc_playlist.active_playlist_fix(param);
-      };
-
       registry["Playlist.playlist_activate_delta"] = [&](vector<char> & param) {
         return rpc_playlist.playlist_activate_delta(param);
       };
