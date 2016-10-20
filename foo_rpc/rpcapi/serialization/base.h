@@ -1,9 +1,14 @@
 #pragma once
 
+#include <tuple>
 #include <vector>
 #include <string>
 
 #include "../../percolate.h"
+
+#define REQUEST_SUCCEEDED 0
+#define REQUEST_FAILED 1
+
 
 namespace serialization {  
   class Payload {
@@ -24,9 +29,10 @@ namespace serialization {
     T unpack(std::vector<char> buf) {};
 
     template<typename T>
-    Payload packed(T value) {};
-
+    Payload packed(tuple<int, T> value) {};
+    
     template<typename T>
-    Payload packed(ApiResult<T> result) {};
+    Payload packed(tuple<int, ApiResult<T>> result) {};
+
   };
 }

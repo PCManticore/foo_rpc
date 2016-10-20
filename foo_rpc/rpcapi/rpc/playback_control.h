@@ -27,7 +27,7 @@ class RpcPlaybackControl {
         api.get_now_playing(result);
       });
       result.wait();            
-      return serialization::serializer.packed(result);
+      return serialization::serializer.packed(make_tuple(0, result));
     }
 
     Payload start(vector<char> & buffer) {
@@ -37,7 +37,7 @@ class RpcPlaybackControl {
         api.start(param, event);
       });
       event.wait();
-      return serialization::serializer.packed(true);
+      return serialization::serializer.packed(make_tuple(0, true));
     }
 
     Payload stop(vector<char> & _unused) {
@@ -46,7 +46,7 @@ class RpcPlaybackControl {
         api.stop(event);
       });
       event.wait();
-      return serialization::serializer.packed(true);
+      return serialization::serializer.packed(make_tuple(0, true));
     }
 
     Payload is_playing(vector<char> & buffer) {
@@ -55,7 +55,7 @@ class RpcPlaybackControl {
         api.is_playing(result);
       });
       result.wait();
-      return serialization::serializer.packed(result);
+      return serialization::serializer.packed(make_tuple(0, result));
     }
 
     Payload is_paused(vector<char> & buffer) {
@@ -64,7 +64,7 @@ class RpcPlaybackControl {
         api.is_paused(result);
       });
       result.wait();            
-      return serialization::serializer.packed(result);
+      return serialization::serializer.packed(make_tuple(0, result));
     }
 
     Payload pause(vector<char> & buffer) {
@@ -74,7 +74,7 @@ class RpcPlaybackControl {
         api.pause(param, event);
       });
       event.wait();
-      return serialization::serializer.packed(true);
+      return serialization::serializer.packed(make_tuple(0, true));
     }
 
     Payload get_stop_after_current(vector<char> & buffer) {
@@ -83,7 +83,7 @@ class RpcPlaybackControl {
         api.get_stop_after_current(result);
       });
       result.wait();            
-      return serialization::serializer.packed(result);
+      return serialization::serializer.packed(make_tuple(0, result));
     }
 
     Payload set_stop_after_current(vector<char> & buffer) {
@@ -93,7 +93,7 @@ class RpcPlaybackControl {
         api.set_stop_after_current(param, event);
       });
       event.wait();
-      return serialization::serializer.packed(true);
+      return serialization::serializer.packed(make_tuple(0, true));
     }
 
     Payload set_volume(vector<char> & buffer) {
@@ -103,7 +103,7 @@ class RpcPlaybackControl {
         api.set_volume(param, event);
       });
       event.wait();
-      return serialization::serializer.packed(true);
+      return serialization::serializer.packed(make_tuple(0, true));
     }
 
     Payload get_volume(vector<char> & buffer) {
@@ -112,7 +112,7 @@ class RpcPlaybackControl {
         api.get_volume(result);
       });
       result.wait();            
-      return serialization::serializer.packed(result);
+      return serialization::serializer.packed(make_tuple(0, result));
     }
 
     Payload volume_up(vector<char> & _unused) {
@@ -121,7 +121,7 @@ class RpcPlaybackControl {
         api.volume_up(event);
       });
       event.wait();
-      return serialization::serializer.packed(true);
+      return serialization::serializer.packed(make_tuple(0, true));
     }
 
     Payload volume_down(vector<char> & _unused) {
@@ -130,7 +130,7 @@ class RpcPlaybackControl {
         api.volume_down(event);
       });
       event.wait();
-      return serialization::serializer.packed(true);
+      return serialization::serializer.packed(make_tuple(0, true));
     }
 
     Payload volume_mute_toggle(vector<char> & _unused) {
@@ -139,7 +139,7 @@ class RpcPlaybackControl {
         api.volume_mute_toggle(event);
       });
       event.wait();
-      return serialization::serializer.packed(true);
+      return serialization::serializer.packed(make_tuple(0, true));
     }
 
     Payload playback_seek(vector<char> & buffer) {
@@ -149,7 +149,7 @@ class RpcPlaybackControl {
         api.playback_seek(param, event);
       });
       event.wait();
-      return serialization::serializer.packed(true);
+      return serialization::serializer.packed(make_tuple(0, true));
     }
 
     Payload playback_seek_delta(vector<char> & buffer) {
@@ -159,7 +159,7 @@ class RpcPlaybackControl {
         api.playback_seek_delta(param, event);
       });
       event.wait();
-      return serialization::serializer.packed(true);
+      return serialization::serializer.packed(make_tuple(0, true));
     }
 
     Payload playback_can_seek(vector<char> & buffer) {
@@ -168,7 +168,7 @@ class RpcPlaybackControl {
         api.playback_can_seek(result);
       });
       result.wait();            
-      return serialization::serializer.packed(result);
+      return serialization::serializer.packed(make_tuple(0, result));
     }
 
     Payload playback_get_position(vector<char> & buffer) {
@@ -177,7 +177,7 @@ class RpcPlaybackControl {
         api.playback_get_position(result);
       });
       result.wait();            
-      return serialization::serializer.packed(result);
+      return serialization::serializer.packed(make_tuple(0, result));
     }
 
     Payload playback_format_title(vector<char> & buffer) {
@@ -187,7 +187,7 @@ class RpcPlaybackControl {
         api.playback_format_title(param, result);
       });
       result.wait();
-      return serialization::serializer.packed(result);
+      return serialization::serializer.packed(make_tuple(0, result));
     }
 
     Payload playback_format_title_complete(vector<char> & buffer) {
@@ -196,7 +196,7 @@ class RpcPlaybackControl {
         api.playback_format_title_complete(result);
       });
       result.wait();            
-      return serialization::serializer.packed(result);
+      return serialization::serializer.packed(make_tuple(0, result));
     }
 
     Payload playback_get_length(vector<char> & buffer) {
@@ -205,7 +205,7 @@ class RpcPlaybackControl {
         api.playback_get_length(result);
       });
       result.wait();            
-      return serialization::serializer.packed(result);
+      return serialization::serializer.packed(make_tuple(0, result));
     }
 
     Payload playback_get_length_ex(vector<char> & buffer) {
@@ -214,7 +214,7 @@ class RpcPlaybackControl {
         api.playback_get_length_ex(result);
       });
       result.wait();            
-      return serialization::serializer.packed(result);
+      return serialization::serializer.packed(make_tuple(0, result));
     }
 
     Payload toggle_stop_after_current(vector<char> & _unused) {
@@ -223,7 +223,7 @@ class RpcPlaybackControl {
         api.toggle_stop_after_current(event);
       });
       event.wait();
-      return serialization::serializer.packed(true);
+      return serialization::serializer.packed(make_tuple(0, true));
     }
 
     Payload toggle_pause(vector<char> & _unused) {
@@ -232,7 +232,7 @@ class RpcPlaybackControl {
         api.toggle_pause(event);
       });
       event.wait();
-      return serialization::serializer.packed(true);
+      return serialization::serializer.packed(make_tuple(0, true));
     }
 
     Payload play_or_pause(vector<char> & _unused) {
@@ -241,7 +241,7 @@ class RpcPlaybackControl {
         api.play_or_pause(event);
       });
       event.wait();
-      return serialization::serializer.packed(true);
+      return serialization::serializer.packed(make_tuple(0, true));
     }
 
     Payload play_or_unpause(vector<char> & _unused) {
@@ -250,7 +250,7 @@ class RpcPlaybackControl {
         api.play_or_unpause(event);
       });
       event.wait();
-      return serialization::serializer.packed(true);
+      return serialization::serializer.packed(make_tuple(0, true));
     }
 
     Payload previous(vector<char> & _unused) {
@@ -259,7 +259,7 @@ class RpcPlaybackControl {
         api.previous(event);
       });
       event.wait();
-      return serialization::serializer.packed(true);
+      return serialization::serializer.packed(make_tuple(0, true));
     }
 
     Payload next(vector<char> & _unused) {
@@ -268,7 +268,7 @@ class RpcPlaybackControl {
         api.next(event);
       });
       event.wait();
-      return serialization::serializer.packed(true);
+      return serialization::serializer.packed(make_tuple(0, true));
     }
 
     Payload is_muted(vector<char> & buffer) {
@@ -277,7 +277,7 @@ class RpcPlaybackControl {
         api.is_muted(result);
       });
       result.wait();            
-      return serialization::serializer.packed(result);
+      return serialization::serializer.packed(make_tuple(0, result));
     }
 
     Payload get_volume_step(vector<char> & buffer) {
@@ -286,6 +286,6 @@ class RpcPlaybackControl {
         api.get_volume_step(result);
       });
       result.wait();            
-      return serialization::serializer.packed(result);
+      return serialization::serializer.packed(make_tuple(0, result));
     }
 };

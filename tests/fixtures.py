@@ -9,8 +9,15 @@ import msgpack
 import pytest
 
 
+SUCCESS = 0
+
+
 def _foobar_pipe_client():
     return multiprocessing.connection.Client('\\\\.\\pipe\\foobar2000')
+
+
+class FoobarRPCError(Exception):
+    pass
 
 
 class TestSoundFile:
@@ -45,7 +52,12 @@ class BaseAPIClient(type):
                  with _foobar_pipe_client() as client:
                      client.send_bytes(packed_data)
                      received_result = client.recv_bytes()
-                     return msgpack.unpackb(received_result)
+                     status, unpacked = msgpack.unpackb(received_result)
+
+                     if status != SUCCESS:
+                         raise FoobarRPCError(unpacked.decode())
+
+                     return unpacked
 
             return wrapper
 

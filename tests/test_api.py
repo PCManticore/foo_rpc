@@ -13,11 +13,13 @@ from fixtures import (
     active_playlist_with_items,
     test_files,
     active_playlist_with_item,
+    FoobarRPCError,
 )
 
 
 def test_default_playlist(client):
     playlist_name = client.activeplaylist_get_name()
+
     assert playlist_name == b"Default"
 
 
@@ -763,3 +765,10 @@ def test_playlist_loading_saving(request, client, test_files):
     actual_paths = [dict(item)[b'path'] for item in contents]
 
     assert expected_paths == actual_paths
+
+
+def test_error_path(client):
+    with pytest.raises(FoobarRPCError) as error:
+        client.create_playlist("a", "a", "a")
+
+    assert str(error.value) == 'bad cast'

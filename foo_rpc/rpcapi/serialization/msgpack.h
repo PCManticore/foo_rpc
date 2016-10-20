@@ -108,19 +108,32 @@ namespace serialization {
         return obj.as<T>();
       }
       catch (msgpack::v1::type_error& e) {
-        logToFoobarConsole("Error while unpacking from buffer: %s", e.what());
+        logToFoobarConsole("Error while unpacking from buffer: %s", e.what());        
         throw RPCException(e.what());
       }
     };
 
-    Payload packed(bool value) {
-      return packed_generic(to_string(value));
+    Payload packed(tuple<int, bool> value) {
+      return packed_generic(
+        make_tuple(
+          std::get<0>(value),
+          to_string(std::get<1>(value))
+        )
+      );
+    }
+
+    Payload packed(tuple<int, const char*> result) {
+      return packed_generic(result);
     }
 
     template<typename T>
-    Payload packed(ApiResult<T> result) {
-      return packed_generic(result.result());
-    }
+    Payload packed(tuple<int, ApiResult<T>> result) {
 
+      return packed_generic(make_tuple(
+        std::get<0>(result),
+        std::get<1>(result).result()
+      ));
+    }
+    
   };
 };

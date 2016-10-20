@@ -63,9 +63,11 @@ private:
         connection.send(rpc_result.data, rpc_result.size);
       }
       catch (RPCException & e) {
-        logToFoobarConsole("Error while dispatching: %s", e.what());
-        // TODO: this is not serialized which is why the client is crashing when receiving
-        connection.send(e.what());
+        auto response = serialization::serializer.packed(
+          make_tuple(1, e.what())
+        );
+        logToFoobarConsole("Error while dispatching: %s", e.what());        
+        connection.send(response.data, response.size);
       }
     }
 

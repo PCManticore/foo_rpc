@@ -25,7 +25,7 @@ class RpcCoreVersion {
         api.get_version_string(result);
       });
       result.wait();            
-      return serialization::serializer.packed(result);
+      return serialization::serializer.packed(make_tuple(0, result));
     }
 
     Payload get_name(vector<char> & buffer) {
@@ -34,7 +34,7 @@ class RpcCoreVersion {
         api.get_name(result);
       });
       result.wait();            
-      return serialization::serializer.packed(result);
+      return serialization::serializer.packed(make_tuple(0, result));
     }
 
     Payload get_version(vector<char> & buffer) {
@@ -43,7 +43,7 @@ class RpcCoreVersion {
         api.get_version(result);
       });
       result.wait();            
-      return serialization::serializer.packed(result);
+      return serialization::serializer.packed(make_tuple(0, result));
     }
 
     Payload get_version_as_text(vector<char> & buffer) {
@@ -52,7 +52,7 @@ class RpcCoreVersion {
         api.get_version_as_text(result);
       });
       result.wait();            
-      return serialization::serializer.packed(result);
+      return serialization::serializer.packed(make_tuple(0, result));
     }
 
     Payload test_version(vector<char> & buffer) {
@@ -62,6 +62,6 @@ class RpcCoreVersion {
         api.test_version(param, result);
       });
       result.wait();
-      return serialization::serializer.packed(result);
+      return serialization::serializer.packed(make_tuple(0, result));
     }
 };
