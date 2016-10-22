@@ -43,7 +43,7 @@ private:
   DWORD ThreadID;
   PipeListener listener = PipeListener(RPC_ADDRESS);
 
-  void process_incoming_connection(PipeConnection connection, Event event) {
+  void process_incoming_connection(PipeConnection & connection, Event event) {
     vector<char> received;
     auto dispatcher = foobar::MethodDispatcher();
 
@@ -86,7 +86,7 @@ public:
     while (true) {
 
       try {
-        PipeConnection connection = listener.accept();
+        PipeConnection & connection = listener.accept();
         Event event;
         underlying_threads.push_back(Thread(
           std::thread([&] {

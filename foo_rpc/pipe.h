@@ -12,15 +12,15 @@ using namespace std;
 
 class PipeConnection {
 private:
-  OverlappedObject * overlapped;
+  OverlappedObject overlapped;
 
 public:
 
 
-  PipeConnection(OverlappedObject * overlappedObj) : overlapped(overlappedObj) {}
+  PipeConnection(OverlappedObject & overlappedObj) : overlapped(overlappedObj) {}
 
   Result<DWORD> send(string bytes, int length) {
-    return send_bytes(overlapped->handle, bytes, length);
+    return send_bytes(overlapped.handle, bytes, length);
   }
 
   Result<DWORD> send(string bytes) {
@@ -32,7 +32,7 @@ public:
     vector<char> moreData;
     vector<char> buffer(INITIAL_READ_SIZE);
 
-    Result<tuple<DWORD, DWORD>> result = recv_bytes(overlapped->handle, &buffer[0], INITIAL_READ_SIZE);
+    Result<tuple<DWORD, DWORD>> result = recv_bytes(overlapped.handle, &buffer[0], INITIAL_READ_SIZE);
     if (result.isFailed()) {
       logToFoobarConsole("Failed receiving bytes %d", result.error());
       return Result<tuple<DWORD, vector<char>>>::withError(result.error());
@@ -40,7 +40,7 @@ public:
 
     tie(lastError, nread) = result.result();
     if (lastError == ERROR_MORE_DATA) {
-      Result<tuple<DWORD, vector<char>>> moreDataResult = get_more_data(overlapped->handle);
+      Result<tuple<DWORD, vector<char>>> moreDataResult = get_more_data(overlapped.handle);
       if (moreDataResult.isFailed()) {
         logToFoobarConsole("Failed retrieving more data %d", moreDataResult.error());
         return Result<tuple<DWORD, vector<char>>>::withError(moreDataResult.error());
@@ -59,9 +59,9 @@ public:
 
     int err = GetLastError();
 
-    if (overlapped->pending) {
-      if (CancelIoEx(overlapped->handle, &overlapped->overlapped) &&
-        GetOverlappedResult(overlapped->handle, &overlapped->overlapped, &bytes, TRUE))
+    if (overlapped.pending) {
+      if (CancelIoEx(overlapped.handle, &overlapped.overlapped) &&
+        GetOverlappedResult(overlapped.handle, &overlapped.overlapped, &bytes, TRUE))
       {
         /* The operation is no longer pending -- nothing to do. */
       }
@@ -71,15 +71,15 @@ public:
         probably about to exit, so we need not worry too much
         about memory leaks.
         */
-        CloseHandle(overlapped->overlapped.hEvent);
+        CloseHandle(overlapped.overlapped.hEvent);
         SetLastError(err);
         return;
       }
     }
 
     SetLastError(err);
-    CloseHandle(overlapped->handle);
-    CloseHandle(overlapped->overlapped.hEvent);
+    CloseHandle(overlapped.handle);
+    CloseHandle(overlapped.overlapped.hEvent);
   }
 
 };
@@ -98,7 +98,7 @@ public:
     handle = handles.front();
     handles.pop_front();
 
-    Result<OverlappedObject*> result = connect_pipe(handle);
+    Result<OverlappedObject> result = connect_pipe(handle);
     if (result.isFailed()) {
       std::string msg = tfm::format(
         "Could not connect to pipe. Failed with error %d",
@@ -106,7 +106,7 @@ public:
       throw PipeException(msg);
     }
 
-    OverlappedObject* overlapped = result.result();
+    OverlappedObject & overlapped = result.result();
     wait_overlapped_event(overlapped);
 
     Result<DWORD> overlappedResult = get_overlapped_result(overlapped);
