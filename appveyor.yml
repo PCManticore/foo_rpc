@@ -52,10 +52,17 @@ before_test:
   - ps: Start-Process C:\\Projects\\foo-rpc\\portable_test\\foobar2000.exe
   - tasklist
 
+init:
+  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+
+
 test_script:
 
   - 'py -3 -m pytest tests'
   - tasklist
+
+on_finish:
+  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 on_success:
   - ps: appveyor PushArtifact foo_rpc-$ENV:APPVEYOR_BUILD_VERSION.fb2k-component
