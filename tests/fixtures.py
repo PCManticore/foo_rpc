@@ -406,6 +406,14 @@ class APIClient(metaclass=BaseAPIClient):
         params = msgpack.packb([path, files])
         return msgpack.packb(["PlaylistLoader.save_playlist", params])
 
+    # These don't actually exist.
+
+    def _unknown_class(self):
+        return msgpack.packb(["UnknownClass.test"])
+
+    def _unknown_method(self):
+        return msgpack.packb(["PlaylistLoader.test"])
+
 
 def _test_files_finalizer(test_files):
     for test_file in test_files:

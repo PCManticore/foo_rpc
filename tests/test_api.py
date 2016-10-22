@@ -767,8 +767,15 @@ def test_playlist_loading_saving(request, client, test_files):
     assert expected_paths == actual_paths
 
 
-def test_error_path(client):
+def test_error_path_bad_arguments(client):
     with pytest.raises(FoobarRPCError) as error:
         client.create_playlist("a", "a", "a")
 
     assert str(error.value) == 'bad cast'
+
+
+def test_error_path_missing_method(client):
+    for meth in client._unknown_class, client._unknown_method:
+        with pytest.raises(FoobarRPCError) as error:
+            meth()
+        assert str(error.value) == "Cannot find the given method."
