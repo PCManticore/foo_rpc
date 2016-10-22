@@ -48,6 +48,7 @@ after_build:
   - ps: mv foo_rpc-$ENV:APPVEYOR_BUILD_VERSION.zip foo_rpc-$ENV:APPVEYOR_BUILD_VERSION.fb2k-component
 
 before_test:
+  - ls C:\\Projects\\foo-rpc\\portable_test\\components
   - ps: Start-Process C:\\Projects\\foo-rpc\\portable_test\\foobar2000.exe
   - tasklist
 
