@@ -41,13 +41,15 @@ build_script:
 
     iex $command
 
-    Start-Process C:\\Projects\\foo-rpc\\portable_test\\foobar2000.exe
-
     $host.SetShouldExit($LASTEXITCODE)
 
 after_build:
   - ps: 7z a foo_rpc-$ENV:APPVEYOR_BUILD_VERSION.zip .\Release\foo_rpc.dll
   - ps: mv foo_rpc-$ENV:APPVEYOR_BUILD_VERSION.zip foo_rpc-$ENV:APPVEYOR_BUILD_VERSION.fb2k-component
+
+before_test:
+  - ps: Start-Process C:\\Projects\\foo-rpc\\portable_test\\foobar2000.exe
+  - tasklist
 
 test_script:
 
