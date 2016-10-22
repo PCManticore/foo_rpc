@@ -56,6 +56,9 @@ test_script:
 
   - 'py -3 -m pytest tests'
 
+after_test:
+  - tasklist
+
 on_success:
   - ps: appveyor PushArtifact foo_rpc-$ENV:APPVEYOR_BUILD_VERSION.fb2k-component
 
