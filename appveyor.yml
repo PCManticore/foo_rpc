@@ -55,8 +55,6 @@ before_test:
 test_script:
 
   - 'py -3 -m pytest tests'
-
-after_test:
   - tasklist
 
 on_success:
