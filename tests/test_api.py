@@ -771,7 +771,27 @@ def test_error_path_bad_arguments(client):
     with pytest.raises(FoobarRPCError) as error:
         client.create_playlist("a", "a", "a")
 
-    assert str(error.value) == 'bad cast'
+    assert str(error.value) == 'Failed unpacking, while expecting type tuple<string,size_t,size_t>'
+
+    with pytest.raises(FoobarRPCError) as error:
+        client.remove_playlists(["a", "b", "c"])
+
+    assert str(error.value) == 'Failed unpacking, while expecting type vector<size_t>'
+
+    with pytest.raises(FoobarRPCError) as error:
+        client.playlist_reorder_items("a", "b")
+
+    assert str(error.value) == 'Failed unpacking, while expecting type tuple<size_t,vector<int>>'
+
+    with pytest.raises(FoobarRPCError) as error:
+        client.start(99, 99)
+
+    assert str(error.value) == ('Failed unpacking, while expecting type '
+                                'tuple<enum t_track_command {track_command_default, '
+                                'track_command_play, track_command_next, '
+                                'track_command_prev, track_command_settrack, '
+                                'track_command_rand},bool>')
+
 
 
 def test_error_path_missing_method(client):

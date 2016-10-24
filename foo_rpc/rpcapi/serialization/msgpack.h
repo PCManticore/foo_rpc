@@ -4,6 +4,7 @@
 #include "../../logging.h"
 #include "../../local_exceptions.h"
 #include "../../api/common/track.h"
+#include "../rpctype.h"
 #include "optional.hpp"
 #include "msgpack.hpp"
 
@@ -108,8 +109,10 @@ namespace serialization {
         return obj.as<T>();
       }
       catch (msgpack::v1::type_error& e) {
-        logToFoobarConsole("Error while unpacking from buffer: %s", e.what());        
-        throw RPCException(e.what());
+        auto repr = repr_type<T>::value();
+        auto exc = tfm::format("Failed unpacking, while expecting type %s", repr);
+        logToFoobarConsole("Error while unpacking from buffer: %s", exc);
+        throw RPCException(exc);
       }
     };
 

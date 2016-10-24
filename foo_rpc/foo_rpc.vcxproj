@@ -126,6 +126,7 @@
     <ClInclude Include="logging.h" />
     <ClInclude Include="rpcapi\dispatch.h" />
     <ClInclude Include="rpcapi\factory.h" />
+    <ClInclude Include="rpcapi\rpctype.h" />
     <ClInclude Include="rpcapi\rpc\coreversion.h" />
     <ClInclude Include="rpcapi\rpc\playback_control.h" />
     <ClInclude Include="rpcapi\rpc\playlist.h" />
