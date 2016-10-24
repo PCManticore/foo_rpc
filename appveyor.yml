@@ -9,7 +9,7 @@ install:
   - cmd: git submodule update --init --recursive
   - ps: Start-Process -FilePath "python" -ArgumentList "-m ensurepip"
 
-  - py -3 -m pip install msgpack-python pytest chippy
+  - py -3 -m pip install msgpack-python pytest chippy pywinauto
 
 
 artifacts:
@@ -48,9 +48,8 @@ after_build:
   - ps: mv foo_rpc-$ENV:APPVEYOR_BUILD_VERSION.zip foo_rpc-$ENV:APPVEYOR_BUILD_VERSION.fb2k-component
 
 before_test:
-  - ls C:\\Projects\\foo-rpc\\portable_test\\components
   - ps: Start-Process C:\\Projects\\foo-rpc\\portable_test\\foobar2000.exe
-  - tasklist
+  - python C:\\Projects\\foo-rpc\\ci\\set_driver_output.py
 
 init:
   - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
