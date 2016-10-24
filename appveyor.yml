@@ -49,7 +49,7 @@ after_build:
 
 before_test:
   - ps: Start-Process C:\\Projects\\foo-rpc\\portable_test\\foobar2000.exe
-  - python C:\\Projects\\foo-rpc\\ci\\set_driver_output.py
+  - py -3 C:\\Projects\\foo-rpc\\ci\\set_driver_output.py
 
 init:
   - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
