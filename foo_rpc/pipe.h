@@ -78,8 +78,8 @@ public:
     }
 
     SetLastError(err);
-    CloseHandle(overlapped.handle);
-    CloseHandle(overlapped.overlapped.hEvent);
+    // CloseHandle(overlapped.handle);
+    // CloseHandle(overlapped.overlapped.hEvent);
   }
 
 };
