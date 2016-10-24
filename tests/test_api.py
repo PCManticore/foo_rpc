@@ -795,7 +795,11 @@ def test_error_path_bad_arguments(client):
 
 
 def test_error_path_missing_method(client):
-    for meth in client._unknown_class, client._unknown_method:
+    expected_messages = ["Cannot find the method UnknownClass.test.",
+                         "Cannot find the method PlaylistLoader.test."]
+
+    for meth, expected_message in zip((client._unknown_class, client._unknown_method),
+                                      expected_messages):
         with pytest.raises(FoobarRPCError) as error:
             meth()
-        assert str(error.value) == "Cannot find the given method."
+        assert str(error.value) == expected_message

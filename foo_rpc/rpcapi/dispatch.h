@@ -34,7 +34,7 @@ namespace foobar {
       dispatch_map::const_iterator iter = registry.find(method_name);
       if (iter == registry.end())
       {
-        throw RPCException("Cannot find the given method.");
+        throw RPCException(tfm::format("Cannot find the method %s.", method_name));
       }
       return iter->second(buf);
     }
