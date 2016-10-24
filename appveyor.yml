@@ -9,7 +9,16 @@ install:
   - cmd: git submodule update --init --recursive
   - ps: Start-Process -FilePath "python" -ArgumentList "-m ensurepip"
 
-  - py -3 -m pip install msgpack-python pytest chippy pywinauto
+  - py -3 -m pip install msgpack-python pytest chippy
+
+  # (NOTE): In order to set the Playback output with pywinauto, we need
+  # a 32-bit Python, since foobar2000 itself is on 32 bit. Trying to do
+  # otherwise will fail the automation itself.
+  # Now, we could have used ``py -3.5-32`` instead for selecting the 32-bit
+  # Python installed, but this does not work on AppVeyor, although at the
+  # moment of this commit, ``py -3.4-32`` works just fine.
+  # So for now, we just hardcode the use of 32-bit Python as an absolute path.
+  - C:\Python35\python.exe -m pip install pywinauto
 
 
 artifacts:
@@ -48,8 +57,8 @@ after_build:
   - ps: mv foo_rpc-$ENV:APPVEYOR_BUILD_VERSION.zip foo_rpc-$ENV:APPVEYOR_BUILD_VERSION.fb2k-component
 
 before_test:
-  - ps: Start-Process C:\\Projects\\foo-rpc\\portable_test\\foobar2000.exe
-  - py -3 C:\\Projects\\foo-rpc\\ci\\set_driver_output.py
+  # See note from install section for why we use an absolute path.
+  - C:\Python35\python.exe C:\\projects\\foo-rpc\\ci\\preconfigure_foobar.py
 
 init:
   - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
@@ -58,7 +67,6 @@ init:
 test_script:
 
   - 'py -3 -m pytest tests'
-  - tasklist
 
 on_finish:
   - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
