@@ -60,16 +60,15 @@ before_test:
   # See note from install section for why we use an absolute path.
   - C:\Python35\python.exe C:\\projects\\foo-rpc\\ci\\preconfigure_foobar.py
 
-init:
-  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
-
+# TODO: RDP support
+# init:
+#  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+# on_finish:
+#   - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 test_script:
 
   - 'py -3 -m pytest tests'
-
-on_finish:
-  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 on_success:
   - ps: appveyor PushArtifact foo_rpc-$ENV:APPVEYOR_BUILD_VERSION.fb2k-component
