@@ -12,12 +12,20 @@ using namespace std;
 
 class PipeConnection {
 private:
-  OverlappedObject overlapped;
+  OverlappedObject overlapped;  
 
 public:
 
+  PipeConnection(OverlappedObject overlappedObj) : overlapped(overlappedObj) {}
 
-  PipeConnection(OverlappedObject & overlappedObj) : overlapped(overlappedObj) {}
+  PipeConnection(const PipeConnection & other) {
+    overlapped = other.overlapped;
+  }
+
+  PipeConnection& operator=(const PipeConnection & other) {
+    overlapped = other.overlapped;
+    return *this;
+  }
 
   Result<DWORD> send(string bytes, int length) {
     return send_bytes(overlapped.handle, bytes, length);

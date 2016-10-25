@@ -18,32 +18,16 @@ using namespace std;
 
 #define RPC_ADDRESS "\\\\.\\pipe\\foobar2000"
 
-class Thread {
-private:
-  std::thread thr;
-  Event event;
-
-public:
-  Thread(std::thread & thread, Event & eventObj) {
-    thr.swap(thread);
-    event = eventObj;
-  }
-
-  void join() {
-    event.set();
-    thr.join();
-  }
-};
 
 class foobar2000api : public initquit {
 private:
-  vector<Thread> underlying_threads;
+  vector<std::tuple<std::thread, Event>> underlying_threads;
 
   // TODO: need createnewthread API?
   DWORD ThreadID;
   PipeListener listener = PipeListener(RPC_ADDRESS);
 
-  void process_incoming_connection(PipeConnection & connection, Event event) {
+  static void process_incoming_connection(PipeConnection connection, Event event) {
     vector<char> received;
     auto dispatcher = foobar::MethodDispatcher();
 
@@ -86,12 +70,12 @@ public:
     while (true) {
 
       try {
-        PipeConnection & connection = listener.accept();
+        PipeConnection connection = listener.accept();
         Event event;
-        underlying_threads.push_back(Thread(
-          std::thread([&] {
-          process_incoming_connection(connection, event);
-        }), event));
+
+        underlying_threads.push_back(std::make_tuple(
+          std::thread([connection, event] { process_incoming_connection(connection, event); }),
+          event));
       }
       catch (PipeException & e) {
         logToFoobarConsole("Failed connecting to pipe with error %s", e.what());
@@ -110,7 +94,8 @@ public:
   {
     listener.close();
     for (auto &thread : underlying_threads) {
-      thread.join();
+      std::get<1>(thread).set();
+      std::get<0>(thread).join();
     }
   }
 };

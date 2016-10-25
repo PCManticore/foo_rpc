@@ -18,7 +18,22 @@ public:
   DWORD pending;
   DWORD completed;
 
-  OverlappedObject() {};  
+  OverlappedObject() {};
+
+  OverlappedObject(const OverlappedObject & other) {
+    handle = other.handle;
+    overlapped = other.overlapped;
+    pending = other.pending;
+    completed = other.completed;
+  }
+
+  OverlappedObject& operator=(const OverlappedObject & other) {
+    handle = other.handle;
+    overlapped = other.overlapped;
+    pending = other.pending;
+    completed = other.completed;
+    return *this;
+  }
 };
 
 
