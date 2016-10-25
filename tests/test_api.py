@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import itertools
 import os
+import random
 import time
 import tempfile
 
@@ -14,6 +15,7 @@ from fixtures import (
     test_files,
     active_playlist_with_item,
     FoobarRPCError,
+    test_files_with_varying_length,
 )
 
 
@@ -803,3 +805,65 @@ def test_error_path_missing_method(client):
         with pytest.raises(FoobarRPCError) as error:
             meth()
         assert str(error.value) == expected_message
+
+
+def test_insert_items(request, client, created_playlist, test_files):
+    files = [test_file.path for test_file in test_files]
+    client.playlist_insert_items(created_playlist, 0, files, False)
+
+    assert client.playlist_get_item_count(created_playlist) == len(files)
+
+
+def test_activeplaylist_insert_items(request, client, test_files):
+    request.addfinalizer(
+      lambda: client.playlist_remove_items(
+          client.get_active_playlist(),
+          list(range(len(test_files)))))
+
+    files = [test_file.path for test_file in test_files]
+    client.activeplaylist_insert_items(0, files, False)
+
+    assert client.activeplaylist_get_item_count() == len(files)
+
+
+def test_activeplaylist_add_items(request, client, test_files):
+    request.addfinalizer(
+      lambda: client.activeplaylist_remove_items(
+          list(range(len(test_files)))))
+
+    files = [test_file.path for test_file in test_files]
+    client.activeplaylist_add_items(files)
+
+    assert client.activeplaylist_get_item_count() == len(files)
+
+
+def test_activeplaylist_sort_by_format(request, client, test_files_with_varying_length):
+    test_files = test_files_with_varying_length
+    random.shuffle(test_files)
+
+    paths = [test_file.path for test_file in test_files]
+
+    request.addfinalizer(
+      lambda: client.activeplaylist_remove_items(
+          list(range(len(test_files)))))
+    request.addfinalizer(lambda: client.stop())
+
+    client.activeplaylist_add_items(paths)
+    # This is a trick for making foobar2000 recognise the lengths of each track.
+    # Without it, the sorting has no effect.
+    for index in range(len(test_files)):
+        client.next()
+        time.sleep(0.1)
+
+    client.activeplaylist_sort_by_format(b"%length_seconds%", False)
+
+    items = [dict(item) for item in client.activeplaylist_get_all_items()]
+    items_paths = [os.path.basename(item[b'path'].decode()) for item in items]
+
+    expected_paths = [
+        os.path.basename(test_file.path) for test_file
+        in sorted(test_files, key=lambda test_file: test_file.length)
+    ]
+
+    # Now the items should be sorted by length
+    assert expected_paths == items_paths

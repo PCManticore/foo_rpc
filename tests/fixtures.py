@@ -1,6 +1,7 @@
 import inspect
 import multiprocessing.connection
 import os
+import random
 import tempfile
 import types
 
@@ -28,12 +29,12 @@ class TestSoundFile:
         sine_wave = synth.sine_pcm(length=length)
         synth.save_wave(sine_wave, path)
 
-    def __init__(self):
+    def __init__(self, length=20):
         fd, path = tempfile.mkstemp(suffix=".wav")
         os.close(fd)
 
         self.path = path
-        self.length = 20
+        self.length = length
         self._generate_wave_file(self.path, self.length)
 
     def remove(self):
@@ -136,19 +137,19 @@ class APIClient(metaclass=BaseAPIClient):
         params = msgpack.packb([p_playlist, p_item, p_new_item])
         return msgpack.packb(["Playlist.playlist_replace_item", params])
 
-    def activeplaylist_insert_items(self, p_base, data, p_selection): # TODO
+    def activeplaylist_insert_items(self, p_base, data, p_selection):
         params = msgpack.packb([p_base, data, p_selection])
         return msgpack.packb(["Playlist.activeplaylist_insert_items", params])
 
-    def activeplaylist_add_items(data, p_selection): # TODO
-        params = msgpack.packb([data, p_selection])
+    def activeplaylist_add_items(self, data):
+        params = msgpack.packb(data)
         return msgpack.packb(["Playlist.activeplaylist_add_items", params])
 
-    def playlist_add_items(self, playlist, data, p_selection): # TODO
+    def playlist_add_items(self, playlist, data, p_selection):
         params = msgpack.packb([playlist, data, p_selection])
         return msgpack.packb(["Playlist.playlist_add_items", params])
 
-    def playlist_insert_items(self, p_playlist, p_base, data, p_selection): # TODO
+    def playlist_insert_items(self, p_playlist, p_base, data, p_selection):
         params = msgpack.packb([p_playlist, p_base, data, p_selection])
         return msgpack.packb(["Playlist.playlist_insert_items", params])
 
@@ -172,7 +173,7 @@ class APIClient(metaclass=BaseAPIClient):
         params = msgpack.packb([p_playlist, p_index])
         return msgpack.packb(["Playlist.get_playing_item_location", params])
 
-    def activeplaylist_sort_by_format(self, spec, p_sel_only): # TODO  maybe we need selection methods back?
+    def activeplaylist_sort_by_format(self, spec, p_sel_only):
         params = msgpack.packb([spec, p_sel_only])
         return msgpack.packb(["Playlist.activeplaylist_sort_by_format", params])
 
@@ -254,7 +255,7 @@ class APIClient(metaclass=BaseAPIClient):
         params = msgpack.packb([p_name, p_name_length])
         return msgpack.packb(["Playlist.find_or_create_playlist_unlocked", params])
 
-    def playlist_activate_delta(self, p_delta):# TODO
+    def playlist_activate_delta(self, p_delta):
         params = msgpack.packb(p_delta)
         return msgpack.packb(["Playlist.playlist_activate_delta", params])
 
@@ -287,7 +288,7 @@ class APIClient(metaclass=BaseAPIClient):
         params = msgpack.packb([p_playlist, p_mask])
         return msgpack.packb(["Playlist.playlist_get_items", params])
 
-    def playlist_insert_items_filter(self, p_playlist, p_base, p_data, p_select):# TODO
+    def playlist_insert_items_filter(self, p_playlist, p_base, p_data, p_select):
         params = msgpack.packb([p_playlist, p_base, p_data, p_select])
         return msgpack.packb(["Playlist.playlist_insert_items_filter", params])
 
@@ -443,6 +444,15 @@ def created_playlist(request, client):
 @pytest.fixture
 def test_files(request, number_of_files=5):
     files = [TestSoundFile() for _ in range(number_of_files)]
+    request.addfinalizer(lambda: _test_files_finalizer(files))
+
+    return files
+
+
+@pytest.fixture
+def test_files_with_varying_length(request, number_of_files=5):
+    files = [TestSoundFile(length=random.randrange(1, index + 2) * (index + 1))
+             for index in range(number_of_files)]
     request.addfinalizer(lambda: _test_files_finalizer(files))
 
     return files
