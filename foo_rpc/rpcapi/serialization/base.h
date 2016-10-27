@@ -29,6 +29,9 @@ namespace serialization {
     T unpack(std::vector<char> buf) {};
 
     template<typename T>
+    Payload packed(T value) {};
+
+    template<typename T>
     Payload packed(tuple<int, T> value) {};
     
     template<typename T>

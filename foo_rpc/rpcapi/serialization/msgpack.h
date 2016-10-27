@@ -116,13 +116,9 @@ namespace serialization {
       }
     };
 
-    Payload packed(tuple<int, bool> value) {
-      return packed_generic(
-        make_tuple(
-          std::get<0>(value),
-          to_string(std::get<1>(value))
-        )
-      );
+    template<typename T>
+    Payload packed(T result) {
+      return packed_generic(result);
     }
 
     Payload packed(tuple<int, const char*> result) {
