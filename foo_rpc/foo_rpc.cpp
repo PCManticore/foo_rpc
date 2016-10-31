@@ -24,10 +24,11 @@ using namespace std;
 class foobar2000api : public initquit {
 private:
   Event stopCollectorEvent;
+  PipeConnection _dummyConnection;
   std::thread collectorThread;
   std::vector<std::tuple<std::thread, Event>> underlying_threads;
   std::vector<PipeConnection> trackedConnections;
-  thread_util::Queue<std::tuple<PipeConnection, bool>> connectionsQueue;
+  thread_util::Queue<PipeConnection> connectionsQueue;
 
 
   // TODO: need createnewthread API?
@@ -72,12 +73,18 @@ private:
   }
 
   static void close_tracked_connections(Event stopEvent,
-                                        thread_util::Queue<std::tuple<PipeConnection, bool>> * queue) {
-    bool is_last;
+                                        thread_util::Queue<PipeConnection> * queue,
+                                        void * param) {
     PipeConnection conn;
+    foobar2000api * thisobj = (foobar2000api*)param;
 
     while (!stopEvent.isReady()) {
-      std::tie(conn, is_last) = queue->pop();
+      conn = queue->pop();
+      if (conn == thisobj->_dummyConnection) {
+        conn.close();
+        return;
+      }
+
       conn.close();
     }
   }
@@ -111,7 +118,8 @@ public:
     collectorThread = std::thread(
       close_tracked_connections,
       stopCollectorEvent,
-      &connectionsQueue);
+      &connectionsQueue,
+      (void*)this);
   }
 
   void on_quit()
@@ -119,12 +127,11 @@ public:
     listener.close();
 
     // Track the non-closed connections for closing them up.
-    for (auto iter = trackedConnections.begin(); iter != trackedConnections.end(); ++iter) {
-      bool is_last = std::next(iter) == trackedConnections.end();
-      if (!iter->is_closed()) {
-        connectionsQueue.push(std::make_tuple((*iter), is_last));
-      }
-    }
+    std::for_each(
+      trackedConnections.begin(),
+      trackedConnections.end(),
+      [&](PipeConnection conn) { connectionsQueue.push(conn); });
+    connectionsQueue.push(_dummyConnection);
 
     /// Notify the collector thread to close after finishing processing
     // the non-closed connections.

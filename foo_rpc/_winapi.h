@@ -34,6 +34,11 @@ public:
     completed = other.completed;
     return *this;
   }
+
+  bool operator==(const OverlappedObject & other) {
+    // Assume the handle is enough.
+    return handle == other.handle;
+  }
 };
 
 

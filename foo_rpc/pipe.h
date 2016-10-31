@@ -32,6 +32,10 @@ public:
     return *this;
   }
 
+  bool operator==(const PipeConnection & other) {
+    return overlapped == other.overlapped;
+  }
+
   bool is_closed() {
     return closingEvent.isReady();
   }
