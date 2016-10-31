@@ -264,3 +264,48 @@ Result<tuple<DWORD, DWORD>> recv_bytes(HANDLE handle, char * readBuffer, int siz
   }
   return Result<tuple<DWORD, DWORD>>::withError(lastError);
 }
+
+std::experimental::optional<HANDLE> connect_client_to_pipe(
+  std::string pipe, DWORD connection_delay) {
+
+  std::experimental::optional<HANDLE> dummyHandle;
+  auto handle = CreateFile(
+    std::wstring(pipe.begin(), pipe.end()).c_str(),
+    GENERIC_READ | GENERIC_WRITE,
+    0,
+    NULL,
+    OPEN_EXISTING,
+    0,
+    NULL);
+
+  if (handle == INVALID_HANDLE_VALUE) {
+    if (GetLastError() != ERROR_PIPE_BUSY) {
+      logToFoobarConsole(
+        "Could not open pipe, failed with error: %d", GetLastError()
+      );
+      return dummyHandle;
+    }
+
+    if (!WaitNamedPipe(std::wstring(pipe.begin(), pipe.end()).c_str(), connection_delay)) {
+      logToFoobarConsole("Cannot connect to pipe, it seems busy");
+      return dummyHandle;
+    }
+  }
+
+  DWORD dwMode = PIPE_READMODE_MESSAGE;
+  BOOL success = SetNamedPipeHandleState(
+    handle,    // pipe handle
+    &dwMode,  // new pipe mode
+    NULL,     // don't set maximum bytes
+    NULL);    // don't set maximum time
+  if (!success)
+  {
+    logToFoobarConsole(
+      "Cannot change the mode of the pipe, "
+      "failing with error %s",
+      GetLastError());
+    return dummyHandle;
+  }
+
+  return std::experimental::optional<HANDLE>(handle);
+}

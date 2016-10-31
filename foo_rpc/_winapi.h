@@ -5,6 +5,7 @@
 #include <windows.h>
 
 #include "result.h"
+#include "optional.hpp"
 
 using namespace std;
 
@@ -50,3 +51,4 @@ Result<tuple<DWORD, DWORD>> recv_bytes(HANDLE handle, char * readBuffer, int siz
 Result<OverlappedObject> connect_pipe(HANDLE handle);
 Result<DWORD> get_overlapped_result(OverlappedObject & overlapped);
 Result<tuple<DWORD, vector<char>>> get_more_data(HANDLE handle);
+std::experimental::optional<HANDLE> connect_client_to_pipe(std::string pipe, DWORD connection_delay);

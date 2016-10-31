@@ -24,8 +24,10 @@ using namespace std;
 class foobar2000api : public initquit {
 private:
   Event stopCollectorEvent;
-  PipeConnection _dummyConnection;
+  Event stopNamedPipeThreadEvent;
+  std::thread namedPipeThread;
   std::thread collectorThread;
+  PipeConnection _dummyConnection;
   std::vector<std::tuple<std::thread, Event>> underlying_threads;
   std::vector<PipeConnection> trackedConnections;
   thread_util::Queue<PipeConnection> connectionsQueue;
@@ -66,10 +68,9 @@ private:
 
   }
 
-  static DWORD WINAPI named_pipe_thread(void* Param) {
-    foobar2000api* This = (foobar2000api*)Param;
+  static void listen(void * param) {
+    foobar2000api* This = (foobar2000api*)param;
     This->listen_commands();
-    return 0;
   }
 
   static void close_tracked_connections(Event stopEvent,
@@ -93,7 +94,7 @@ public:
 
   void listen_commands() {
 
-    while (true) {
+    while (!stopNamedPipeThreadEvent.isReady()) {
 
       try {
         PipeConnection connection = listener.accept();
@@ -114,7 +115,9 @@ public:
   void on_init()
   {
     // Start the named pipe server
-    CreateThread(NULL, 0, named_pipe_thread, (void*) this, 0, &ThreadID);
+    namedPipeThread = std::thread(
+      listen, (void*)this
+    );
     collectorThread = std::thread(
       close_tracked_connections,
       stopCollectorEvent,
@@ -124,7 +127,27 @@ public:
 
   void on_quit()
   {
+
+    /*
+    The order of the operations in this function is extremely important,
+    changing it could result in the component not closing, while waiting
+    for its spawned threads to be closed.
+
+    The operations we are doing in order to ensure a safe stop are:
+    - mark the named pipe thread to stop, by activatings its event
+    - connect to the underlying address as a final client, in order
+      to force the accept() method to return.
+    - close the actual named pipe thread.
+    - push the non-closed connections to the collecting thread, so that
+      they will be closed.
+    - wait for the spawned threads to be stopped.
+    */
     listener.close();
+    stopNamedPipeThreadEvent.set();
+
+    auto clientHandle = connect_client_to_pipe(std::string(RPC_ADDRESS), 200);
+    if (clientHandle) CloseHandle((*clientHandle));
+    namedPipeThread.join();
 
     // Track the non-closed connections for closing them up.
     std::for_each(
@@ -142,6 +165,7 @@ public:
       std::get<1>(thread).set();
       std::get<0>(thread).join();
     }
+
 
   }
 };
