@@ -8,6 +8,13 @@ private:
 public:
   Event() {}
 
+  Event(const Event& other) : event(other.event) {}
+
+  Event& operator=(const Event& other) {
+    event = other.event;
+    return *this;
+  }
+
   void set() { SetEvent(event); }
 
   bool isReady() {

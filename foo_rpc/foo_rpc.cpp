@@ -1,6 +1,7 @@
-#include <condition_variable>
-#include <string>
+#include <algorithm>
+#include <iterator>
 #include <deque>
+#include <string>
 #include <thread>
 
 #include "local_exceptions.h"
@@ -11,6 +12,7 @@
 #include "_winapi.h"
 #include "stdafx.h"
 
+#include "safequeue.h"
 #include "rpcapi/dispatch.h"
 #include "rpcapi/serialization/base.h"
 
@@ -21,7 +23,12 @@ using namespace std;
 
 class foobar2000api : public initquit {
 private:
-  vector<std::tuple<std::thread, Event>> underlying_threads;
+  Event stopCollectorEvent;
+  std::thread collectorThread;
+  std::vector<std::tuple<std::thread, Event>> underlying_threads;
+  std::vector<PipeConnection> trackedConnections;
+  thread_util::Queue<std::tuple<PipeConnection, bool>> connectionsQueue;
+
 
   // TODO: need createnewthread API?
   DWORD ThreadID;
@@ -36,6 +43,7 @@ private:
 
       if (result.isFailed()) {
         logToFoobarConsole("Failed receiving data from pipe %d", result.error());
+        int is_closed = connection.is_closed();
         connection.close();
         break;
       }
@@ -63,6 +71,17 @@ private:
     return 0;
   }
 
+  static void close_tracked_connections(Event stopEvent,
+                                        thread_util::Queue<std::tuple<PipeConnection, bool>> * queue) {
+    bool is_last;
+    PipeConnection conn;
+
+    while (!stopEvent.isReady()) {
+      std::tie(conn, is_last) = queue->pop();
+      conn.close();
+    }
+  }
+
 public:
 
   void listen_commands() {
@@ -76,6 +95,7 @@ public:
         underlying_threads.push_back(std::make_tuple(
           std::thread([connection, event] { process_incoming_connection(connection, event); }),
           event));
+        trackedConnections.push_back(connection);
       }
       catch (PipeException & e) {
         logToFoobarConsole("Failed connecting to pipe with error %s", e.what());
@@ -88,15 +108,34 @@ public:
   {
     // Start the named pipe server
     CreateThread(NULL, 0, named_pipe_thread, (void*) this, 0, &ThreadID);
+    collectorThread = std::thread(
+      close_tracked_connections,
+      stopCollectorEvent,
+      &connectionsQueue);
   }
 
   void on_quit()
   {
     listener.close();
+
+    // Track the non-closed connections for closing them up.
+    for (auto iter = trackedConnections.begin(); iter != trackedConnections.end(); ++iter) {
+      bool is_last = std::next(iter) == trackedConnections.end();
+      if (!iter->is_closed()) {
+        connectionsQueue.push(std::make_tuple((*iter), is_last));
+      }
+    }
+
+    /// Notify the collector thread to close after finishing processing
+    // the non-closed connections.
+    stopCollectorEvent.set();
+    collectorThread.join();
+
     for (auto &thread : underlying_threads) {
       std::get<1>(thread).set();
       std::get<0>(thread).join();
     }
+
   }
 };
 

@@ -2,6 +2,7 @@
 #include <deque>
 #include <string>
 
+#include "event.h"
 #include "logging.h"
 #include "_winapi.h"
 
@@ -12,19 +13,27 @@ using namespace std;
 
 class PipeConnection {
 private:
-  OverlappedObject overlapped;  
+  OverlappedObject overlapped;
+  Event closingEvent;
 
 public:
 
+  PipeConnection() { }
   PipeConnection(OverlappedObject overlappedObj) : overlapped(overlappedObj) {}
 
   PipeConnection(const PipeConnection & other) {
     overlapped = other.overlapped;
+    closingEvent = other.closingEvent;
   }
 
   PipeConnection& operator=(const PipeConnection & other) {
     overlapped = other.overlapped;
+    closingEvent = other.closingEvent;
     return *this;
+  }
+
+  bool is_closed() {
+    return closingEvent.isReady();
   }
 
   Result<DWORD> send(string bytes, int length) {
@@ -63,6 +72,11 @@ public:
   }
 
   void close() {
+    if (is_closed())
+      return;
+
+    closingEvent.set();
+
     DWORD bytes;
 
     int err = GetLastError();

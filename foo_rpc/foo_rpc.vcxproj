@@ -133,6 +133,7 @@
     <ClInclude Include="rpcapi\rpc\playlist_loader.h" />
     <ClInclude Include="rpcapi\serialization\base.h" />
     <ClInclude Include="rpcapi\serialization\msgpack.h" />
+    <ClInclude Include="safequeue.h" />
     <ClInclude Include="_winapi.h" />
   </ItemGroup>
   <ItemGroup>
