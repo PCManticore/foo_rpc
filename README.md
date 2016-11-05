@@ -5,9 +5,10 @@ foo_rpc
 [![Download](https://api.bintray.com/packages/pcmanticore/foo_rpc/foo_rpc/images/download.svg)](https://bintray.com/pcmanticore/foo_rpc/foo_rpc/_latestVersion)
 [![Documentation Status](https://readthedocs.org/projects/foo-rpc/badge/?version=latest)](http://foo-rpc.readthedocs.io/en/latest/?badge=latest)
 
-Automate foobar2000 audio player through a RPC interface.
-
-Pretty much work in progress.
+This project is a [foobar2000](http://www.foobar2000.org/) component,
+which exposes a RPC interface for a part of foobar2000's internal API.
+This is similar in nature to [foo_com_automation](http://foosion.foobar2000.org/0.9/#comserver),
+although based on different technologies.
 
 
 Building
